@@ -96,7 +96,7 @@ You should bring you own implementation of the MethodCheckerForLink interface an
 ### Determine if a field should be included in the schema
 You should bring you own implementation of the FieldCheckerForSchema interface and bind it with your own factory. A common use case is included in the package. There, you do the filtering with jackson's JsonView annotation. In the future, we plan to do the filtering based on the roles of a user. This feature depends on https://java.net/jira/browse/JERSEY-2998.
 
-### Do the mapping of a field by your own
+### Mapping of a field
 Provide a IndividualSchemaGenerator with the PropertySchema annotation at the desired field.
 
 # Creating your own relations
