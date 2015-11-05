@@ -1,6 +1,6 @@
 # rest-schemagen
-Jersey add-on for dynamic link and schema building
-This add-on is for building HATEOAS - conform responses with your jersey-driven REST - api. Creating and managing your links and schemas of your REST-API becomes as easy as making a method call.
+Jersey add-on for dynamic link and schema building.
+This add-on is for building HATEOAS-conform responses with your jersey REST-API. Creating and managing your links and schemas of your REST-API becomes as easy as making a method call.
 
 It also works for reverse proxies (like jetty behind apache/ngix)
 
@@ -10,7 +10,7 @@ In your jersey configuration simply type:
 ```java
 LinkFactoryResourceConfig.configure(rs); 
 ```
-Where rs is your jersey application ResourceConfig. Please choose Jackson as your JSON provider
+Where "rs" is your jersey application ResourceConfig. Please choose Jackson as your JSON provider
 
 In your resources you simply type:
 ```java
@@ -42,7 +42,7 @@ Optional<Link> link = linkMetaFactory
     .subResource(p -> p.getSubResourceInResource()), SubResourceClass.class)
     .forCall(Rel.SELF, r -> r.getSomething(id));
 ```
-Note, that all calls have properly typed return values. So you have code completion, call hierarchy and all other feature you are used to have in your IDE.
+Note, that all calls have properly typed return values. So you get code completion, call hierarchy and all other features you are used to have in your IDE.
 
 Responses will look like this:
 ```json
@@ -90,14 +90,14 @@ The context and the parameter, which is build by context.builderFor() are still 
 # Plugins
 There are three possibilities to customize the way the schema generation works. All of them are located in the plugin package.
 
-### Determine if a link should be made out of a method
-You should bring you own implementation of the MethodCheckerForLink interface and bind it with your own factory. A common use case would be if you want to check security roles. This use case is in the included in the package.
+### Determine if a link should be made from a method
+You should bring you own implementation of the MethodCheckerForLink interface and bind it with your own factory. A common use-case would be if you want to check security roles. The implementation can be found in the plugin package.
 
 ### Determine if a field should be included in the schema
-You should bring you own implementation of the FieldCheckerForSchema interface and bind it with your own factory. A common use case is included in the package. There, you do the filtering with jackson's JsonView annotation. In the future, we plan to do the filtering based on the roles of a user. This feature depends on https://java.net/jira/browse/JERSEY-2998.
+You should bring you own implementation of the FieldCheckerForSchema interface and bind it with your own factory. A common use-case is included in the package. There, you do the filtering with jackson's JsonView annotation. In the future, we plan to do the filtering based on the roles of a user. This feature depends on https://java.net/jira/browse/JERSEY-2998.
 
 ### Mapping of a field
-Provide a IndividualSchemaGenerator with the PropertySchema annotation at the desired field.
+Provide an IndividualSchemaGenerator with the PropertySchema annotation at the desired field.
 
 # Creating your own relations
 If you need your own relations you can do the following:
