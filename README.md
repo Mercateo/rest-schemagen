@@ -42,7 +42,7 @@ Optional<Link> link = linkMetaFactory
     .subResource(p -> p.getSubResourceInResource()), SubResourceClass.class)
     .forCall(Rel.SELF, r -> r.getSomething(id));
 ```
-Note, that all calls have properly eyped return values, so you have code completion, call hierarchy and all other feature you are used to have in your IDE.
+Note, that all calls have properly typed return values. So you have code completion, call hierarchy and all other feature you are used to have in your IDE.
 
 Responses will look like this:
 ```json
@@ -65,14 +65,36 @@ Responses will look like this:
     }
 }
 ```
+# Allowed and default values
+There is a way to manipulate allowed and default values. The central class is CallContext. With CallContext you can also bring custom values to your plugins (see next section). The following sample shows how to bring dynamic computed default/allowed values to an address (based e.g. on the country the current user comes from).
+
+```java
+Optional<Link> link = Optional.empty();
+ 
+final Parameter.Context context = Parameter.createContext();
+ 
+final Parameter.Builder<AddressJson> addressJsonBuilder = context.builderFor(AddressJson.class) //
+        .allowValues(getAllowedAddressTypes());
+ 
+if (!addressJsonBuilder.isEmpty()) {
+    final Parameter<AddressJson> addressJson = addressJsonBuilder //
+            .allowValues(getAvailableContryCodes())
+            .defaultValue(getDefaultAddressValue()).build();
+ 
+    link = linkFactoryForAddressResource.forCall(Rel.CREATE, r -> r.createAddress(addressJson.get()),
+            context);
+}
+```
+The context and the parameter, which is build by context.builderFor() are still connected.
+
 # Plugins
-There are three possibilities to customize the way the schema generation works. All of them are located in the plugin package
+There are three possibilities to customize the way the schema generation works. All of them are located in the plugin package.
 
 ## Determine if a link should be made out of a method
-You should bring you own implementation of the MethodCheckerForLink interface and bind it with your own factory. A common use case would be if you want to check securoty roles. This usecase is in the included in the package.
+You should bring you own implementation of the MethodCheckerForLink interface and bind it with your own factory. A common use case would be if you want to check security roles. This use case is in the included in the package.
 
 ## Determine if a field should be included in the schema
-You should bring you own implementation of the FieldCheckerForSchema interface and bind it with your own factory. A common use case is included in the package. There you do the filtering with jackson's JsonView annotation. In the future, we plan to do the filtering based on the roles of a user. This feature depends on https://java.net/jira/browse/JERSEY-2998.
+You should bring you own implementation of the FieldCheckerForSchema interface and bind it with your own factory. A common use case is included in the package. There, you do the filtering with jackson's JsonView annotation. In the future, we plan to do the filtering based on the roles of a user. This feature depends on https://java.net/jira/browse/JERSEY-2998.
 
 ## Do the mapping of a field by your own
 Provide a IndividualSchemaGenerator with the PropertySchema annotation at the desired field.
