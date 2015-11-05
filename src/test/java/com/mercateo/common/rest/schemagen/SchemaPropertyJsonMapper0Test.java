@@ -1,6 +1,5 @@
 package com.mercateo.common.rest.schemagen;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
 
 import java.lang.reflect.Type;
 import java.net.URL;
@@ -12,6 +11,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mercateo.common.rest.schemagen.generator.ObjectContext;
 import com.mercateo.common.rest.schemagen.generictype.GenericType;
 import com.mercateo.common.rest.schemagen.parameter.CallContext;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class SchemaPropertyJsonMapper0Test {
 

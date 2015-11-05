@@ -1,12 +1,9 @@
 package com.mercateo.common.rest.schemagen.link;
 
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.hasEntry;
-import static org.hamcrest.Matchers.is;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
@@ -175,10 +172,10 @@ public class LinkFactory0Test {
 
         final Link link = linkOption.get();
 
-        assertThat(link.getUri().getPath(), is(
-                "basePath/parentResource/subresource/sub/submethod/14"));
-        assertThat(link.getParams().size(), is(2));
-        assertThat(link.getParams(), allOf(hasEntry("rel", "self"), hasEntry("method", "GET")));
+        assertThat(link.getUri().getPath()).isEqualTo(
+                "basePath/parentResource/subresource/sub/submethod/14");
+        assertThat(link.getParams()).hasSize(2);
+        assertThat(link.getParams()).containsEntry("rel", "self").containsEntry("method", "GET");
     }
 
     private void allowRole(String test) {

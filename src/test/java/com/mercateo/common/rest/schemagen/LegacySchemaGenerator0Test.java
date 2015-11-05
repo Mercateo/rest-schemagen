@@ -1,9 +1,9 @@
 package com.mercateo.common.rest.schemagen;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.StrictAssertions.assertThat;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
 
@@ -145,8 +145,10 @@ public class LegacySchemaGenerator0Test {
     @Test
     public void shouldProduceCorrectJson() throws IOException, JSONException {
         createSchemaFor(TestRto.class);
-        JSONObject target = new JSONObject(CharStreams.toString(new InputStreamReader(getClass()
-                .getResourceAsStream("SchemaGeneratorOutputTestFile.json"), "UTF-8")));
+        final InputStream resourceAsStream = getClass()
+                .getResourceAsStream("/SchemaGeneratorOutputTestFile.json");
+        final InputStreamReader inputStreamReader = new InputStreamReader(resourceAsStream, "UTF-8");
+        JSONObject target = new JSONObject(CharStreams.toString(inputStreamReader));
         JSONObject actual = new JSONObject(new PropertyJsonSchemaMapper().toJson(schema)
                 .toString());
         assertThat(actual.toString(2)).isEqualTo(target.toString(2));
