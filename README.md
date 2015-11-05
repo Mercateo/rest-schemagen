@@ -1,4 +1,8 @@
 # rest-schemagen
+[![Build Status](https://travis-ci.org/Mercateo/rest-schemagen.svg?branch=travis_ci)](https://travis-ci.org/Mercateo/rest-schemagen)
+[![Coverage Status](https://coveralls.io/repos/Mercateo/rest-schemagen/badge.svg?branch=master&service=github)](https://coveralls.io/github/Mercateo/rest-schemagen?branch=master)
+
+
 Jersey add-on for dynamic link and schema building.
 This add-on is for building HATEOAS-conform responses with your jersey REST-API. Creating and managing your links and schemas of your REST-API becomes as easy as making a method call.
 
