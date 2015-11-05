@@ -1,0 +1,57 @@
+{
+  "properties": {
+    "anEnum": {
+      "enum": [
+        "VALUE_1",
+        "VALUE_2"
+      ],
+      "type": "string"
+    },
+    "bigDecimal": {
+      "properties": {
+        "precision": {"type": "integer"},
+        "scale": {"type": "integer"}
+      },
+      "required": [
+        "scale",
+        "precision"
+      ],
+      "type": "object"
+    },
+    "bool": {
+      "default": false,
+      "type": "boolean"
+    },
+    "boxedBool": {
+      "default": false,
+      "type": "boolean"
+    },
+    "constrainedString": {
+      "maxLength": 8,
+      "minLength": 5,
+      "type": "string"
+    },
+    "hasOwnGenerator": {"type": "test"},
+    "integer": {"type": "integer"},
+    "nestedRecursiveElement": {
+      "id": "#/nestedRecursiveElement",
+      "properties": {
+        "nextThing": {"$ref": "#/nestedRecursiveElement"},
+        "thisThing": {"type": "string"}
+      },
+      "type": "object"
+    },
+    "recursiveElement": {"$ref": "#"},
+    "requiredString": {"type": "string"},
+    "string": {"type": "string"},
+    "twoDimStringArray": {
+      "items": {
+        "items": {"type": "string"},
+        "type": "array"
+      },
+      "type": "array"
+    }
+  },
+  "required": ["requiredString"],
+  "type": "object"
+}
