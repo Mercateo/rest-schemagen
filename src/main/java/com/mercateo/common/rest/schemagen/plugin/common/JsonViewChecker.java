@@ -3,6 +3,7 @@ package com.mercateo.common.rest.schemagen.plugin.common;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
@@ -20,7 +21,7 @@ public class JsonViewChecker implements FieldCheckerForSchema {
         if (jsonView != null) {
             @SuppressWarnings("rawtypes")
             Optional<Set<Class>> viewClasses = context.getAddionalObjectsFor(Class.class);
-            return !viewClasses.isPresent() || viewClasses.get().contains(jsonView);
+            return !viewClasses.isPresent() || Arrays.stream(jsonView.value()).anyMatch(c->viewClasses.get().contains(c));
         }
         return true;
     }

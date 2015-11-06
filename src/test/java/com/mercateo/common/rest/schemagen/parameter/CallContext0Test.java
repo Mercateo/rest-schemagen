@@ -19,6 +19,7 @@ public class CallContext0Test {
         assertThat(context.getAddionalObjectsFor(Class.class).isPresent()).isFalse();
 
         context.addAddionalObjects(Class.class, getClass());
+        context.addAddionalObjects(Class.class, getClass());
 
         assertThat(context.getAddionalObjectsFor(Class.class).get()).isNotEmpty();
     }
