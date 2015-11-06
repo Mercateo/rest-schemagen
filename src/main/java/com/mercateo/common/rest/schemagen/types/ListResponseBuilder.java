@@ -11,6 +11,13 @@ public class ListResponseBuilder<ElementIn, ElementOut> extends
         ResponseBuilderAbstract<ListResponseBuilder<ElementIn, ElementOut>, ElementIn, ElementOut, ListResponse<ElementOut>> {
     private List<ElementIn> list;
 
+    /**
+     * @deprecated please use {@link ListResponse#builder()} instead
+     */
+    @Deprecated
+    public ListResponseBuilder() {
+    }
+
     @Override
     public ListResponse<ElementOut> build() {
         requireNonNull(list);

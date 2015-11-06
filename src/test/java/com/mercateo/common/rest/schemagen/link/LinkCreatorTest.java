@@ -23,7 +23,7 @@ import com.mercateo.common.rest.schemagen.Something;
 import com.mercateo.common.rest.schemagen.link.relation.Rel;
 import com.mercateo.common.rest.schemagen.link.relation.Relation;
 
-public class LinkCreator0Test {
+public class LinkCreatorTest {
 
     private final String testSchema = "test";
 

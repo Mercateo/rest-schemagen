@@ -26,7 +26,7 @@ import com.mercateo.common.rest.schemagen.types.ListResponse;
 import com.mercateo.common.rest.schemagen.types.ObjectWithSchema;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SchemaPropertyGenerator0Test {
+public class SchemaPropertyGeneratorTest {
 
     private SchemaPropertyGenerator schemaGenerator;
 
@@ -479,7 +479,7 @@ public class SchemaPropertyGenerator0Test {
     public void testUnwrappedObjectWithDependencyLoopShouldThrow() {
         assertThatThrownBy(() -> generateSchemaProperty(UnwrappedObject.class)) //
                 .isInstanceOf(IllegalStateException.class) //
-                .hasMessageStartingWith("recursion detected while unwrapping field <object> in <com.mercateo.common.rest.schemagen.SchemaPropertyGenerator0Test$UnwrappedObject>");
+                .hasMessageStartingWith("recursion detected while unwrapping field <object> in <com.mercateo.common.rest.schemagen.SchemaPropertyGeneratorTest$UnwrappedObject>");
     }
 
     @Test

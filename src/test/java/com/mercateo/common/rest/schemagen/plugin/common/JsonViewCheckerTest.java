@@ -11,7 +11,7 @@ import com.google.common.collect.Sets;
 import com.mercateo.common.rest.schemagen.parameter.CallContext;
 
 
-public class JsonViewChecker0Test {
+public class JsonViewCheckerTest {
 
 	public static class TestBean{
 		@JsonView({Class.class, TestBean.class})

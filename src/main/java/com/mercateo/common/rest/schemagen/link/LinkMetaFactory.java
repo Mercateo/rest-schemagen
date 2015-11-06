@@ -52,4 +52,7 @@ public class LinkMetaFactory {
         return new LinkFactory<>(resourceClass, linkFactoryContext, new ArrayList<>());
     }
 
+    public LinkFactoryContext getFactoryContext() {
+        return linkFactoryContext;
+    }
 }

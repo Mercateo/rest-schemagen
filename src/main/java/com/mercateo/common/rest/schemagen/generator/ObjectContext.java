@@ -28,6 +28,7 @@ import com.mercateo.common.rest.schemagen.SchemaPropertyContext;
 import com.mercateo.common.rest.schemagen.SizeConstraints;
 import com.mercateo.common.rest.schemagen.generictype.GenericClass;
 import com.mercateo.common.rest.schemagen.generictype.GenericType;
+import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 import com.mercateo.common.rest.schemagen.plugin.IndividualSchemaGenerator;
 import com.mercateo.common.rest.schemagen.plugin.PropertySchema;
 import com.mercateo.common.rest.schemagen.types.ObjectWithSchema;

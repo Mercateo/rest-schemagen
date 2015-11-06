@@ -7,6 +7,6 @@ import java.util.Set;
 public enum PropertyType {
     OBJECT, STRING, BOOLEAN, INTEGER, FLOAT, ARRAY;
 
-    public static final Set<PropertyType> PRIMITIVE_TYPES = new HashSet<>(Arrays.asList(STRING,
+    static final Set<PropertyType> PRIMITIVE_TYPES = new HashSet<>(Arrays.asList(STRING,
             BOOLEAN, INTEGER, FLOAT));
 }

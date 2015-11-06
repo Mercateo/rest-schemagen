@@ -7,7 +7,7 @@ import java.lang.reflect.Method;
 
 import org.junit.Test;
 
-public class ProxyFactory0Test {
+public class ProxyFactoryTest {
 
     public static class A {
         public int primitiveReturn() {

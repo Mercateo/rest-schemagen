@@ -1,6 +1,7 @@
 package com.mercateo.common.rest.schemagen.validation;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public class ValidationErrors {
         public Builder addError(ValidationErrorCode code, String path) {
             HashMap<MessageKey, String> entries = new HashMap<>();
             entries.put(MessageKey.path, path);
-            validationErrors.add(new ValidationError(code, entries));
+            addError(new ValidationError(code, entries));
             return this;
         }
 
@@ -45,7 +46,7 @@ public class ValidationErrors {
         public final ValidationError[] validationErrors;
 
         public Data(ValidationError[] validationErrors) {
-            this.validationErrors = validationErrors;
+            this.validationErrors = Arrays.copyOf(validationErrors, validationErrors.length);
         }
     }
 

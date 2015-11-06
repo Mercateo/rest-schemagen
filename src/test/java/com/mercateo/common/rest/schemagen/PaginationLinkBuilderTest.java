@@ -15,7 +15,7 @@ import com.mercateo.common.rest.schemagen.link.relation.Relation;
 import com.mercateo.common.rest.schemagen.link.relation.RelationContainer;
 
 @SuppressWarnings("unused")
-public class PaginationLinkBuilder0Test {
+public class PaginationLinkBuilderTest {
 
     private static final int LIMIT = 5;
 

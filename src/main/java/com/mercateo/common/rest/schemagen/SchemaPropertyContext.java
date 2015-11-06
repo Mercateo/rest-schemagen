@@ -19,13 +19,8 @@ public class SchemaPropertyContext {
         this.fieldCheckerForSchema = checkNotNull(fieldCheckerForSchema);
     }
 
-    public CallContext getCallContext() {
-        return callContext;
-    }
-
     public boolean isFieldApplicable(Field field) {
         checkNotNull(field);
         return fieldCheckerForSchema.test(field, callContext);
     }
-
 }

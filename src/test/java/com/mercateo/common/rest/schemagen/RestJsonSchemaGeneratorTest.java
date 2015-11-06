@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings({ "boxing", "unused" })
 @RunWith(MockitoJUnitRunner.class)
-public class RestJsonSchemaGenerator0Test {
+public class RestJsonSchemaGeneratorTest {
 
     private RestJsonSchemaGenerator schemaGenerator;
 

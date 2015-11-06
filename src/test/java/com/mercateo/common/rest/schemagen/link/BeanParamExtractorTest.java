@@ -17,7 +17,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-public class BeanParamExtractor0Test {
+public class BeanParamExtractorTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
