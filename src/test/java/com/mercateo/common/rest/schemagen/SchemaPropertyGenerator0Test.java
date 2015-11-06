@@ -471,7 +471,7 @@ public class SchemaPropertyGenerator0Test {
     public void testInheritedObjectWithCollidingFieldNames() {
         assertThatThrownBy(() -> generateSchemaProperty(InheritedObject.class)) //
                 .isInstanceOf(IllegalStateException.class) //
-                .hasMessage("field name <name> collision in class SuperObject");
+                .hasMessageStartingWith("field name <name> collision in class");
     }
 
     @Test

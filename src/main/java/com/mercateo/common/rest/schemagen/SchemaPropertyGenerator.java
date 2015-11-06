@@ -5,24 +5,29 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.collect.ImmutableMap;
 import com.mercateo.common.rest.schemagen.generator.ObjectContext;
 import com.mercateo.common.rest.schemagen.generator.PathContext;
-import com.mercateo.common.rest.schemagen.generictype.GenericType;
 
 public class SchemaPropertyGenerator {
 
-    private static final Map<Class<?>, PropertyBuilder> builtins = ImmutableMap.of(BigDecimal.class,
-            Property.builderFor(BigDecimal.class).withChildren( //
-                    Property.builderFor(Integer.class).withName("scale").setRequired().build(), //
-                    Property.builderFor(Integer.class).withName("precision").setRequired().build()), //
-            Date.class, Property.builderFor(Integer.class).setRequired());
+    private static final Map<Class<?>, PropertyBuilder> builtins = ImmutableMap
+            .of(BigDecimal.class,
+                    Property.builderFor(BigDecimal.class).withChildren(
+                            //
+                            Property.builderFor(Integer.class).withName("scale").setRequired()
+                                    .build(), //
+                            Property.builderFor(Integer.class).withName("precision").setRequired()
+                                    .build()), //
+                    Date.class, Property.builderFor(Integer.class).setRequired());
 
     /**
      * Generate and return a property hierarchy for the object defined by the
@@ -54,26 +59,14 @@ public class SchemaPropertyGenerator {
     public Property generateSchemaProperty(ObjectContext<?> objectContext,
             SchemaPropertyContext context) {
         final Property property = determineProperty("#", objectContext, new PathContext(), context);
-        enableIdsOfReferencedElements(property);
-        return Property.builderFor(objectContext).withProperty(property).withName(objectContext
-                .getRawType().getSimpleName()).build();
+        addIdsToReferencedElements(property, new HashMap<>());
+        return Property.builderFor(objectContext).withProperty(property).withName(
+                objectContext.getRawType().getSimpleName()).build();
     }
 
-    private void enableIdsOfReferencedElements(Property property) {
-        final HashMap<String, Property> pathMap = new HashMap<>();
-        collectIdsOfReferencedElements(property, pathMap);
-        enableIdsOfReferencedElements(property, pathMap);
-    }
-
-    private void collectIdsOfReferencedElements(final Property property, final Map<String, Property> pathMap) {
+    private void addIdsToReferencedElements(Property property, Map<String, Property> pathMap) {
         pathMap.put(property.getPath(), property);
 
-        for (Property childProperty : property.getProperties()) {
-            collectIdsOfReferencedElements(childProperty, pathMap);
-        }
-    }
-
-    private void enableIdsOfReferencedElements(final Property property, final Map<String, Property> pathMap) {
         if (property.getRef() != null) {
             final Property referencedProperty = pathMap.get(property.getRef());
             if (referencedProperty == null) {
@@ -84,60 +77,71 @@ public class SchemaPropertyGenerator {
         }
 
         for (Property childProperty : property.getProperties()) {
-            enableIdsOfReferencedElements(childProperty, pathMap);
+            addIdsToReferencedElements(childProperty, pathMap);
         }
     }
 
-    private List<Property> getProperties(ObjectContext<?> objectContext, PathContext pathContext,
+    private List<Property> getProperties(final ObjectContext<?> objectContext,
+            final PathContext pathContext, final SchemaPropertyContext context) {
+
+        final Map<Field, ObjectContext> fieldContextMap = getFieldContextMap(objectContext, context);
+
+        final Set<String> fieldNames = new HashSet<>();
+        final Stream<Field> sortedFields = fieldContextMap.keySet().stream().sorted(this::byName);
+
+        return sortedFields.map(
+                field -> {
+                    String name = field.getName();
+
+                    if (!fieldNames.contains(name)) {
+                        fieldNames.add(name);
+                    } else {
+                        throw new IllegalStateException("field name <" + name + "> collision in class "
+                                + objectContext.getRawType().getSimpleName());
+                    }
+                    return determineProperty(field.getName(), fieldContextMap.get(field).forField(
+                            field), pathContext, context);
+                }).collect(Collectors.toList());
+    }
+
+    private Map<Field, ObjectContext> getFieldContextMap(ObjectContext objectContext,
             SchemaPropertyContext context) {
-        Map<String, Property> propertiesByName = new TreeMap<>();
+        return getFieldContextMap(objectContext, new HashMap<>(), context);
+    }
+
+    private Map<Field, ObjectContext> getFieldContextMap(ObjectContext objectContext,
+            final Map<Field, ObjectContext> fieldContextMap, SchemaPropertyContext context) {
         do {
-            final List<Property> typeLevelProperties = getTypeLevelProperties(objectContext,
-                    pathContext, context);
-            for (Property typeLevelProperty : typeLevelProperties) {
-                final String name = typeLevelProperty.getName();
-                if (!propertiesByName.containsKey(name)) {
-                    propertiesByName.put(name, typeLevelProperty);
-                } else {
-                    throw new IllegalStateException("field name <" + name + "> collision in class "
-                            + objectContext.getRawType().getSimpleName());
-                }
+            for (Field field : objectContext.getType().getDeclaredFields()) {
+                addFieldToMap(field, objectContext, fieldContextMap, context);
             }
         } while ((objectContext = objectContext.forSupertype()) != null);
-
-        return new ArrayList<>(propertiesByName.values());
+        return fieldContextMap;
     }
 
-    private List<Property> getTypeLevelProperties(ObjectContext<?> objectContext,
-            PathContext pathContext, SchemaPropertyContext context) {
-        List<Property> levelProperties = new ArrayList<>();
-        final GenericType<?> type = objectContext.getType();
-        for (Field field : sortByName(type.getDeclaredFields())) {
-            if (objectContext.isApplicable(field, context)) {
-                if (field.getAnnotation(JsonUnwrapped.class) != null) {
-                    levelProperties.addAll(getUnwrappedProperties(objectContext.forField(field),
-                            pathContext, context));
-                } else {
-                    levelProperties.add(determineProperty(field.getName(), objectContext.forField(
-                            field), pathContext, context));
+    private void addFieldToMap(Field field, ObjectContext objectContext,
+            Map<Field, ObjectContext> fieldContextMap, SchemaPropertyContext context) {
+        if (objectContext.isApplicable(field, context)) {
+            if (fieldContextMap.containsKey(field)) {
+                throw new IllegalStateException("found duplicate field " + field);
+            }
+
+            if (field.getAnnotation(JsonUnwrapped.class) != null) {
+                objectContext = objectContext.forField(field);
+                final PropertyType unwrappedFieldType = objectContext.getPropertyType();
+                if (PropertyType.PRIMITIVE_TYPES.contains(unwrappedFieldType)) {
+                    throw new IllegalStateException("can not unwrap primitive type "
+                            + unwrappedFieldType);
                 }
+                fieldContextMap.putAll(getFieldContextMap(objectContext, context));
+            } else {
+                fieldContextMap.put(field, objectContext);
             }
         }
-        return levelProperties;
     }
 
-    private Field[] sortByName(Field[] fields) {
-        return Stream.of(fields).sorted((f1, f2) -> f1.getName().compareTo(f2.getName())).toArray(
-                Field[]::new);
-    }
-
-    private List<Property> getUnwrappedProperties(ObjectContext<?> objectContext,
-            PathContext pathContext, SchemaPropertyContext context) {
-        final PropertyType unwrappedFieldType = objectContext.getPropertyType();
-        if (PropertyType.PRIMITIVE_TYPES.contains(unwrappedFieldType)) {
-            throw new IllegalStateException("can not unwrap primitive type " + unwrappedFieldType);
-        }
-        return getProperties(objectContext, pathContext, context);
+    private int byName(Field field1, Field field2) {
+        return field1.getName().compareTo(field2.getName());
     }
 
     private Property determineProperty(String name, ObjectContext<?> objectContext,
@@ -160,10 +164,10 @@ public class SchemaPropertyGenerator {
         }
 
         final PropertyType propertyType = objectContext.getPropertyType();
-        pathContext = pathContext.enter(builder.getName(), propertyType == PropertyType.OBJECT
-                ? rawType : null);
-        return builder.withPath(pathContext.getCurrentPath()).withChildren(getNestedProperties(
-                objectContext, pathContext, context)).build();
+        pathContext = pathContext.enter(builder.getName(),
+                propertyType == PropertyType.OBJECT ? rawType : null);
+        return builder.withPath(pathContext.getCurrentPath()).withChildren(
+                getNestedProperties(objectContext, pathContext, context)).build();
     }
 
     private List<Property> getNestedProperties(ObjectContext<?> objectContext,
