@@ -1,6 +1,7 @@
 package com.mercateo.common.rest.schemagen;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,15 +20,11 @@ import com.mercateo.common.rest.schemagen.generator.PathContext;
 
 public class SchemaPropertyGenerator {
 
-    private static final Map<Class<?>, PropertyBuilder> builtins = ImmutableMap
-            .of(BigDecimal.class,
-                    Property.builderFor(BigDecimal.class).withChildren(
-                            //
-                            Property.builderFor(Integer.class).withName("scale").setRequired()
-                                    .build(), //
-                            Property.builderFor(Integer.class).withName("precision").setRequired()
-                                    .build()), //
-                    Date.class, Property.builderFor(Integer.class).setRequired());
+    private static final Map<Class<?>, PropertyBuilder> builtins = ImmutableMap.of( //
+            BigDecimal.class, Property.builderFor(BigDecimal.class).withChildren( //
+                    Property.builderFor(Integer.class).withName("scale").setRequired().build(), //
+                    Property.builderFor(Integer.class).withName("precision").setRequired().build()), //
+            Date.class, Property.builderFor(Integer.class).setRequired());
 
     /**
      * Generate and return a property hierarchy for the object defined by the
@@ -96,7 +93,8 @@ public class SchemaPropertyGenerator {
                     if (!fieldNames.contains(name)) {
                         fieldNames.add(name);
                     } else {
-                        throw new IllegalStateException("field name <" + name + "> collision in class "
+                        throw new IllegalStateException("field name <" + name
+                                + "> collision in class "
                                 + objectContext.getRawType().getSimpleName());
                     }
                     return determineProperty(field.getName(), fieldContextMap.get(field).forField(
@@ -106,38 +104,48 @@ public class SchemaPropertyGenerator {
 
     private Map<Field, ObjectContext> getFieldContextMap(ObjectContext objectContext,
             SchemaPropertyContext context) {
-        return getFieldContextMap(objectContext, new HashMap<>(), context);
+        return getFieldContextMap(objectContext, new HashMap<>(), new HashSet<>(), context);
     }
 
     private Map<Field, ObjectContext> getFieldContextMap(ObjectContext objectContext,
-            final Map<Field, ObjectContext> fieldContextMap, SchemaPropertyContext context) {
+            final Map<Field, ObjectContext> fieldContextMap, final Set<Type> unwrappedTypes,
+            SchemaPropertyContext context) {
         do {
             for (Field field : objectContext.getType().getDeclaredFields()) {
-                addFieldToMap(field, objectContext, fieldContextMap, context);
+                addFieldToMap(field, objectContext, fieldContextMap, unwrappedTypes, context);
             }
         } while ((objectContext = objectContext.forSupertype()) != null);
         return fieldContextMap;
     }
 
     private void addFieldToMap(Field field, ObjectContext objectContext,
-            Map<Field, ObjectContext> fieldContextMap, SchemaPropertyContext context) {
+            Map<Field, ObjectContext> fieldContextMap, Set<Type> unwrappedTypes,
+            SchemaPropertyContext context) {
         if (objectContext.isApplicable(field, context)) {
-            if (fieldContextMap.containsKey(field)) {
-                throw new IllegalStateException("found duplicate field " + field);
-            }
-
             if (field.getAnnotation(JsonUnwrapped.class) != null) {
-                objectContext = objectContext.forField(field);
-                final PropertyType unwrappedFieldType = objectContext.getPropertyType();
-                if (PropertyType.PRIMITIVE_TYPES.contains(unwrappedFieldType)) {
-                    throw new IllegalStateException("can not unwrap primitive type "
-                            + unwrappedFieldType);
-                }
-                fieldContextMap.putAll(getFieldContextMap(objectContext, context));
+                fieldContextMap.putAll(getUnwrappedFieldsMap(field, objectContext, unwrappedTypes,
+                        context));
             } else {
                 fieldContextMap.put(field, objectContext);
             }
         }
+    }
+
+    private Map<Field, ObjectContext> getUnwrappedFieldsMap(Field field,
+            ObjectContext objectContext, Set<Type> unwrappedTypes, SchemaPropertyContext context) {
+        objectContext = objectContext.forField(field);
+        final Type unwrappedType = objectContext.getType().getType();
+        if (unwrappedTypes.contains(unwrappedType)) {
+            throw new IllegalStateException(String.format(
+                    "recursion detected while unwrapping field <%s> in <%s>", field.getName(),
+                    unwrappedType.getTypeName()));
+        }
+        unwrappedTypes.add(unwrappedType);
+        final PropertyType unwrappedFieldType = objectContext.getPropertyType();
+        if (PropertyType.PRIMITIVE_TYPES.contains(unwrappedFieldType)) {
+            throw new IllegalStateException("can not unwrap primitive type " + unwrappedFieldType);
+        }
+        return getFieldContextMap(objectContext, new HashMap<>(), unwrappedTypes, context);
     }
 
     private int byName(Field field1, Field field2) {
@@ -179,8 +187,8 @@ public class SchemaPropertyGenerator {
             break;
 
         case ARRAY:
-            properties.add(determineProperty("", objectContext.getContained(), pathContext,
-                    context));
+            properties
+                    .add(determineProperty("", objectContext.getContained(), pathContext, context));
             break;
 
         default:

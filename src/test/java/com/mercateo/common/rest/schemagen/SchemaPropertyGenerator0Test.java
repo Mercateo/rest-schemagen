@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import javax.ws.rs.PathParam;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -475,6 +476,13 @@ public class SchemaPropertyGenerator0Test {
     }
 
     @Test
+    public void testUnwrappedObjectWithDependencyLoopShouldThrow() {
+        assertThatThrownBy(() -> generateSchemaProperty(UnwrappedObject.class)) //
+                .isInstanceOf(IllegalStateException.class) //
+                .hasMessageStartingWith("recursion detected while unwrapping field <object> in <com.mercateo.common.rest.schemagen.SchemaPropertyGenerator0Test$UnwrappedObject>");
+    }
+
+    @Test
     public void testClassWithComplexType() {
         Property property = generateSchemaProperty(TestClassWithBuiltins.class);
 
@@ -587,6 +595,13 @@ public class SchemaPropertyGenerator0Test {
     public static class InheritedObject extends SuperObject {
         @SuppressWarnings("hiding")
         public String name;
+    }
+
+    public static class UnwrappedObject {
+        public String name;
+
+        @JsonUnwrapped
+        public UnwrappedObject object;
     }
 
     public static class MessageResponse extends ObjectWithSchema<String> {
