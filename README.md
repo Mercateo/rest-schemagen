@@ -60,11 +60,22 @@ Responses will look like this:
   "_schema":
     {
       "links":
-        [{"href": "http://localhost:8081/catalog.management.rest/cvc/1",
-      "rel": "self",
-      "targetSchema":
-        "{\"type\":\"object\",\"properties\":{\"verNr\":{\"type\":\"integer\"},\"legalEntityDisplayName\":{\"type\":\"string\"},\"catalogId\":{\"type\":\"string\"},\"date\":{\"type\":\"integer\"},\"displayName\":{\"type\":\"string\"},\"legalEnityId\":{\"type\":\"string\"}}}",
-      "method": "GET"
+        [{
+            "href": "http://localhost:8081/catalog.management.rest/cvc/1",
+            "rel": "self",
+            "targetSchema":
+                {
+                    "type":"object",
+                    "properties":{
+                        "verNr":{"type":"integer"},
+                        "legalEntityDisplayName":{\"type\":\"string\"},
+                        "catalogId":{"type":"string"},
+                        "date":{"type":"integer"},
+                        "displayName":{"type":"string"},
+                        "legalEnityId":{"type":"string"}
+                    }
+                },
+            "method": "GET"
        }]
     }
 }
