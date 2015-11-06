@@ -1,5 +1,5 @@
 # rest-schemagen
-[![Build Status](https://travis-ci.org/Mercateo/rest-schemagen.svg?branch=travis_ci)](https://travis-ci.org/Mercateo/rest-schemagen)
+[![Build Status](https://travis-ci.org/Mercateo/rest-schemagen.svg?branch=master)](https://travis-ci.org/Mercateo/rest-schemagen)
 [![Coverage Status](https://coveralls.io/repos/Mercateo/rest-schemagen/badge.svg?branch=master&service=github)](https://coveralls.io/github/Mercateo/rest-schemagen?branch=master)
 
 
