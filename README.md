@@ -68,7 +68,7 @@ Responses will look like this:
                     "type":"object",
                     "properties":{
                         "verNr":{"type":"integer"},
-                        "legalEntityDisplayName":{\"type\":\"string\"},
+                        "legalEntityDisplayName":{"type":"string"},
                         "catalogId":{"type":"string"},
                         "date":{"type":"integer"},
                         "displayName":{"type":"string"},
