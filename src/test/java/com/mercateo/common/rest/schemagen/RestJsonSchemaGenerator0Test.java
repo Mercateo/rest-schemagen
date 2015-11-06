@@ -1,6 +1,5 @@
 package com.mercateo.common.rest.schemagen;
 
-import static org.assertj.core.api.StrictAssertions.assertThat;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -26,6 +25,8 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.mercateo.common.rest.schemagen.link.ScopeMethod;
 import com.mercateo.common.rest.schemagen.parameter.Parameter;
 import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings({ "boxing", "unused" })
 @RunWith(MockitoJUnitRunner.class)

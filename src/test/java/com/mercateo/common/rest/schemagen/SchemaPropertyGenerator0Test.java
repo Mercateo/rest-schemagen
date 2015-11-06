@@ -1,11 +1,10 @@
 package com.mercateo.common.rest.schemagen;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.StrictAssertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
-import java.net.URL;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -13,9 +12,7 @@ import java.util.Optional;
 import javax.ws.rs.PathParam;
 
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -29,9 +26,6 @@ import com.mercateo.common.rest.schemagen.types.ObjectWithSchema;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SchemaPropertyGenerator0Test {
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     private SchemaPropertyGenerator schemaGenerator;
 
@@ -415,10 +409,9 @@ public class SchemaPropertyGenerator0Test {
 
     @Test
     public void testInheritedGenericObjectWithWrappedPrimitiveShouldThrow() {
-        expectedException.expect(IllegalStateException.class);
-        expectedException.expectMessage("can not unwrap primitive type STRING");
-
-        generateSchemaProperty(MessageResponse.class);
+        assertThatThrownBy(() -> generateSchemaProperty(MessageResponse.class)) //
+                .isExactlyInstanceOf(IllegalStateException.class) //
+                .hasMessage("can not unwrap primitive type STRING");
     }
 
     @Test
@@ -476,10 +469,9 @@ public class SchemaPropertyGenerator0Test {
 
     @Test
     public void testInheritedObjectWithCollidingFieldNames() {
-        expectedException.expectMessage("field name <name> collision in class SuperObject");
-        expectedException.expect(IllegalStateException.class);
-
-        generateSchemaProperty(InheritedObject.class);
+        assertThatThrownBy(() -> generateSchemaProperty(InheritedObject.class)) //
+                .isInstanceOf(IllegalStateException.class) //
+                .hasMessage("field name <name> collision in class SuperObject");
     }
 
     @Test

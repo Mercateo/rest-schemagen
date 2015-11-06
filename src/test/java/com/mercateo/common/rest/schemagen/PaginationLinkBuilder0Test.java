@@ -1,7 +1,6 @@
 package com.mercateo.common.rest.schemagen;
 
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -39,20 +38,20 @@ public class PaginationLinkBuilder0Test {
         final List<Optional<Result>> links = new ArrayList<>();
         createLinks(paginationLinkBuilder, links);
 
-        assertThat(filter(links, Rel.SELF).get().offset, is(OFFSET));
-        assertThat(filter(links, Rel.SELF).get().limit, is(LIMIT));
+        assertThat(filter(links, Rel.SELF).get().offset).isEqualTo(OFFSET);
+        assertThat(filter(links, Rel.SELF).get().limit).isEqualTo(LIMIT);
 
-        assertThat(filter(links, Rel.NEXT).get().offset, is(OFFSET + LIMIT));
-        assertThat(filter(links, Rel.NEXT).get().limit, is(LIMIT));
+        assertThat(filter(links, Rel.NEXT).get().offset).isEqualTo(OFFSET + LIMIT);
+        assertThat(filter(links, Rel.NEXT).get().limit).isEqualTo(LIMIT);
 
-        assertThat(filter(links, Rel.PREV).get().offset, is(OFFSET - LIMIT));
-        assertThat(filter(links, Rel.PREV).get().limit, is(LIMIT));
+        assertThat(filter(links, Rel.PREV).get().offset).isEqualTo(OFFSET - LIMIT);
+        assertThat(filter(links, Rel.PREV).get().limit).isEqualTo(LIMIT);
 
-        assertThat(filter(links, Rel.FIRST).get().offset, is(0));
-        assertThat(filter(links, Rel.FIRST).get().limit, is(LIMIT));
+        assertThat(filter(links, Rel.FIRST).get().offset).isEqualTo(0);
+        assertThat(filter(links, Rel.FIRST).get().limit).isEqualTo(LIMIT);
 
-        assertThat(filter(links, Rel.LAST).get().offset, is(OFFSET_FOR_LAST));
-        assertThat(filter(links, Rel.LAST).get().limit, is(LIMIT));
+        assertThat(filter(links, Rel.LAST).get().offset).isEqualTo(OFFSET_FOR_LAST);
+        assertThat(filter(links, Rel.LAST).get().limit).isEqualTo(LIMIT);
 
     }
 
@@ -64,7 +63,7 @@ public class PaginationLinkBuilder0Test {
         final List<Optional<Result>> links = new ArrayList<>();
         createLinks(paginationLinkBuilder, links);
 
-        assertThat(links.size(), is(0));
+        assertThat(links.size()).isEqualTo(0);
     }
 
     @Test
@@ -75,7 +74,7 @@ public class PaginationLinkBuilder0Test {
         final List<Optional<Result>> links = new ArrayList<>();
         createLinks(paginationLinkBuilder, links);
 
-        assertThat(filter(links, Rel.NEXT), is(Optional.empty()));
+        assertThat(filter(links, Rel.NEXT)).isEqualTo(Optional.empty());
     }
 
     @Test
@@ -85,8 +84,8 @@ public class PaginationLinkBuilder0Test {
         final List<Optional<Result>> links = new ArrayList<>();
         createLinks(paginationLinkBuilder, links);
 
-        assertThat(filter(links, Rel.FIRST), is(Optional.empty()));
-        assertThat(filter(links, Rel.PREV), is(Optional.empty()));
+        assertThat(filter(links, Rel.FIRST)).isEqualTo(Optional.empty());
+        assertThat(filter(links, Rel.PREV)).isEqualTo(Optional.empty());
     }
 
     @SuppressWarnings("boxing")
@@ -98,7 +97,7 @@ public class PaginationLinkBuilder0Test {
         final List<Optional<Result>> links = new ArrayList<>();
         createLinks(paginationLinkBuilder, links);
 
-        assertThat(filter(links, Rel.PREV).get().offset, is(0));
+        assertThat(filter(links, Rel.PREV).get().offset).isEqualTo(0);
     }
 
     @SuppressWarnings("boxing")
@@ -109,7 +108,7 @@ public class PaginationLinkBuilder0Test {
         final List<Optional<Result>> links = new ArrayList<>();
         createLinks(paginationLinkBuilder, links);
 
-        assertThat(filter(links, Rel.LAST).get().offset, is(TOTAL - LIMIT_2));
+        assertThat(filter(links, Rel.LAST).get().offset).isEqualTo(TOTAL - LIMIT_2);
     }
 
     @Test
@@ -119,7 +118,7 @@ public class PaginationLinkBuilder0Test {
         final List<Optional<Result>> links = new ArrayList<>();
         createLinks(paginationLinkBuilder, links);
 
-        assertThat(filter(links, Rel.LAST), is(Optional.empty()));
+        assertThat(filter(links, Rel.LAST)).isEqualTo(Optional.empty());
     }
 
     private void createLinks(PaginationLinkBuilder paginationLinkBuilder,
@@ -149,7 +148,7 @@ public class PaginationLinkBuilder0Test {
             result.target = target;
             result.offset = off;
             result.limit = lim;
-            return Optional.ofNullable(result);
+            return Optional.of(result);
         }
     }
 

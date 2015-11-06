@@ -1,7 +1,6 @@
 package com.mercateo.common.rest.schemagen.parameter;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.StrictAssertions.assertThat;
 
 import org.junit.Before;
 import org.junit.Test;
