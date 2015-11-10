@@ -123,11 +123,11 @@ public enum OwnRel implements RelationContainer {
  
     private final Relation relation;
  
-    BuyerRel() {
+    OwnRel() {
         this(RelType.SELF);
     }
  
-    BuyerRel(RelType type) {
+    OwnRel(RelType type) {
         relation = Relation.of(this, type);
     }
  
