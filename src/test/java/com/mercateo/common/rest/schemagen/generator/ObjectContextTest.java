@@ -9,7 +9,7 @@ import java.lang.reflect.Field;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ObjectContext0Test {
+public class ObjectContextTest {
 
     private ObjectContext<TestClass> uut;
 

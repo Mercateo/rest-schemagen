@@ -3,7 +3,6 @@ package com.mercateo.common.rest.schemagen.types;
 import java.util.List;
 
 import com.mercateo.common.rest.schemagen.JsonHyperSchema;
-import com.mercateo.common.rest.schemagen.WrappedList;
 
 public class ListResponse<T> extends ObjectWithSchema<WrappedList<ObjectWithSchema<T>>> {
 
@@ -18,5 +17,9 @@ public class ListResponse<T> extends ObjectWithSchema<WrappedList<ObjectWithSche
 
     public static <T> ListResponse<T> create(List<ObjectWithSchema<T>> members, JsonHyperSchema schema) {
         return new ListResponse<>(members, schema);
+    }
+
+    public static <ElementIn, ElementOut> ListResponseBuilder<ElementIn, ElementOut> builder() {
+        return new ListResponseBuilder<>();
     }
 }

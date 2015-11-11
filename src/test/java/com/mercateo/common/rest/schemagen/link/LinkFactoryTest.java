@@ -33,7 +33,7 @@ import com.mercateo.common.rest.schemagen.plugin.common.RolesAllowedChecker;
 
 @SuppressWarnings("boxing")
 @RunWith(MockitoJUnitRunner.class)
-public class LinkFactory0Test {
+public class LinkFactoryTest {
 
     @Mock
     private SecurityContext securityContext;

@@ -17,6 +17,13 @@ public class PaginatedResponseBuilder<ElementIn, ElementOut> extends
 
     private PaginatedList<ElementIn> paginatedList;
 
+    /**
+     * @deprecated please use {@link PaginatedResponse#builder()} instead
+     */
+    @Deprecated
+    public PaginatedResponseBuilder() {
+    }
+
     @Override
     public PaginatedResponse<ElementOut> build() {
         requireNonNull(paginatedList);

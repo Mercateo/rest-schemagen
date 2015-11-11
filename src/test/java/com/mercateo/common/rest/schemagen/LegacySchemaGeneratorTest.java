@@ -20,7 +20,7 @@ import com.mercateo.common.rest.schemagen.generictype.GenericType;
 import com.mercateo.common.rest.schemagen.parameter.CallContext;
 import com.mercateo.common.rest.schemagen.types.ObjectWithSchema;
 
-public class LegacySchemaGenerator0Test {
+public class LegacySchemaGeneratorTest {
 
     private Property schema;
 

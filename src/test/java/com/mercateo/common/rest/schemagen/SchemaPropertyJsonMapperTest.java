@@ -14,7 +14,7 @@ import com.mercateo.common.rest.schemagen.parameter.CallContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SchemaPropertyJsonMapper0Test {
+public class SchemaPropertyJsonMapperTest {
 
     private SchemaPropertyGenerator schemaGenerator;
 

@@ -35,7 +35,7 @@ public class JsonLink {
 
     public JsonLink(Link link) throws JsonProcessingException, IOException {
         href = link.getUri().toString();
-        map = new HashMap<String, String>(link.getParams());
+        map = new HashMap<>(link.getParams());
         ObjectMapper mapper = new ObjectMapper();
         String schemaString = link.getParams().get(LinkCreator.SCHEMA_PARAM_KEY);
         if (schemaString != null) {

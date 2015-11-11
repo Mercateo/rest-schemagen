@@ -26,4 +26,8 @@ public class PaginatedResponse<T> extends ObjectWithSchema<PaginatedList<ObjectW
     public static <U> PaginatedResponse<U> create(PaginatedList<ObjectWithSchema<U>> paginatedList, JsonHyperSchema schema) {
         return new PaginatedResponse<>(paginatedList.members, paginatedList.total, paginatedList.offset, paginatedList.limit, schema);
     }
+
+    public static <ElementIn, ElementOut> PaginatedResponseBuilder<ElementIn, ElementOut> builder() {
+        return new PaginatedResponseBuilder<>();
+    }
 }

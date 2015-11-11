@@ -8,7 +8,7 @@ import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
 
-public class Parameter0Test {
+public class ParameterTest {
 
     private Parameter.Builder<TestClass> builder;
 

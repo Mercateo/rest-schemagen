@@ -29,7 +29,7 @@ import com.mercateo.common.rest.schemagen.link.ScopeMethod;
 import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 
 public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
-    public static final Set<Class<?>> INVALID_OUTPUT_TYPES = new HashSet<>(Arrays.asList(void.class,
+    static final Set<Class<?>> INVALID_OUTPUT_TYPES = new HashSet<>(Arrays.asList(void.class,
             Void.class));
 
     private final static Logger logger = LoggerFactory.getLogger(RestJsonSchemaGenerator.class);

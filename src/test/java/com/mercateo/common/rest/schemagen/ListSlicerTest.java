@@ -10,7 +10,7 @@ import jersey.repackaged.com.google.common.collect.Lists;
 import org.junit.Test;
 
 @SuppressWarnings("boxing")
-public class ListSlicer0Test {
+public class ListSlicerTest {
 
     public static final int DEFAULT_LIMIT = 100;
     public static final int DEFAULT_OFFSET = 0;

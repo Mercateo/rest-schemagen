@@ -7,6 +7,7 @@ package com.mercateo.common.rest.schemagen.link;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -21,27 +22,32 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.mercateo.common.rest.schemagen.link.helper.Pair;
 
 public class BeanParamExtractor {
     private final static Logger logger = LoggerFactory.getLogger(BeanParamExtractor.class);
 
     public Map<String, Object[]> getQueryParameters(Object bean) {
         return getQueryParameters(bean, QueryParam.class, QueryParam::value, false).asMap()
-                .entrySet().stream().map(e -> new Pair<>(e.getKey(), e.getValue().stream()
-                        .toArray())).collect(Collectors.toMap(p -> p.left, p -> p.right, (a,
-                                b) -> a));
+                .entrySet().stream().map(this::transformAll).collect(
+                        Collectors.toMap(Param::getName, Param::getValue, (a, b) -> a));
+    }
+
+    private Param<Object[]> transformAll(Map.Entry<String, Collection<Object>> entry) {
+        return new Param<>(entry.getKey(), entry.getValue().stream().toArray());
     }
 
     public Map<String, Object> getPathParameters(Object bean) {
         return getQueryParameters(bean, PathParam.class, PathParam::value, true).asMap().entrySet()
-                .stream().map(e -> {
-                    if (e.getValue().size() != 1) {
-                        throw new IllegalStateException("No single occurence of a "
-                                + "PathParam annotation for name " + e.getKey());
-                    }
-                    return new Pair<>(e.getKey(), e.getValue().stream().findFirst().get());
-                }).collect(Collectors.toMap(p -> p.left, p -> p.right, (a, b) -> a));
+                .stream().map(this::transformFirstOnly).collect(
+                        Collectors.toMap(Param::getName, Param::getValue, (a, b) -> a));
+    }
+
+    private Param<Object> transformFirstOnly(Map.Entry<String, Collection<Object>> entry) {
+        if (entry.getValue().size() != 1) {
+            throw new IllegalStateException("No single occurence of a "
+                    + "PathParam annotation for name " + entry.getKey());
+        }
+        return new Param<>(entry.getKey(), entry.getValue().stream().findFirst().get());
     }
 
     private <A extends Annotation> Multimap<String, Object> getQueryParameters(Object bean,
@@ -77,5 +83,24 @@ public class BeanParamExtractor {
             }
         }
         return result;
+    }
+
+    private static class Param<T> {
+        private final String name;
+
+        private final T value;
+
+        public Param(String name, T value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public T getValue() {
+            return value;
+        }
     }
 }

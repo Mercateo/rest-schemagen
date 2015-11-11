@@ -1,4 +1,4 @@
-package com.mercateo.common.rest.schemagen;
+package com.mercateo.common.rest.schemagen.types;
 
 import java.util.List;
 
