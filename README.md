@@ -6,7 +6,7 @@
 Jersey add-on for dynamic link and schema building.
 This add-on is for building HATEOAS-conform responses with your jersey REST-API. Creating and managing your links and schemas of your REST-API becomes as easy as making a method call.
 
-It also works for reverse proxies (like jetty behind apache/ngix)
+It also works for reverse proxies (like jetty behind apache/nginx)
 
 
 # Quick start
@@ -22,7 +22,7 @@ In your resources you simply type:
 @Produces(MediaType.APPLICATION_JSON)
 public class ResourceClass {
     @Inject
-    private LinkMetaFactory linkMetaFactory; //security and baseURIs already injected
+    private LinkMetaFactory linkMetaFactory; // security and baseURIs already injected
  
     @Path("/method/{id}")
     @GET
@@ -33,7 +33,7 @@ public class ResourceClass {
             .createFactoryFor(ResourceClass.class)
             .forCall(Rel.SELF, r -> r.getSomething(id));
  
-        final JsonHyperSchema hyperSchema = JsonHyperSchema.fromOptional(result);
+        final JsonHyperSchema hyperSchema = JsonHyperSchema.fromOptional(link);
         return ObjectWithSchema.create(json, hyperSchema);
     }
 }
