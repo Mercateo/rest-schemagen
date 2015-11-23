@@ -1,8 +1,6 @@
 package com.mercateo.common.rest.schemagen;
 
 import java.util.Optional;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 
 public class ValueConstraints {
     private Optional<Long> max;
@@ -17,11 +15,7 @@ public class ValueConstraints {
         return min;
     }
 
-    public ValueConstraints(Max max, Min min)  {
-        this(Optional.ofNullable(max).map(Max::value), Optional.ofNullable(min).map(Min::value));
-    }
-
-    private ValueConstraints(Optional<Long> max, Optional<Long> min) {
+    public ValueConstraints(Optional<Long> max, Optional<Long> min) {
         if (max.flatMap(x -> min.map(y -> y > x)).orElse(false)) {
             throw new IllegalArgumentException(String.format(
                     "Minimum value %s is larger than maximum value %s", min, max));

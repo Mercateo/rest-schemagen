@@ -1,5 +1,7 @@
 package com.mercateo.common.rest.schemagen.generator;
 
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -16,6 +18,10 @@ public class TestClass {
     @Size(min = 10)
     @NotEmpty
     private String notEmptyStringWithSize;
+
+    @Min(-4)
+    @Max(2704)
+    private int intWithValueConstraints;
 
     public String getNotNullString() {
         return notNullString;
@@ -43,6 +49,14 @@ public class TestClass {
 
     public String getNotEmptyStringWithSize() {
         return notEmptyStringWithSize;
+    }
+
+    public int getIntWithValueConstraints() {
+        return intWithValueConstraints;
+    }
+
+    public void setIntWithValueConstraints(int intWithValueConstraints) {
+        this.intWithValueConstraints = intWithValueConstraints;
     }
 
     public void setNotEmptyStringWithSize(String notEmptyStringWithSize) {
