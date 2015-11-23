@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import javax.ws.rs.NotFoundException;
 
@@ -201,6 +202,22 @@ public class LegacySchemaGeneratorTest {
         final List<String> otherProp = schema.getPropertyByName("string").getAllowedValues();
         assertThat(otherProp).hasSize(1);
         assertThat(otherProp).contains("this|is|an|enum");
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void getPropertyByNameShouldThrow() {
+        createSchemaFor(TestRto.class);
+        schema.getPropertyByName("nonExistentProperty");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowOnNegativeSizeConstraint() {
+        createSchemaFor(NegativeSizeConstraintRto.class);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void shouldThrowOnInconsistentConstraints() {
+        createSchemaFor(InvalidTestRto.class);
     }
 
     @SuppressWarnings("unused")

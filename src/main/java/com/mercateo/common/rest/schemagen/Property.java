@@ -25,6 +25,8 @@ public class Property {
 
     private transient SizeConstraints sizeConstraints;
 
+    private transient ValueConstraints valueConstraints;
+
     private transient String ref;
 
     private transient boolean idEnabled = false;
@@ -32,8 +34,8 @@ public class Property {
     private String path;
 
     Property(String name, PropertyType type, String path, String ref, String defaultValue,
-            List<String> allowedValues, boolean isRequired, SizeConstraints sizeConstraints,
-            Class<? extends IndividualSchemaGenerator> generator, List<Property> children) {
+             List<String> allowedValues, boolean isRequired, SizeConstraints sizeConstraints,
+             ValueConstraints valueConstraints, Class<? extends IndividualSchemaGenerator> generator, List<Property> children) {
         this.name = name;
         this.type = type;
         this.path = path;
@@ -43,6 +45,7 @@ public class Property {
         this.properties = children;
         this.generator = generator;
         this.ref = ref;
+        this.valueConstraints = valueConstraints;
         this.sizeConstraints = sizeConstraints;
     }
 
@@ -88,6 +91,10 @@ public class Property {
 
     public final SizeConstraints getSizeConstraints() {
         return sizeConstraints;
+    }
+
+    public final ValueConstraints getValueConstraints() {
+        return valueConstraints;
     }
 
     @VisibleForTesting

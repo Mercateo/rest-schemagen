@@ -69,18 +69,15 @@ public class PropertyJsonSchemaMapper {
                     if (hasDefaultValue(property)) {
                         result.set("default", getDefaultValue(property));
                     }
-                    if (property.getSizeConstraints().getMin().isPresent()) {
-                        result.put("minLength", property.getSizeConstraints().getMin().get());
-                    }
-                    if (property.getSizeConstraints().getMax().isPresent()) {
-                        result.put("maxLength", property.getSizeConstraints().getMax().get());
-                    }
+                    property.getSizeConstraints().getMin().ifPresent(x -> result.put("minLength", x));
+                    property.getSizeConstraints().getMax().ifPresent(x -> result.put("maxLength", x));
                     break;
 
                 case INTEGER:
                     result.put("type", "integer");
+                    property.getValueConstraints().getMin().ifPresent(x -> result.put("minimum", x));
+                    property.getValueConstraints().getMax().ifPresent(x -> result.put("maximum", x));
                     break;
-
                 case FLOAT:
                     result.put("type", "float");
                     break;

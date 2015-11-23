@@ -1,6 +1,6 @@
 package com.mercateo.common.rest.schemagen.generator;
 
-import static org.junit.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -22,19 +22,27 @@ public class ObjectContextTest {
     public void testSizeConstraint() throws NoSuchFieldException, SecurityException {
         Field f1 = TestClass.class.getDeclaredField("sizeString");
         ObjectContext<Object> s1 = uut.forField(f1);
-        assertEquals(1, s1.getSizeConstraints().getMin().get().intValue());
-        assertEquals(10, s1.getSizeConstraints().getMax().get().intValue());
+        assertThat(s1.getSizeConstraints().getMin().get()).isEqualTo(1);
+        assertThat(s1.getSizeConstraints().getMax().get()).isEqualTo(10);
     }
 
     @Test
     public void testCustomSizeConstraints() throws NoSuchFieldException, SecurityException {
         Field f1 = TestClass.class.getDeclaredField("notEmptyString");
         ObjectContext<Object> s1 = uut.forField(f1);
-        assertEquals(1, s1.getSizeConstraints().getMin().get().intValue());
+        assertThat(s1.getSizeConstraints().getMin().get()).isEqualTo(1);
 
         Field f2 = TestClass.class.getDeclaredField("notEmptyStringWithSize");
         ObjectContext<Object> s2 = uut.forField(f2);
-        assertEquals(10, s2.getSizeConstraints().getMin().get().intValue());
+        assertThat(s2.getSizeConstraints().getMin().get()).isEqualTo(10);
+    }
+
+    @Test
+    public void testCustomValueConstraints() throws NoSuchFieldException {
+        Field f1 = TestClass.class.getDeclaredField("intWithValueConstraints");
+        ObjectContext<Object> s1 = uut.forField(f1);
+        assertThat(s1.getValueConstraints().getMin().get()).isEqualTo(-4);
+        assertThat(s1.getValueConstraints().getMax().get()).isEqualTo(2704);
     }
 
     @Test

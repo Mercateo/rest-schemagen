@@ -22,21 +22,17 @@ public class SizeConstraints {
         this(size.max(), size.min());
     }
 
+    @SuppressWarnings("boxing")
     private SizeConstraints(int max, int min) {
-        if (min > max)
+        if (min > max) {
             throw new IllegalArgumentException(String.format(
-                    "Minimum value %s is larger than maximum value %s", Integer.valueOf(min),
-                    Integer.valueOf(max)));
-        if (min < 0 || max < 0)
+                    "Minimum value %s is larger than maximum value %s", min, max));
+        }
+        if (min < 0 || max < 0) {
             throw new IllegalArgumentException("Supplied arguments must be non-negative");
-        if (max != Integer.MAX_VALUE)
-            this.max = Optional.of(Integer.valueOf(max));
-        else
-            this.max = Optional.empty();
-        if (min != 0)
-            this.min = Optional.of(Integer.valueOf(min));
-        else
-            this.min = Optional.empty();
+        }
+        this.max = max == Integer.MAX_VALUE ? Optional.empty() : Optional.of(max);
+        this.min = min == 0 ? Optional.empty() : Optional.of(min);
     }
 
     public static SizeConstraints empty() {

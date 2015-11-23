@@ -34,6 +34,8 @@ public class PropertyBuilder {
 
     private SizeConstraints sizeConstraints = SizeConstraints.empty();
 
+    private ValueConstraints valueConstraints = ValueConstraints.empty();
+
     private Class<? extends IndividualSchemaGenerator> schemaGenerator;
 
     private String ref;
@@ -151,6 +153,11 @@ public class PropertyBuilder {
         return this;
     }
 
+    public PropertyBuilder withValueConstraints(ValueConstraints valueConstraints) {
+        this.valueConstraints = valueConstraints;
+        return this;
+    }
+
     public PropertyBuilder withContext(ObjectContext<?> objectContext) {
         withType(objectContext.getType());
         withPropertyType(objectContext.getPropertyType());
@@ -158,6 +165,7 @@ public class PropertyBuilder {
         withAllowedValues(objectContext.getAllowedValues());
         withRequired(objectContext.isRequired());
         withSizeConstraints(objectContext.getSizeConstraints());
+        withValueConstraints(objectContext.getValueConstraints());
         withSchemaGenerator(objectContext.getSchemaGenerator());
         return this;
     }
@@ -170,6 +178,7 @@ public class PropertyBuilder {
         defaultValue = property.getDefaultValue();
         withRequired(property.isRequired());
         withSizeConstraints(property.getSizeConstraints());
+        withValueConstraints(property.getValueConstraints());
         withSchemaGenerator(property.getGenerator());
         allowedValues = property.getAllowedValues();
         withChildren(property.getProperties());
@@ -185,7 +194,7 @@ public class PropertyBuilder {
     public Property build() {
 
         return new Property(name, propertyType, path, ref, defaultValue, getAllowedValues(),
-                required, sizeConstraints, schemaGenerator, childProperties);
+                required, sizeConstraints, valueConstraints, schemaGenerator, childProperties);
     }
 
     public String getName() {

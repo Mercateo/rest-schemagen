@@ -12,8 +12,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 
 import javax.validation.Constraint;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import javax.ws.rs.PathParam;
@@ -26,9 +29,9 @@ import com.mercateo.common.rest.schemagen.PropertyType;
 import com.mercateo.common.rest.schemagen.PropertyTypeMapper;
 import com.mercateo.common.rest.schemagen.SchemaPropertyContext;
 import com.mercateo.common.rest.schemagen.SizeConstraints;
+import com.mercateo.common.rest.schemagen.ValueConstraints;
 import com.mercateo.common.rest.schemagen.generictype.GenericClass;
 import com.mercateo.common.rest.schemagen.generictype.GenericType;
-import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 import com.mercateo.common.rest.schemagen.plugin.IndividualSchemaGenerator;
 import com.mercateo.common.rest.schemagen.plugin.PropertySchema;
 import com.mercateo.common.rest.schemagen.types.ObjectWithSchema;
@@ -50,13 +53,15 @@ public class ObjectContext<T> {
 
     private final SizeConstraints sizeConstraints;
 
+    private final ValueConstraints valueConstraints;
+
     private final Class<? extends IndividualSchemaGenerator> schemaGenerator;
 
     private T currentValue;
 
     ObjectContext(GenericType<T> type, T defaultValue, List<T> allowedValues, boolean required,
-            SizeConstraints sizeConstraints,
-            Class<? extends IndividualSchemaGenerator> schemaGenerator, T currentValue) {
+                  SizeConstraints sizeConstraints,
+                  ValueConstraints valueConstraints, Class<? extends IndividualSchemaGenerator> schemaGenerator, T currentValue) {
         this.type = requireNonNull(type);
         this.currentValue = currentValue;
         this.propertyType = PropertyTypeMapper.of(type);
@@ -64,6 +69,7 @@ public class ObjectContext<T> {
         this.allowedValues = allowedValues;
         this.required = required;
         this.sizeConstraints = sizeConstraints;
+        this.valueConstraints = valueConstraints;
         this.schemaGenerator = schemaGenerator;
     }
 
@@ -110,6 +116,10 @@ public class ObjectContext<T> {
         return sizeConstraints;
     }
 
+    public ValueConstraints getValueConstraints() {
+        return valueConstraints;
+    }
+
     public PropertyType getPropertyType() {
         return propertyType;
     }
@@ -118,7 +128,7 @@ public class ObjectContext<T> {
         return schemaGenerator;
     }
 
-    public ObjectContext<?> forSupertype() {
+    public ObjectContext<?> forSuperType() {
         GenericType<? super T> superType = type.getSuperType();
         if (superType != null) {
             return buildObjectContextForSuper(superType, allowedValues, defaultValue);
@@ -159,10 +169,10 @@ public class ObjectContext<T> {
             builder.setRequired();
         }
 
-        Optional<SizeConstraints> sizeConstraintOption = determineSizeContraint(field);
-        if (sizeConstraintOption.isPresent()) {
-            builder.withSizeConstraints(sizeConstraintOption.get());
-        }
+        determineConstraints(Size.class, field, SizeConstraints::new).ifPresent(builder::withSizeConstraints);
+        builder.withValueConstraints(new ValueConstraints(
+                determineConstraints(Max.class, field, Max::value),
+                determineConstraints(Min.class, field, Min::value)));
 
         final PropertySchema schemaGenerator = field.getAnnotation(PropertySchema.class);
         if (schemaGenerator != null) {
@@ -187,23 +197,18 @@ public class ObjectContext<T> {
         return false;
     }
 
-    @SuppressWarnings("boxing")
-    private Optional<SizeConstraints> determineSizeContraint(Field field) {
-        Size size = field.getAnnotation(Size.class);
-        if (size != null) {
-            return Optional.of(new SizeConstraints(size));
+    private <U, C extends Annotation> Optional<U> determineConstraints(Class<C> clazz, Field field, Function<C, U> callback) {
+        C constraint = field.getAnnotation(clazz);
+        if (constraint != null) {
+            return Optional.of(callback.apply(constraint));
         }
-        Annotation[] annotations = field.getAnnotations();
-        for (Annotation annotation : annotations) {
+        for (Annotation annotation : field.getAnnotations()) {
             Class<? extends Annotation> annotationType = annotation.annotationType();
-            if (annotationType.isAnnotationPresent(Constraint.class) && annotationType
-                    .isAnnotationPresent(Size.class)) {
-                size = annotationType.getAnnotation(Size.class);
-                return Optional.of(new SizeConstraints(size));
+            if (annotationType.isAnnotationPresent(Constraint.class) && annotationType.isAnnotationPresent(clazz)) {
+                return Optional.of(callback.apply(annotationType.getAnnotation(clazz)));
             }
         }
         return Optional.empty();
-
     }
 
     @SuppressWarnings("unchecked")
@@ -226,8 +231,8 @@ public class ObjectContext<T> {
     }
 
     private boolean isApplicableForPathParam(Field field) {
-        PathParam pathparamAnnotation = field.getAnnotation(PathParam.class);
-        if (pathparamAnnotation == null) {
+        PathParam pathParamAnnotation = field.getAnnotation(PathParam.class);
+        if (pathParamAnnotation == null) {
             return true;
         }
         if (currentValue == null) {
@@ -242,11 +247,8 @@ public class ObjectContext<T> {
     }
 
     private boolean isApplicableFor(Field field, SchemaPropertyContext context) {
-        // this is the container...
-        if (field.getDeclaringClass().equals(ObjectWithSchema.class)) {
-            return true;
-        }
-        return context.isFieldApplicable(field);
+        return field.getDeclaringClass().equals(ObjectWithSchema.class)
+                || context.isFieldApplicable(field);
     }
 
     public Class<?> getRawType() {
@@ -266,6 +268,8 @@ public class ObjectContext<T> {
         private boolean required;
 
         private SizeConstraints sizeConstraints = SizeConstraints.empty();
+
+        private ValueConstraints valueConstraints = ValueConstraints.empty();
 
         private Class<? extends IndividualSchemaGenerator> schemaGenerator;
 
@@ -294,7 +298,7 @@ public class ObjectContext<T> {
         }
 
         public ObjectContext<T> build() {
-            return new ObjectContext<>(type, defaultValue, allowedValues, required, sizeConstraints,
+            return new ObjectContext<>(type, defaultValue, allowedValues, required, sizeConstraints, valueConstraints,
                     schemaGenerator, currentValue);
         }
 
@@ -305,6 +309,11 @@ public class ObjectContext<T> {
 
         Builder<T> withSizeConstraints(SizeConstraints sizeConstraints) {
             this.sizeConstraints = sizeConstraints;
+            return this;
+        }
+
+        Builder<T> withValueConstraints(ValueConstraints valueConstraints) {
+            this.valueConstraints = valueConstraints;
             return this;
         }
 
