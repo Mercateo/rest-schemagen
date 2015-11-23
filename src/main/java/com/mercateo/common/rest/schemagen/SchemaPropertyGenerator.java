@@ -114,7 +114,7 @@ public class SchemaPropertyGenerator {
             for (Field field : objectContext.getType().getDeclaredFields()) {
                 addFieldToMap(field, objectContext, fieldContextMap, unwrappedTypes, context);
             }
-        } while ((objectContext = objectContext.forSupertype()) != null);
+        } while ((objectContext = objectContext.forSuperType()) != null);
         return fieldContextMap;
     }
 

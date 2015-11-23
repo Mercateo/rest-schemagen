@@ -128,7 +128,7 @@ public class ObjectContext<T> {
         return schemaGenerator;
     }
 
-    public ObjectContext<?> forSupertype() {
+    public ObjectContext<?> forSuperType() {
         GenericType<? super T> superType = type.getSuperType();
         if (superType != null) {
             return buildObjectContextForSuper(superType, allowedValues, defaultValue);
@@ -169,8 +169,10 @@ public class ObjectContext<T> {
             builder.setRequired();
         }
 
-        determineSizeConstraint(field).ifPresent(builder::withSizeConstraints);
-        builder.withValueConstraints(determineValueConstraints(field));
+        determineConstraints(Size.class, field, SizeConstraints::new).ifPresent(builder::withSizeConstraints);
+        builder.withValueConstraints(new ValueConstraints(
+                determineConstraints(Max.class, field, Max::value),
+                determineConstraints(Min.class, field, Min::value)));
 
         final PropertySchema schemaGenerator = field.getAnnotation(PropertySchema.class);
         if (schemaGenerator != null) {
@@ -195,24 +197,12 @@ public class ObjectContext<T> {
         return false;
     }
 
-    @SuppressWarnings("boxing")
-    private Optional<SizeConstraints> determineSizeConstraint(Field field) {
-        return determineConstraints(Size.class, field, SizeConstraints::new);
-    }
-
-    private ValueConstraints determineValueConstraints(Field field) {
-        final Optional<Long> max = determineConstraints(Max.class, field, Max::value);
-        final Optional<Long> min = determineConstraints(Min.class, field, Min::value);
-        return new ValueConstraints(max, min);
-    }
-
     private <U, C extends Annotation> Optional<U> determineConstraints(Class<C> clazz, Field field, Function<C, U> callback) {
         C constraint = field.getAnnotation(clazz);
         if (constraint != null) {
             return Optional.of(callback.apply(constraint));
         }
-        List<Annotation> annotations = Arrays.asList(field.getAnnotations());
-        for (Annotation annotation : annotations) {
+        for (Annotation annotation : field.getAnnotations()) {
             Class<? extends Annotation> annotationType = annotation.annotationType();
             if (annotationType.isAnnotationPresent(Constraint.class) && annotationType.isAnnotationPresent(clazz)) {
                 return Optional.of(callback.apply(annotationType.getAnnotation(clazz)));
