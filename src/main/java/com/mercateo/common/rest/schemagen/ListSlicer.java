@@ -1,7 +1,7 @@
 package com.mercateo.common.rest.schemagen;
 
 import java.util.List;
-import java.util.function.Function;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.mercateo.common.rest.schemagen.types.PaginatedList;
@@ -23,6 +23,14 @@ public class ListSlicer {
         return new PaginatedList<>(list.size(), offset, limit, slicedList);
     }
 
+    public int getOffset() {
+        return offset;
+    }
+
+    public int getLimit() {
+        return limit;
+    }
+
     private ListSlicer(int offset, int limit) {
         this.offset = offset;
         this.limit = limit;
@@ -36,22 +44,18 @@ public class ListSlicer {
         return withInterval(DEFAULT_MIN_LIMIT, DEFAULT_MAX_LIMIT);
     }
 
-    public static SliceDefaults createDefaults(final int defaultLimit, final int defaultOffset) {
-        return new SliceDefaults(defaultLimit, defaultOffset);
-    }
-
     public static class ListSlicerBuilder {
 
         private final int minLimit;
 
         private final int maxLimit;
 
-        private final SliceDefaults slicerDefault;
+        private final int defaultOffset;
 
         private ListSlicerBuilder(int minLimit, int maxLimit, int defaultOffset) {
             this.minLimit = minLimit;
             this.maxLimit = maxLimit;
-            this.slicerDefault = new SliceDefaults(maxLimit, defaultOffset);
+            this.defaultOffset = defaultOffset;
         }
 
         public ListSlicer create(Integer offset, Integer limit) {
@@ -60,43 +64,12 @@ public class ListSlicer {
 
         @SuppressWarnings("boxing")
         private int getConstrainedOffset(Integer offset) {
-            return slicerDefault.determineOffset(offset, o -> Math.max(o.intValue(), 0));
+            return Optional.ofNullable(offset).map(o -> Math.max(o, 0)).orElse(defaultOffset);
         }
 
         @SuppressWarnings("boxing")
         private int getConstrainedLimit(Integer limit) {
-            return slicerDefault.determineLimit(limit, l -> Math.min(Math.max(l.intValue(),
-                    minLimit), maxLimit));
-        }
-    }
-
-    public static class SliceDefaults {
-
-        private final int defaultLimit;
-
-        private final int defaultOffset;
-
-        private SliceDefaults(final int defaultLimit, final int defaultOffset) {
-            this.defaultLimit = defaultLimit;
-            this.defaultOffset = defaultOffset;
-        }
-
-        public int determineOffset(Integer offset) {
-            return determineOffset(offset, Function.<Integer> identity());
-        }
-
-        @SuppressWarnings({ "unboxing", "boxing" })
-        public int determineOffset(Integer offset, Function<Integer, Integer> function) {
-            return offset == null ? defaultOffset : function.apply(offset);
-        }
-
-        public int determineLimit(Integer limit) {
-            return determineLimit(limit, Function.<Integer> identity());
-        }
-
-        @SuppressWarnings({ "unboxing", "boxing" })
-        public int determineLimit(Integer limit, Function<Integer, Integer> function) {
-            return limit == null ? defaultLimit : function.apply(limit);
+            return Optional.ofNullable(limit).map(l -> Math.min(Math.max(l, minLimit), maxLimit)).orElse(maxLimit);
         }
     }
 
