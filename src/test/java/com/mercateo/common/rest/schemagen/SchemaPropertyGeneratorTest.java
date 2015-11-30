@@ -8,6 +8,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import javax.ws.rs.PathParam;
 
@@ -483,6 +484,15 @@ public class SchemaPropertyGeneratorTest {
     }
 
     @Test
+    public void testUUIDSchemaGeneration() {
+        final Property property = generateSchemaProperty(UUIDSchemaObject.class);
+
+        final Property idProperty = property.getPropertyByName("id");
+
+        assertThat(idProperty.getType()).isEqualTo(PropertyType.STRING);
+    }
+
+    @Test
     public void testClassWithComplexType() {
         Property property = generateSchemaProperty(TestClassWithBuiltins.class);
 
@@ -573,6 +583,10 @@ public class SchemaPropertyGeneratorTest {
 
     public static class InheritedSchemaObject extends SchemaObject {
         public Boolean enabled;
+    }
+
+    public static class UUIDSchemaObject {
+        public UUID id;
     }
 
     public static class ListObject extends ListResponse<SchemaObject> {

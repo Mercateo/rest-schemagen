@@ -3,6 +3,7 @@ package com.mercateo.common.rest.schemagen;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 import com.mercateo.common.rest.schemagen.generictype.GenericType;
 
@@ -26,6 +27,7 @@ public final class PropertyTypeMapper {
         TYPE_MAP.put(Double.class, PropertyType.FLOAT);
         TYPE_MAP.put(double.class, PropertyType.FLOAT);
         TYPE_MAP.put(BigInteger.class, PropertyType.INTEGER);
+        TYPE_MAP.put(UUID.class, PropertyType.STRING);
     }
 
     public static PropertyType of(GenericType<?> type) {
