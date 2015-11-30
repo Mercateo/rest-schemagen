@@ -14,7 +14,6 @@ public class MethodCheckerForLinkFactory implements Factory<MethodCheckerForLink
     @Inject
     public MethodCheckerForLinkFactory(SecurityContext securityContext) {
         this.securityContext = securityContext;
-
     }
 
     @Override
@@ -25,7 +24,6 @@ public class MethodCheckerForLinkFactory implements Factory<MethodCheckerForLink
     @Override
     public void dispose(MethodCheckerForLink instance) {
         // nothing
-
     }
 
 }

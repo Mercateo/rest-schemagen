@@ -84,7 +84,7 @@ public class ProxyFactory {
                                 } else if (returnType.equals(double.class)) {
                                     return (double) 0;
                                 } else if (returnType.equals(boolean.class)) {
-                                    return true;
+                                    return false;
                                 } else if (returnType.equals(char.class)) {
                                     return (char) 0;
                                 } else if (returnType.equals(void.class)) {

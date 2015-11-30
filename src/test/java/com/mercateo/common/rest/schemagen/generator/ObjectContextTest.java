@@ -1,13 +1,13 @@
 package com.mercateo.common.rest.schemagen.generator;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.lang.reflect.Field;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class ObjectContextTest {
 
@@ -72,5 +72,17 @@ public class ObjectContextTest {
         ObjectContext<Object> s1 = uut.forField(f1);
         assertFalse(s1.getSizeConstraints().getMin().isPresent());
         assertFalse(s1.getSizeConstraints().getMax().isPresent());
+    }
+
+    @Test
+    public void testAllowedValues() throws NoSuchFieldException {
+        final TestClass testClass = new TestClass();
+        testClass.setNotEmptyString("allowed");
+        uut = ObjectContext.buildFor(TestClass.class).withAllowedValue(testClass).build();
+        Field f1 = TestClass.class.getDeclaredField("notEmptyString");
+
+        final ObjectContext<Object> objectObjectContext = uut.forField(f1);
+        assertThat(objectObjectContext.getAllowedValues()).containsOnly("allowed");
+
     }
 }
