@@ -1,22 +1,27 @@
 package com.mercateo.common.rest.schemagen.parameter;
 
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import com.google.common.collect.Sets;
+import static com.google.common.base.Preconditions.checkNotNull;
+import static java.util.Objects.requireNonNull;
 
 public class CallContext {
 
     private final Map<Object, Parameter<?>> parameters = new IdentityHashMap<>();
 
     private final Map<Class<?>, Set<?>> additionalObjects = new HashMap<>();
+
+    public static CallContext create() {
+        return new CallContext();
+    }
 
     public <T> Parameter.Builder<T> builderFor(Class<T> parameterClass) {
         return new Parameter.Builder<>(parameterClass, this);
@@ -38,32 +43,45 @@ public class CallContext {
         parameters.put(value, parameter);
     }
 
-    public static CallContext create() {
-        return new CallContext();
+    /**
+     * @deprecated please use {@link #addAdditionalObjects(Class, Object[])} instead
+     */
+    @SafeVarargs
+    @Deprecated
+    public final <T> CallContext addAddionalObjects(Class<T> clazz, T... objects) {
+        return addAdditionalObjects(clazz, objects);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> CallContext addAddionalObjects(Class<T> clazz, T object, T... objects) {
-        checkNotNull(clazz);
-        if (object == null) {
-            return this;
-        }
-        Set<T> set = Sets.newHashSet(object);
-        if (objects != null) {
-            Arrays.stream(objects).forEach(o -> set.add(o));
-        }
-        if (additionalObjects.containsKey(clazz)) {
-            Set<T> setInMap = (Set<T>) additionalObjects.get(clazz);
-            setInMap.addAll(set);
+    public <T> CallContext addAdditionalObjects(Class<T> clazz, T... objects) {
+        requireNonNull(clazz);
 
-        } else {
-            additionalObjects.put(clazz, set);
+        final Set<T> set = Arrays.stream(objects != null ? objects : (T[]) new Object[0])
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        if (!set.isEmpty()) {
+            if (additionalObjects.containsKey(clazz)) {
+                Set<T> setInMap = (Set<T>) additionalObjects.get(clazz);
+                setInMap.addAll(set);
+            } else {
+                additionalObjects.put(clazz, set);
+            }
         }
+
         return this;
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * @deprecated please use {@link #getAdditionalObjectsFor(Class)} instead
+     */
+    @Deprecated
     public <T> Optional<Set<T>> getAddionalObjectsFor(Class<T> clazz) {
+        return getAdditionalObjectsFor(clazz);
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> Optional<Set<T>> getAdditionalObjectsFor(Class<T> clazz) {
         checkNotNull(clazz);
         Set<T> set = (Set<T>) additionalObjects.get(clazz);
         if (set != null) {
