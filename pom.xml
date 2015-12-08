@@ -36,7 +36,19 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-
+  <developers>
+    <developer>
+      <id>joerg_adler</id>
+      <name>Joerg Adler</name>
+      <email>joerg.adler@mercateo.com</email>
+      <url>http://www.mercateo.com</url>
+      <organization>Mercateo AG</organization>
+      <organizationUrl>http://www.mercateo.com</organizationUrl>
+      <roles>
+        <role>developer</role>
+      </roles>
+    </developer>
+  </developers>
   <build>
     <plugins>
       <plugin>
@@ -84,9 +96,8 @@
         <executions>
           <execution>
             <id>attach-sources</id>
-            <phase>install</phase>
             <goals>
-              <goal>jar</goal>
+              <goal>jar-no-fork</goal>
             </goals>
           </execution>
         </executions>
