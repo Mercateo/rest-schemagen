@@ -30,7 +30,7 @@ public class JsonViewCheckerTest {
 	@Test
 	public void test_true_without_views_in_context() throws NoSuchFieldException, SecurityException{
 		CallContext callContext=Mockito.mock(CallContext.class);
-		Mockito.when(callContext.getAddionalObjectsFor(Class.class)).thenReturn(Optional.empty());
+		Mockito.when(callContext.getAdditionalObjectsFor(Class.class)).thenReturn(Optional.empty());
 		JsonViewChecker uut=new JsonViewChecker();
 		Assert.assertTrue(uut.test(TestBean.class.getDeclaredField("viewField"), callContext));
 	}
@@ -39,7 +39,7 @@ public class JsonViewCheckerTest {
 	@Test
 	public void test_true_with_views_in_context() throws NoSuchFieldException, SecurityException{
 		CallContext callContext=Mockito.mock(CallContext.class);
-		Mockito.when(callContext.getAddionalObjectsFor(Class.class)).thenReturn(Optional.of(Sets.newHashSet(Class.class, this.getClass())));
+		Mockito.when(callContext.getAdditionalObjectsFor(Class.class)).thenReturn(Optional.of(Sets.newHashSet(Class.class, this.getClass())));
 		JsonViewChecker uut=new JsonViewChecker();
 		Assert.assertTrue(uut.test(TestBean.class.getDeclaredField("viewField"), callContext));
 	}
@@ -47,7 +47,7 @@ public class JsonViewCheckerTest {
 	@Test
 	public void test_false_with_views_in_context() throws NoSuchFieldException, SecurityException{
 		CallContext callContext=Mockito.mock(CallContext.class);
-		Mockito.when(callContext.getAddionalObjectsFor(Class.class)).thenReturn(Optional.of(Sets.newHashSet(this.getClass())));
+		Mockito.when(callContext.getAdditionalObjectsFor(Class.class)).thenReturn(Optional.of(Sets.newHashSet(this.getClass())));
 		JsonViewChecker uut=new JsonViewChecker();
 		Assert.assertFalse(uut.test(TestBean.class.getDeclaredField("viewField"), callContext));
 	}

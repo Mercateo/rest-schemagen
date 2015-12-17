@@ -43,15 +43,6 @@ public class CallContext {
         parameters.put(value, parameter);
     }
 
-    /**
-     * @deprecated please use {@link #addAdditionalObjects(Class, Object[])} instead
-     */
-    @SafeVarargs
-    @Deprecated
-    public final <T> CallContext addAddionalObjects(Class<T> clazz, T... objects) {
-        return addAdditionalObjects(clazz, objects);
-    }
-
     @SuppressWarnings("unchecked")
     public <T> CallContext addAdditionalObjects(Class<T> clazz, T... objects) {
         requireNonNull(clazz);
@@ -70,14 +61,6 @@ public class CallContext {
         }
 
         return this;
-    }
-
-    /**
-     * @deprecated please use {@link #getAdditionalObjectsFor(Class)} instead
-     */
-    @Deprecated
-    public <T> Optional<Set<T>> getAddionalObjectsFor(Class<T> clazz) {
-        return getAdditionalObjectsFor(clazz);
     }
 
     @SuppressWarnings("unchecked")

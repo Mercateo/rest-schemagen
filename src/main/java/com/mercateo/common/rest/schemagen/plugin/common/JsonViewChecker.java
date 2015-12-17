@@ -20,7 +20,7 @@ public class JsonViewChecker implements FieldCheckerForSchema {
         final JsonView jsonView = field.getAnnotation(JsonView.class);
         if (jsonView != null) {
             @SuppressWarnings("rawtypes")
-            Optional<Set<Class>> viewClasses = context.getAddionalObjectsFor(Class.class);
+            Optional<Set<Class>> viewClasses = context.getAdditionalObjectsFor(Class.class);
             return !viewClasses.isPresent() || Arrays.stream(jsonView.value()).anyMatch(c->viewClasses.get().contains(c));
         }
         return true;
