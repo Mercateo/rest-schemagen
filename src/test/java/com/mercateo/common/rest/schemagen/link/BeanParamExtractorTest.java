@@ -5,17 +5,19 @@
  */
 package com.mercateo.common.rest.schemagen.link;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Map;
-
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class BeanParamExtractorTest {
 
@@ -75,6 +77,51 @@ public class BeanParamExtractorTest {
     public void testNullValuesNotInMap() {
         ChildBeanParam bean = new ChildBeanParam();
         assertThat(beanParamExtractor.getQueryParameters(bean)).doesNotContainKey("q1");
+    }
+
+    @Test
+    public void testDoubleDefinitionOfSamePathParam() {
+        final InvalidPathBeanParam beanParam = new InvalidPathBeanParam();
+
+        assertThatThrownBy(() -> beanParamExtractor.getPathParameters(beanParam))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessage("No single occurence of a PathParam annotation for name path");
+    }
+
+    @Test
+    public void testUseOfTemplates() {
+        final PathBeanParam beanParam = new PathBeanParam();
+
+        final Map<String, Object> pathParameters = beanParamExtractor.getPathParameters(beanParam);
+
+        assertThat(pathParameters).hasSize(1).containsEntry("pathParam", "{pathParam}");
+    }
+
+    @Test
+    public void testCollectionQueryParams() {
+        final CollectionQueryBeanParam queryParam = new CollectionQueryBeanParam();
+        queryParam.setValues(Arrays.asList("foo", "bar"));
+
+        final Map<String, Object[]> queryParameters = beanParamExtractor.getQueryParameters(queryParam);
+
+        assertThat(queryParameters).hasSize(1).containsEntry("names", new Object[]{"foo", "bar"});
+    }
+
+    public static class CollectionQueryBeanParam {
+        @QueryParam("names")
+        private List<String> values;
+
+        public void setValues(List<String> values) {
+            this.values = values;
+        }
+    }
+
+    public static class PathBeanParam {
+        @PathParam("pathParam")
+        private String path;
+
+        @QueryParam("queryParam")
+        private String query;
     }
 
     public static class ParentBeanParam<T> {
@@ -139,6 +186,14 @@ public class BeanParamExtractorTest {
         public void setDoubleQ1(String path2) {
             this.path2 = path2;
         }
+    }
+
+    public static class InvalidPathBeanParam {
+        @PathParam("path")
+        private String path1;
+
+        @PathParam("path")
+        private String path2;
     }
 
 }

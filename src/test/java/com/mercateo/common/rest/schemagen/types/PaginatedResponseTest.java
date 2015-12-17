@@ -1,35 +1,34 @@
 package com.mercateo.common.rest.schemagen.types;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import com.mercateo.common.rest.schemagen.JsonHyperSchema;
+import com.mercateo.common.rest.schemagen.link.relation.RelationContainer;
+import org.junit.Test;
 
+import javax.ws.rs.core.Link;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.core.Link;
-
-import com.mercateo.common.rest.schemagen.PaginationLinkBuilder;
-import com.mercateo.common.rest.schemagen.link.relation.Rel;
-import com.mercateo.common.rest.schemagen.link.relation.RelationContainer;
-import org.junit.Test;
-
-import com.mercateo.common.rest.schemagen.JsonHyperSchema;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class PaginatedResponseTest {
 
     @Test
     public void testPaginatedResponseBuilder() {
 
-        List<Optional<Link>> containerLinks = Collections.singletonList(Optional.of(Link.fromPath(
+        final List<Optional<Link>> containerLinks = Collections.singletonList(Optional.of(Link.fromPath(
                 "/").build()));
-        final PaginatedResponse<String> listResponse = PaginatedResponse.<Integer, String> builder()
-                .withList(Arrays.asList(1, 2, 3), 1, 2).withElementMapper(this::elementMapper)
+        final PaginatedResponse<String> listResponse = PaginatedResponse.<Integer, String>builder()
+                .withList(Arrays.asList(1, 2, 3), 1, 2)
+                .withElementMapper(this::elementMapper)
                 .withPaginationLinkCreator(this::paginationLinkCreator)
-                .withContainerLinks(containerLinks).build();
+                .withContainerLinks(containerLinks)
+                .build();
 
-        final List<String> strings = listResponse.object.members.stream().map(o -> o.object)
+        final List<String> strings = listResponse.object.members.stream()
+                .map(o -> o.object)
                 .collect(Collectors.toList());
         assertThat(strings).containsExactly("2", "3");
 
@@ -40,6 +39,23 @@ public class PaginatedResponseTest {
 
         assertThat(listResponse.schema.getLinks().iterator().next().getUri().toString()).isEqualTo(
                 "/");
+    }
+
+    @Test
+    public void testPaginagedResponseBuilderWithList() {
+        final PaginatedList<Integer> paginatedList = new PaginatedList<>(10, 3, 2, Arrays.asList(1, 3));
+        final List<Optional<Link>> containerLinks = Collections.singletonList(Optional.of(Link.fromPath(
+                "/").build()));
+        final PaginatedResponse<String> listResponse = PaginatedResponse.<Integer, String>builder()
+                .withList(paginatedList)
+                .withElementMapper(this::elementMapper)
+                .withPaginationLinkCreator(this::paginationLinkCreator)
+                .withContainerLinks(containerLinks)
+                .build();
+
+        assertThat(listResponse.object.total).isEqualTo(paginatedList.total);
+        assertThat(listResponse.object.offset).isEqualTo(paginatedList.offset);
+        assertThat(listResponse.object.limit).isEqualTo(paginatedList.limit);
     }
 
     private ObjectWithSchema<String> elementMapper(Integer number) {
