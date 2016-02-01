@@ -72,11 +72,10 @@ public class LinkCreatorTest {
         implementedBeanParamType.setPathParam("path");
         implementedBeanParamType.setQueryParam1("v1");
         implementedBeanParamType.setQueryParam2("v2");
-        ScopeMethod scopeMethod = new ScopeMethod(ImplementedGenricResource.class.getMethod("get",
-                Object.class), new Object[] { implementedBeanParamType },
-                ImplementedGenricResource.class);
+        Scope scope = new CallScope(ImplementedGenricResource.class, ImplementedGenricResource.class.getMethod("get",
+                Object.class), new Object[] { implementedBeanParamType }, null);
 
-        Link link = createFor(scopeMethod, Relation.of(Rel.SELF), URI.create(
+        Link link = createFor(scope, Relation.of(Rel.SELF), URI.create(
                 "http://localhost:8080/"));
 
         assertEquals("http://localhost:8080/test/path?qp2=v2&qp1=v1", link.getUri().toString());
@@ -98,11 +97,10 @@ public class LinkCreatorTest {
         ImplementedBeanParamType implementedBeanParamType = new ImplementedBeanParamType();
         implementedBeanParamType.setPathParam("path");
 
-        ScopeMethod scopeMethod = new ScopeMethod(ImplementedGenricResource.class.getMethod("get",
-                Object.class), new Object[] { implementedBeanParamType },
-                ImplementedGenricResource.class);
+        Scope scope = new CallScope(ImplementedGenricResource.class, ImplementedGenricResource.class.getMethod("get",
+                Object.class), new Object[] { implementedBeanParamType }, null );
 
-        Link link = createFor(scopeMethod, Relation.of(Rel.SELF), URI.create(
+        Link link = createFor(scope, Relation.of(Rel.SELF), URI.create(
                 "http://localhost:8080/"));
 
         assertEquals("http://localhost:8080/test/path", link.getUri().toString());
@@ -125,11 +123,10 @@ public class LinkCreatorTest {
         ImplementedBeanParamType implementedBeanParamType = new ImplementedBeanParamType();
         implementedBeanParamType.setPathParam("path");
         implementedBeanParamType.setElements("foo", "bar", "baz");
-        ScopeMethod scopeMethod = new ScopeMethod(ImplementedGenricResource.class.getMethod("get",
-                Object.class), new Object[] { implementedBeanParamType },
-                ImplementedGenricResource.class);
+        Scope scope = new CallScope(ImplementedGenricResource.class, ImplementedGenricResource.class.getMethod("get",
+                Object.class), new Object[] { implementedBeanParamType }, null);
 
-        Link link = createFor(scopeMethod, Relation.of(Rel.SELF), URI.create(
+        Link link = createFor(scope, Relation.of(Rel.SELF), URI.create(
                 "http://localhost:8080/"));
 
         assertEquals("http://localhost:8080/test/path?elements=foo&elements=bar&elements=baz", link
@@ -148,10 +145,10 @@ public class LinkCreatorTest {
 
     private Link createFor(Class<?> invokedClass, Method method, Relation relation, URI baseUri,
             Object... params) {
-        return createFor(new ScopeMethod(method, params, invokedClass), relation, baseUri);
+        return createFor(new CallScope(invokedClass, method, params, null), relation, baseUri);
     }
 
-    private Link createFor(ScopeMethod method, Relation relation, URI baseURI) {
+    private Link createFor(Scope method, Relation relation, URI baseURI) {
         final JsonSchemaGenerator jsonSchemaGenerator = createJsonSchemaGenerator();
 
         final LinkFactoryContext linkFactoryContext = new LinkFactoryContext(jsonSchemaGenerator,
