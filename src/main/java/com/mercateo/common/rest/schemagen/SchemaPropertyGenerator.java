@@ -1,6 +1,13 @@
 package com.mercateo.common.rest.schemagen;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.google.common.collect.ImmutableMap;
+import com.mercateo.common.rest.schemagen.generator.ObjectContext;
+import com.mercateo.common.rest.schemagen.generator.PathContext;
+import com.mercateo.common.rest.schemagen.generictype.GenericType;
+
 import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -12,11 +19,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.google.common.collect.ImmutableMap;
-import com.mercateo.common.rest.schemagen.generator.ObjectContext;
-import com.mercateo.common.rest.schemagen.generator.PathContext;
 
 public class SchemaPropertyGenerator {
 
@@ -36,6 +38,7 @@ public class SchemaPropertyGenerator {
      *            the object context builder for the object to build the
      *            property hierarchy for
      * @param context
+     *            the current schema property context
      * @return property hierarchy
      */
     public Property generateSchemaProperty(ObjectContext.Builder<?> objectContextBuilder,
@@ -51,14 +54,20 @@ public class SchemaPropertyGenerator {
      *            the object context for the object to build the property
      *            hierarchy for
      * @param context
+     *            the current schema property context
      * @return property hierarchy
      */
     public Property generateSchemaProperty(ObjectContext<?> objectContext,
             SchemaPropertyContext context) {
         final Property property = determineProperty("#", objectContext, new PathContext(), context);
         addIdsToReferencedElements(property, new HashMap<>());
+        final String name = objectContext.getRawType().getSimpleName();
+        return updateName(objectContext, property, name);
+    }
+
+    private Property updateName(ObjectContext<?> objectContext, Property property, String name) {
         return Property.builderFor(objectContext).withProperty(property).withName(
-                objectContext.getRawType().getSimpleName()).build();
+                name).build();
     }
 
     private void addIdsToReferencedElements(Property property, Map<String, Property> pathMap) {
@@ -182,19 +191,41 @@ public class SchemaPropertyGenerator {
             PathContext pathContext, SchemaPropertyContext context) {
         List<Property> properties = new ArrayList<>();
         switch (objectContext.getPropertyType()) {
-        case OBJECT:
-            properties = getProperties(objectContext, pathContext, context);
-            break;
+            case OBJECT:
+                final PropertySubType subType = objectContext.getPropertySubType();
+                switch (subType) {
+                    case DICT:
+                        properties = getDictProperties(objectContext, pathContext, context);
+                        break;
+                    default:
+                        properties = getProperties(objectContext, pathContext, context);
+                }
+                break;
 
-        case ARRAY:
-            properties
-                    .add(determineProperty("", objectContext.getContained(), pathContext, context));
-            break;
+            case ARRAY:
+                properties
+                        .add(determineProperty("", objectContext.getContained(), pathContext, context));
+                break;
 
-        default:
-            break;
+            default:
+                break;
         }
         return properties;
+    }
+
+    private List<Property> getDictProperties(ObjectContext<?> objectContext, PathContext pathContext, SchemaPropertyContext context) {
+        ParameterizedType parameterizedType = (ParameterizedType) objectContext.getType().getType();
+
+        final Class<?> keyType = (Class<?>) parameterizedType.getActualTypeArguments()[0];
+        final Type valueType = parameterizedType.getActualTypeArguments()[1];
+        final ObjectContext<?> valueObjectContext = ObjectContext.buildFor(GenericType.of(valueType)).build();
+        Property valueProperty = determineProperty("", valueObjectContext, pathContext, context);
+
+        return Stream.of(keyType.getEnumConstants())
+                .map(enumConstant -> {
+                    final String enumName = ((Enum<?>) enumConstant).name();
+                    return updateName(objectContext, valueProperty, enumName);
+                }).collect(Collectors.toList());
     }
 
 }
