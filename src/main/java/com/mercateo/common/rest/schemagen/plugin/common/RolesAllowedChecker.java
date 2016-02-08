@@ -10,7 +10,7 @@ import javax.ws.rs.core.SecurityContext;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.glassfish.jersey.server.model.AnnotatedMethod;
 
-import com.mercateo.common.rest.schemagen.link.ScopeMethod;
+import com.mercateo.common.rest.schemagen.link.Scope;
 import com.mercateo.common.rest.schemagen.plugin.MethodCheckerForLink;
 
 /**
@@ -28,9 +28,9 @@ public class RolesAllowedChecker implements MethodCheckerForLink {
     }
 
     @Override
-    public boolean test(ScopeMethod scopeMethod) {
+    public boolean test(Scope scope) {
 
-        AnnotatedMethod am = new AnnotatedMethod(scopeMethod.getInvokedMethod());
+        AnnotatedMethod am = new AnnotatedMethod(scope.getInvokedMethod());
 
         // DenyAll on the method take precedence over RolesAllowed and PermitAll
         if (am.isAnnotationPresent(DenyAll.class)) {
@@ -52,7 +52,7 @@ public class RolesAllowedChecker implements MethodCheckerForLink {
         // DenyAll can't be attached to classes
 
         // RolesAllowed on the class takes precedence over PermitAll
-        ra = scopeMethod.getInvokedClass().getAnnotation(RolesAllowed.class);
+        ra = scope.getInvokedClass().getAnnotation(RolesAllowed.class);
         if (ra != null) {
             return checkRoles(ra.value());
         }

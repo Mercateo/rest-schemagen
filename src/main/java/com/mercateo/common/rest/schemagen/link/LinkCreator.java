@@ -47,40 +47,40 @@ public class LinkCreator {
     /**
      * create a link for a resource method
      *
-     * @param scopeMethods
-     *            list of ScopeMethod objects for every scope level
+     * @param scopes
+     *            list of Scope objects for every scope level
      *
      * @param relation
      *            relation of method
      *
      * @return link with schema if applicable
      */
-    public Link createFor(List<ScopeMethod> scopeMethods, Relation relation) {
-        final Class<?> resourceClass = scopeMethods.get(0).getInvokedClass();
+    public Link createFor(List<Scope> scopes, Relation relation) {
+        final Class<?> resourceClass = scopes.get(0).getInvokedClass();
         UriBuilder uriBuilder = UriBuilder.fromResource(resourceClass);
 
         Map<String, Object> pathParameters = new HashMap<>();
-        for (ScopeMethod scopeMethod : scopeMethods) {
-            final Method method = scopeMethod.getInvokedMethod();
-            final Object[] parameters = scopeMethod.getParams();
+        for (Scope scope : scopes) {
+            final Method method = scope.getInvokedMethod();
+            final Object[] parameters = scope.getParams();
             if (method.isAnnotationPresent(Path.class)) {
                 uriBuilder.path(method.getDeclaringClass(), method.getName());
             }
-            pathParameters.putAll(collectPathParameters(scopeMethod, parameters));
-            setQueryParameters(uriBuilder, scopeMethod, parameters);
+            pathParameters.putAll(collectPathParameters(scope, parameters));
+            setQueryParameters(uriBuilder, scope, parameters);
         }
 
         final URI uri = uriBuilder.buildFromMap(pathParameters);
         Builder builder = Link.fromUri(uri).rel(relation.getName());
 
-        addLinkProperties(scopeMethods, builder);
+        addLinkProperties(scopes, builder);
 
         if (requireNonNull(relation).getType().isShouldBeSerialized()) {
             builder.param("relType", relation.getType().getName());
             builder.param("target", relation.getType().getSerializedName());
         }
 
-        final ScopeMethod lastScopedMethod = Iterables.getLast(scopeMethods);
+        final Scope lastScopedMethod = Iterables.getLast(scopes);
         addHttpMethod(builder, lastScopedMethod);
         addSchemaIfNeeded(builder, lastScopedMethod);
         if (linkFactoryContext.getBaseUri() != null) {
@@ -89,15 +89,15 @@ public class LinkCreator {
         return builder.build();
     }
 
-    private void addLinkProperties(List<ScopeMethod> scopeMethods, Builder builder) {
-        final LinkProperties properties = Iterables.getLast(scopeMethods).getInvokedMethod()
+    private void addLinkProperties(List<Scope> scopes, Builder builder) {
+        final LinkProperties properties = Iterables.getLast(scopes).getInvokedMethod()
                 .getAnnotation(LinkProperties.class);
         if (properties != null) {
             Stream.of(properties.value()).forEach(x -> builder.param(x.key(), x.value()));
         }
     }
 
-    private Map<String, Object> collectPathParameters(ScopeMethod scopeMethod,
+    private Map<String, Object> collectPathParameters(Scope scope,
             Object[] parameters) {
         final Map<String, Object> pathParameters = new HashMap<>();
         visitAnnotations((parameter, parameterIndex, annotation) -> {
@@ -108,15 +108,15 @@ public class LinkCreator {
                 BeanParamExtractor beanParamExtractor = new BeanParamExtractor();
                 pathParameters.putAll(beanParamExtractor.getPathParameters(parameter));
             }
-        } , scopeMethod.getInvokedMethod(), parameters);
+        } , scope.getInvokedMethod(), parameters);
 
         return pathParameters;
     }
 
-    private void setQueryParameters(final UriBuilder uriBuilder, ScopeMethod scopeMethod,
+    private void setQueryParameters(final UriBuilder uriBuilder, Scope scope,
             Object[] parameters) {
-        Type[] realParamTypes = GenericTypeReflector.getExactParameterTypes(scopeMethod
-                .getInvokedMethod(), scopeMethod.getInvokedClass());
+        Type[] realParamTypes = GenericTypeReflector.getExactParameterTypes(scope
+                .getInvokedMethod(), scope.getInvokedClass());
         visitAnnotations((parameter, parameterIndex, annotation) -> {
             if (annotation instanceof QueryParam && parameter != null) {
                 uriBuilder.queryParam(((QueryParam) annotation).value(), parameter.toString());
@@ -128,13 +128,13 @@ public class LinkCreator {
                     queryParameter.forEach((uriBuilder::queryParam));
                 }
             }
-        } , scopeMethod.getInvokedMethod(), parameters);
+        } , scope.getInvokedMethod(), parameters);
     }
 
-    private void addHttpMethod(Builder builder, ScopeMethod scopeMethod) {
+    private void addHttpMethod(Builder builder, Scope scope) {
         final List<Class<? extends Annotation>> httpMethodAnnotations = Arrays.asList(GET.class,
                 POST.class, PUT.class, DELETE.class);
-        final Method invokedMethod = scopeMethod.getInvokedMethod();
+        final Method invokedMethod = scope.getInvokedMethod();
         final Optional<Class<? extends Annotation>> httpMethod = httpMethodAnnotations.stream()
                 .filter(invokedMethod::isAnnotationPresent).findFirst();
 
@@ -148,7 +148,7 @@ public class LinkCreator {
         }
     }
 
-    private void addSchemaIfNeeded(Builder builder, ScopeMethod method) {
+    private void addSchemaIfNeeded(Builder builder, Scope method) {
         final JsonSchemaGenerator schemaGenerator = linkFactoryContext.getSchemaGenerator();
         Optional<String> optionalInputSchema = schemaGenerator.createInputSchema(method,
                 linkFactoryContext.getFieldCheckerForSchema());

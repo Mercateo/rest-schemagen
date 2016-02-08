@@ -2,7 +2,7 @@ package com.mercateo.common.rest.schemagen.plugin;
 
 import java.util.function.Predicate;
 
-import com.mercateo.common.rest.schemagen.link.ScopeMethod;
+import com.mercateo.common.rest.schemagen.link.Scope;
 
 /**
  * Checks if a link should be created for that method.
@@ -10,9 +10,9 @@ import com.mercateo.common.rest.schemagen.link.ScopeMethod;
  * @author joerg_adler
  *
  */
-public interface MethodCheckerForLink extends Predicate<ScopeMethod> {
+public interface MethodCheckerForLink extends Predicate<Scope> {
 
-    static MethodCheckerForLink fromPredicate(Predicate<ScopeMethod> predicate) {
+    static MethodCheckerForLink fromPredicate(Predicate<Scope> predicate) {
         return s -> predicate.test(s);
     }
 

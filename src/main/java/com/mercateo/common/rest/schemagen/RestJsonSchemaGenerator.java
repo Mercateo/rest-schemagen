@@ -25,7 +25,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mercateo.common.rest.schemagen.annotation.Media;
 import com.mercateo.common.rest.schemagen.generator.ObjectContext;
 import com.mercateo.common.rest.schemagen.generictype.GenericType;
-import com.mercateo.common.rest.schemagen.link.ScopeMethod;
+import com.mercateo.common.rest.schemagen.link.Scope;
 import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 
 public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
@@ -44,38 +44,38 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
     }
 
     @Override
-    public Optional<String> createOutputSchema(ScopeMethod method,
+    public Optional<String> createOutputSchema(Scope scope,
             FieldCheckerForSchema fieldCheckerForSchema) {
-        logger.debug("createOutputSchema {}", method);
-        final GenericType<?> genericType = GenericType.of(method.getReturnType(), method
+        logger.debug("createOutputSchema {}", scope);
+        final GenericType<?> genericType = GenericType.of(scope.getReturnType(), scope
                 .getInvokedMethod().getReturnType());
 
         if (!INVALID_OUTPUT_TYPES.contains(genericType.getRawType())) {
             return generateJsonSchema(ObjectContext.buildFor(genericType).build(),
-                    createSchemaPropertyContext(method, fieldCheckerForSchema)).map(
+                    createSchemaPropertyContext(scope, fieldCheckerForSchema)).map(
                             Object::toString);
         } else {
             return Optional.empty();
         }
     }
 
-    private SchemaPropertyContext createSchemaPropertyContext(ScopeMethod method,
+    private SchemaPropertyContext createSchemaPropertyContext(Scope method,
             FieldCheckerForSchema fieldCheckerForSchema) {
-        return new SchemaPropertyContext(method.getCallContext(), fieldCheckerForSchema);
+        return new SchemaPropertyContext(method.getCallContext().get(), fieldCheckerForSchema);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public Optional<String> createInputSchema(ScopeMethod method,
+    public Optional<String> createInputSchema(Scope scope,
             FieldCheckerForSchema fieldCheckerForSchema) {
         Map<String, ObjectNode> objectNodes = new HashMap<>();
 
-        logger.debug("createInputSchema {}", method);
+        logger.debug("createInputSchema {}", scope);
 
-        final Type[] types = method.getParameterTypes();
+        final Type[] types = scope.getParameterTypes();
 
         for (int i = 0; i < types.length; i++) {
-            Annotation[] paramAns = method.getInvokedMethod().getParameterAnnotations()[i];
+            Annotation[] paramAns = scope.getInvokedMethod().getParameterAnnotations()[i];
             Optional<Media> media = Optional.empty();
 
             boolean ignore = false;
@@ -102,20 +102,20 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
                 final ObjectContext.Builder objectContextBuilder = ObjectContext.buildFor(
                         GenericType.of(types[i]));
 
-                if (method.hasAllowedValues(i)) {
-                    final List<Object> allowedValues = method.getAllowedValues(i);
+                if (scope.hasAllowedValues(i)) {
+                    final List<Object> allowedValues = scope.getAllowedValues(i);
                     objectContextBuilder.withAllowedValues(allowedValues);
                 }
-                if (method.getParams() != null && method.getParams().length > i) {
-                    objectContextBuilder.withCurrentValue(method.getParams()[i]);
+                if (scope.getParams() != null && scope.getParams().length > i) {
+                    objectContextBuilder.withCurrentValue(scope.getParams()[i]);
                 }
 
-                if (method.hasDefaultValue(i)) {
-                    objectContextBuilder.withDefaultValue(method.getDefaultValue(i));
+                if (scope.hasDefaultValue(i)) {
+                    objectContextBuilder.withDefaultValue(scope.getDefaultValue(i));
                 }
 
                 final Optional<ObjectNode> objectNodeOption = generateJsonSchema(
-                        objectContextBuilder.build(), createSchemaPropertyContext(method,
+                        objectContextBuilder.build(), createSchemaPropertyContext(scope,
                                 fieldCheckerForSchema));
                 if (!objectNodeOption.isPresent()) {
                     continue;
