@@ -5,14 +5,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import javax.ws.rs.PathParam;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -354,6 +350,34 @@ public class SchemaPropertyGeneratorTest {
     }
 
     @Test
+    public void testObjectWithMapAsObject() {
+        final Property property = generateSchemaProperty(SchemaObjectWithMapAsObject.class);
+        assertThat(property.getType()).isEqualTo(PropertyType.OBJECT);
+        List<Property> properties = property.getProperties();
+        assertThat(properties).hasSize(1);
+    }
+
+    @Test
+    public void testObjectWithMapAsDict() {
+        final Property property = generateSchemaProperty(SchemaObjectWithMapAsDict.class);
+        assertThat(property.getType()).isEqualTo(PropertyType.OBJECT);
+        List<Property> properties = property.getProperties();
+        assertThat(properties).hasSize(1);
+
+        final List<Property> dictProperties = properties.get(0).getProperties();
+
+        assertThat(dictProperties.get(0).getName()).isEqualTo("FOO");
+        assertThat(dictProperties.get(0).getType()).isEqualTo(PropertyType.ARRAY);
+        List<Property> innerArrayProperties = dictProperties.get(0).getProperties();
+        assertThat(innerArrayProperties).hasSize(1);
+
+        assertThat(dictProperties.get(1).getName()).isEqualTo("BAR");
+        assertThat(dictProperties.get(1).getType()).isEqualTo(PropertyType.ARRAY);
+        innerArrayProperties = dictProperties.get(1).getProperties();
+        assertThat(innerArrayProperties).hasSize(1);
+    }
+
+    @Test
     public void testObjectWithUnwrappedContent() {
         Property property = generateSchemaProperty(SchemaObjectWithUnwrappedContent.class);
         assertThat(property.getName()).isEqualTo("SchemaObjectWithUnwrappedContent");
@@ -570,6 +594,14 @@ public class SchemaPropertyGeneratorTest {
 
     public static class SchemaObjectWithNestedArrayElement {
         public Integer[][] values;
+    }
+
+    public static class SchemaObjectWithMapAsObject {
+        public Map<String, List<String>> valuesByKey;
+    }
+
+    public static class SchemaObjectWithMapAsDict {
+        public Map<TestEnum, List<String>> valuesByKey;
     }
 
     public static class SchemaObjectWithUnwrappedContent {

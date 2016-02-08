@@ -1,11 +1,11 @@
 package com.mercateo.common.rest.schemagen;
 
+import com.mercateo.common.rest.schemagen.generictype.GenericType;
+
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
-
-import com.mercateo.common.rest.schemagen.generictype.GenericType;
 
 public final class PropertyTypeMapper {
 

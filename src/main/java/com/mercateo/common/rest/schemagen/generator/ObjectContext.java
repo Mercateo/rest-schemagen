@@ -25,6 +25,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.collect.ImmutableList;
 import com.googlecode.gentyref.GenericTypeReflector;
 import com.mercateo.common.rest.schemagen.IgnoreInRestSchema;
+import com.mercateo.common.rest.schemagen.PropertySubType;
+import com.mercateo.common.rest.schemagen.PropertySubTypeMapper;
 import com.mercateo.common.rest.schemagen.PropertyType;
 import com.mercateo.common.rest.schemagen.PropertyTypeMapper;
 import com.mercateo.common.rest.schemagen.SchemaPropertyContext;
@@ -58,6 +60,7 @@ public class ObjectContext<T> {
     private final Class<? extends IndividualSchemaGenerator> schemaGenerator;
 
     private T currentValue;
+    private PropertySubType propertySubType;
 
     ObjectContext(GenericType<T> type, T defaultValue, List<T> allowedValues, boolean required,
                   SizeConstraints sizeConstraints,
@@ -65,6 +68,7 @@ public class ObjectContext<T> {
         this.type = requireNonNull(type);
         this.currentValue = currentValue;
         this.propertyType = PropertyTypeMapper.of(type);
+        this.propertySubType = PropertySubTypeMapper.of(type, this.propertyType);
         this.defaultValue = defaultValue;
         this.allowedValues = allowedValues;
         this.required = required;
@@ -122,6 +126,10 @@ public class ObjectContext<T> {
 
     public PropertyType getPropertyType() {
         return propertyType;
+    }
+
+    public PropertySubType getPropertySubType() {
+        return propertySubType;
     }
 
     public Class<? extends IndividualSchemaGenerator> getSchemaGenerator() {
