@@ -24,7 +24,7 @@ public class ValidationErrors {
             validationErrors = new ArrayList<>();
         }
 
-        public Builder addError(ValidationErrorCode code, String path) {
+        public Builder addError(ValidationErrorCodeContainer code, String path) {
             HashMap<MessageKey, String> entries = new HashMap<>();
             entries.put(MessageKey.path, path);
             addError(new ValidationError(code, entries));
@@ -65,9 +65,9 @@ public class ValidationErrors {
             return entries;
         }
 
-        public ValidationError(ValidationErrorCode code, HashMap<MessageKey, String> otherEntries) {
+        public ValidationError(ValidationErrorCodeContainer code, HashMap<MessageKey, String> otherEntries) {
             HashMap<MessageKey, String> entries = new HashMap<>();
-            entries.put(MessageKey.validationErrorCode, code.toString());
+            entries.put(MessageKey.validationErrorCode, code.name());
             if (otherEntries != null) {
                 entries.putAll(otherEntries);
             }
@@ -80,9 +80,20 @@ public class ValidationErrors {
         validationErrorCode, path, minimum, maximum
     }
 
-    public enum ValidationErrorCode {
+    @Deprecated
+    /**
+     * @deprecated
+     *
+     * This Enum should be implemented inside the specific service project.
+     *
+     */
+    public enum ValidationErrorCode implements ValidationErrorCodeContainer {
         REQUIRED, UNKNOWN, STRING_LENGTH_SHORT, STRING_LENGTH_LONG, DUPLICATE,
         NO_PACKSTATION_ALLOWED, NO_POST_OFFICE_BOX_ALLOWED, NO_VALID_EMAIL, UNRECOGNIZED_FIELD,
         VALUE_BELOW_MIN, VALUE_ABOVE_MAX, NO_VALID_ZIP, USER_EXISTS, WRONG_PASSWORD
+    }
+
+    public interface ValidationErrorCodeContainer {
+        String name();
     }
 }

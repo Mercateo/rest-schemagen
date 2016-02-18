@@ -20,7 +20,7 @@ public class ValidationErrorTest {
     @Test
     public void testAddValidationErrorWithCodeAndPath() {
         final String errorLocation = "#/foo";
-        final ValidationErrors.ValidationErrorCode errorCode = ValidationErrors.ValidationErrorCode.REQUIRED;
+        final TestValidationErrorCode errorCode = TestValidationErrorCode.REQUIRED;
         final ValidationErrors.Data validationErrorsData = ValidationErrors.builder().addError(
                 errorCode, errorLocation).build();
 
@@ -34,7 +34,7 @@ public class ValidationErrorTest {
 
     @Test
     public void testValidationErrorAdd() {
-        final ValidationErrors.ValidationErrorCode errorCode = ValidationErrors.ValidationErrorCode.DUPLICATE;
+        final TestValidationErrorCode errorCode = TestValidationErrorCode.DUPLICATE;
 
         final ValidationErrors.ValidationError validationError = new ValidationErrors.ValidationError(errorCode, new HashMap<>());
 
@@ -49,5 +49,9 @@ public class ValidationErrorTest {
                 .hasSize(2) //
                 .containsEntry(ValidationErrors.MessageKey.validationErrorCode, errorCode.toString())
                 .containsEntry(ValidationErrors.MessageKey.maximum, maximumValue);
+    }
+
+    public enum TestValidationErrorCode implements ValidationErrors.ValidationErrorCodeContainer {
+        REQUIRED, DUPLICATE
     }
 }
