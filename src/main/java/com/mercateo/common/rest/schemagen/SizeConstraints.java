@@ -6,6 +6,8 @@ import javax.validation.constraints.Size;
 
 public class SizeConstraints {
 
+    private static final SizeConstraints EMPTY_CONSTRAINTS = new SizeConstraints();
+
     private Optional<Integer> max;
 
     private Optional<Integer> min;
@@ -28,7 +30,7 @@ public class SizeConstraints {
             throw new IllegalArgumentException(String.format(
                     "Minimum value %s is larger than maximum value %s", min, max));
         }
-        if (min < 0 || max < 0) {
+        if (min < 0) {
             throw new IllegalArgumentException("Supplied arguments must be non-negative");
         }
         this.max = max == Integer.MAX_VALUE ? Optional.empty() : Optional.of(max);
@@ -36,7 +38,7 @@ public class SizeConstraints {
     }
 
     public static SizeConstraints empty() {
-        return new SizeConstraints();
+        return EMPTY_CONSTRAINTS;
     }
 
     private SizeConstraints() {
