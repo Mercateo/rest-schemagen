@@ -37,6 +37,7 @@ public class LinkCreator {
     public static final String SCHEMA_PARAM_KEY = "schema";
 
     public static final String METHOD_PARAM_KEY = "method";
+   
 
     private final LinkFactoryContext linkFactoryContext;
 
@@ -44,6 +45,16 @@ public class LinkCreator {
         this.linkFactoryContext = requireNonNull(linkFactoryContext);
     }
 
+    public static Builder setRelation(Relation relation, URI uri) {
+    	requireNonNull(relation);
+    	requireNonNull(uri);
+    	Builder builder = Link.fromUri(uri).rel(relation.getName());
+    	if (requireNonNull(relation).getType().isShouldBeSerialized()) {
+    		builder.param("relType", relation.getType().getName());
+    		builder.param("target", relation.getType().getSerializedName());
+    	}
+    	return builder;
+    }
     /**
      * create a link for a resource method
      *
@@ -71,14 +82,10 @@ public class LinkCreator {
         }
 
         final URI uri = uriBuilder.buildFromMap(pathParameters);
-        Builder builder = Link.fromUri(uri).rel(relation.getName());
+        
+        Builder builder = setRelation(relation, uri);
 
         addLinkProperties(scopes, builder);
-
-        if (requireNonNull(relation).getType().isShouldBeSerialized()) {
-            builder.param("relType", relation.getType().getName());
-            builder.param("target", relation.getType().getSerializedName());
-        }
 
         final Scope lastScopedMethod = Iterables.getLast(scopes);
         addHttpMethod(builder, lastScopedMethod);
@@ -88,6 +95,7 @@ public class LinkCreator {
         }
         return builder.build();
     }
+
 
     private void addLinkProperties(List<Scope> scopes, Builder builder) {
         final LinkProperties properties = Iterables.getLast(scopes).getInvokedMethod()

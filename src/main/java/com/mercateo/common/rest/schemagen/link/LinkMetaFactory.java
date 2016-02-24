@@ -14,45 +14,46 @@ import com.mercateo.common.rest.schemagen.plugin.MethodCheckerForLink;
 
 public class LinkMetaFactory {
 
-    private final LinkFactoryContext linkFactoryContext;
+	private static final ExternalLinkFactory externalLinkFactory = new ExternalLinkFactory();
 
-    LinkMetaFactory(JsonSchemaGenerator schemaGenerator, URI baseUri,
-            MethodCheckerForLink methodCheckerForLink,
-            FieldCheckerForSchema fieldCheckerForSchema) {
-        this(new LinkFactoryContext(schemaGenerator, baseUri, methodCheckerForLink,
-                fieldCheckerForSchema));
-    }
+	private final LinkFactoryContext linkFactoryContext;
 
-    protected LinkMetaFactory() {
-        this(null);
-    }
+	LinkMetaFactory(JsonSchemaGenerator schemaGenerator, URI baseUri, MethodCheckerForLink methodCheckerForLink,
+			FieldCheckerForSchema fieldCheckerForSchema) {
+		this(new LinkFactoryContext(schemaGenerator, baseUri, methodCheckerForLink, fieldCheckerForSchema));
+	}
 
-    LinkMetaFactory(LinkFactoryContext linkFactoryContext) {
-        this.linkFactoryContext = linkFactoryContext;
-    }
+	protected LinkMetaFactory() {
+		this(null);
+	}
 
-    public static LinkMetaFactory create(JsonSchemaGenerator jsonSchemaGenerator, URI baseUri,
-            MethodCheckerForLink methodCheckerForLink,
-            FieldCheckerForSchema fieldCheckerForSchema) {
+	LinkMetaFactory(LinkFactoryContext linkFactoryContext) {
+		this.linkFactoryContext = linkFactoryContext;
+	}
 
-        checkNotNull(baseUri);
-        checkNotNull(methodCheckerForLink);
-        checkNotNull(fieldCheckerForSchema);
-        return new LinkMetaFactory(jsonSchemaGenerator, baseUri, methodCheckerForLink,
-                fieldCheckerForSchema);
-    }
+	public static LinkMetaFactory create(JsonSchemaGenerator jsonSchemaGenerator, URI baseUri,
+			MethodCheckerForLink methodCheckerForLink, FieldCheckerForSchema fieldCheckerForSchema) {
 
-    @VisibleForTesting
-    public static LinkMetaFactory createInsecureFactoryForTest() {
-        return new LinkMetaFactory(new RestJsonSchemaGenerator(), URI.create(""), r -> true, (r,
-                c) -> true);
-    }
+		checkNotNull(baseUri);
+		checkNotNull(methodCheckerForLink);
+		checkNotNull(fieldCheckerForSchema);
+		return new LinkMetaFactory(jsonSchemaGenerator, baseUri, methodCheckerForLink, fieldCheckerForSchema);
+	}
 
-    public <T extends JerseyResource> LinkFactory<T> createFactoryFor(Class<T> resourceClass) {
-        return new LinkFactory<>(resourceClass, linkFactoryContext, new ArrayList<>());
-    }
+	@VisibleForTesting
+	public static LinkMetaFactory createInsecureFactoryForTest() {
+		return new LinkMetaFactory(new RestJsonSchemaGenerator(), URI.create(""), r -> true, (r, c) -> true);
+	}
 
-    public LinkFactoryContext getFactoryContext() {
-        return linkFactoryContext;
-    }
+	public <T extends JerseyResource> LinkFactory<T> createFactoryFor(Class<T> resourceClass) {
+		return new LinkFactory<>(resourceClass, linkFactoryContext, new ArrayList<>());
+	}
+
+	public LinkFactoryContext getFactoryContext() {
+		return linkFactoryContext;
+	}
+
+	public ExternalLinkFactory externalLinkFactory() {
+		return externalLinkFactory;
+	}
 }
