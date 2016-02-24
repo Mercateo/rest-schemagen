@@ -3,6 +3,7 @@ package com.mercateo.common.rest.schemagen.validation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -65,7 +66,7 @@ public class ValidationErrors {
             return entries;
         }
 
-        public ValidationError(ValidationErrorCodeContainer code, HashMap<MessageKey, String> otherEntries) {
+        public ValidationError(ValidationErrorCodeContainer code, Map<MessageKey, String> otherEntries) {
             HashMap<MessageKey, String> entries = new HashMap<>();
             entries.put(MessageKey.validationErrorCode, code.name());
             if (otherEntries != null) {
@@ -73,24 +74,17 @@ public class ValidationErrors {
             }
             this.entries = entries;
         }
-
     }
 
     public enum MessageKey {
         validationErrorCode, path, minimum, maximum
     }
 
-    @Deprecated
-    /**
-     * @deprecated
-     *
-     * This Enum should be implemented inside the specific service project.
-     *
-     */
     public enum ValidationErrorCode implements ValidationErrorCodeContainer {
         REQUIRED, UNKNOWN, STRING_LENGTH_SHORT, STRING_LENGTH_LONG, DUPLICATE,
-        NO_PACKSTATION_ALLOWED, NO_POST_OFFICE_BOX_ALLOWED, NO_VALID_EMAIL, UNRECOGNIZED_FIELD,
-        VALUE_BELOW_MIN, VALUE_ABOVE_MAX, NO_VALID_ZIP, USER_EXISTS, WRONG_PASSWORD
+        @Deprecated NO_PACKSTATION_ALLOWED,
+        @Deprecated NO_POST_OFFICE_BOX_ALLOWED, @Deprecated NO_VALID_EMAIL, UNRECOGNIZED_FIELD,
+        VALUE_BELOW_MIN, VALUE_ABOVE_MAX, @Deprecated NO_VALID_ZIP, @Deprecated USER_EXISTS, WRONG_PASSWORD
     }
 
     public interface ValidationErrorCodeContainer {
