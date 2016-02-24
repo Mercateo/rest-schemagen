@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static com.google.common.base.CaseFormat.*;
 
 @SuppressWarnings({"boxing", "unused"})
 @RunWith(MockitoJUnitRunner.class)
@@ -178,6 +179,18 @@ public class RestJsonSchemaGeneratorTest {
     }
 
     @Test
+    public void createInputSchemaWithEnumParamWithJsonValue() throws NoSuchMethodException {
+        final Method enumValue = getTestResourceMethod("enumValueJsonValue", TestEnumJsonValue.class);
+        final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
+                enumValue, new Object[]{null}, CallContext.create()) {
+        }, fieldCheckerForSchema);
+
+        assertThat(inputSchema.isPresent()).isTrue();
+        assertThat(inputSchema.get()).containsIgnoringCase(
+                "{\"type\":\"string\",\"enum\":[\"fooValue\",\"barValue\"]}");
+    }
+
+    @Test
     public void createInputSchemaWithMediaParam() {
         final Method enumValue = getTestResourceMethod("media", String.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
@@ -199,6 +212,15 @@ public class RestJsonSchemaGeneratorTest {
 
     public enum TestEnum {
         FOO_VALUE, BAR_VALUE;
+    }
+
+    public enum TestEnumJsonValue {
+        FOO_VALUE, BAR_VALUE;
+
+        @JsonValue
+        public String getValue() {
+            return UPPER_UNDERSCORE.to(LOWER_CAMEL, name());
+        }
     }
 
     public static class TestBeanParam {
@@ -257,6 +279,12 @@ public class RestJsonSchemaGeneratorTest {
         @GET
         @Path("/enumValue")
         public void enumValue(TestEnum enumValue) {
+            // Nothing to do
+        }
+
+        @GET
+        @Path("/enumValueJsonValue")
+        public void enumValueJsonValue(TestEnumJsonValue enumValue) {
             // Nothing to do
         }
 

@@ -1,5 +1,7 @@
 package com.mercateo.common.rest.schemagen;
 
+import static com.google.common.base.CaseFormat.LOWER_CAMEL;
+import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -9,6 +11,7 @@ import java.util.*;
 
 import javax.ws.rs.PathParam;
 
+import com.fasterxml.jackson.annotation.JsonValue;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -378,6 +381,26 @@ public class SchemaPropertyGeneratorTest {
     }
 
     @Test
+    public void testObjectWithMapAsDictWithEnumJsonValue() {
+        final Property property = generateSchemaProperty(SchemaObjectWithMapAsDictEnumJsonValue.class);
+        assertThat(property.getType()).isEqualTo(PropertyType.OBJECT);
+        List<Property> properties = property.getProperties();
+        assertThat(properties).hasSize(1);
+
+        final List<Property> dictProperties = properties.get(0).getProperties();
+
+        assertThat(dictProperties.get(0).getName()).isEqualTo("fooOne");
+        assertThat(dictProperties.get(0).getType()).isEqualTo(PropertyType.ARRAY);
+        List<Property> innerArrayProperties = dictProperties.get(0).getProperties();
+        assertThat(innerArrayProperties).hasSize(1);
+
+        assertThat(dictProperties.get(1).getName()).isEqualTo("barTwo");
+        assertThat(dictProperties.get(1).getType()).isEqualTo(PropertyType.ARRAY);
+        innerArrayProperties = dictProperties.get(1).getProperties();
+        assertThat(innerArrayProperties).hasSize(1);
+    }
+
+    @Test
     public void testObjectWithUnwrappedContent() {
         Property property = generateSchemaProperty(SchemaObjectWithUnwrappedContent.class);
         assertThat(property.getName()).isEqualTo("SchemaObjectWithUnwrappedContent");
@@ -549,6 +572,15 @@ public class SchemaPropertyGeneratorTest {
         FOO, BAR
     }
 
+    enum TestEnumJsonValue {
+        FOO_ONE, BAR_TWO;
+
+        @JsonValue
+        public String getValue() {
+            return UPPER_UNDERSCORE.to(LOWER_CAMEL, name());
+        }
+    }
+
     public static class TestClassWithBuiltins {
         public Date timestamp;
 
@@ -602,6 +634,10 @@ public class SchemaPropertyGeneratorTest {
 
     public static class SchemaObjectWithMapAsDict {
         public Map<TestEnum, List<String>> valuesByKey;
+    }
+
+    public static class SchemaObjectWithMapAsDictEnumJsonValue {
+        public Map<TestEnumJsonValue, List<String>> valuesByKey;
     }
 
     public static class SchemaObjectWithUnwrappedContent {

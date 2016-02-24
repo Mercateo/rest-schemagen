@@ -1,20 +1,17 @@
 package com.mercateo.common.rest.schemagen;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.mercateo.common.rest.schemagen.generator.ObjectContext;
 import com.mercateo.common.rest.schemagen.generictype.GenericType;
 import com.mercateo.common.rest.schemagen.plugin.IndividualSchemaGenerator;
+import com.mercateo.common.rest.schemagen.util.EnumUtil;
 
 public class PropertyBuilder {
 
@@ -95,7 +92,7 @@ public class PropertyBuilder {
     @SuppressWarnings("unchecked")
     private String convertToString(Object defaultValue) {
         if (Enum.class.isAssignableFrom(rawType)) {
-            return convertEnumToString((Enum<? extends Enum<?>>) defaultValue);
+            return EnumUtil.convertToString((Enum<? extends Enum<?>>) defaultValue);
         } else {
             return defaultValue.toString();
         }
@@ -113,24 +110,9 @@ public class PropertyBuilder {
     @SuppressWarnings("unchecked")
     private List<String> convertToStrings(Object x) {
         if (Enum.class.isAssignableFrom(rawType)) {
-            return Collections.singletonList(convertEnumToString((Enum<? extends Enum<?>>) x));
+            return Collections.singletonList(EnumUtil.convertToString((Enum<? extends Enum<?>>) x));
         } else {
             return Arrays.asList(x.toString());
-        }
-    }
-
-    private String convertEnumToString(Enum<? extends Enum<?>> x) {
-        final Optional<Method> valueMethod = Stream.of(x.getClass().getDeclaredMethods()).filter(
-                m -> m.isAnnotationPresent(JsonValue.class)).findFirst();
-
-        if (valueMethod.isPresent()) {
-            try {
-                return valueMethod.get().invoke(x).toString();
-            } catch (IllegalAccessException | InvocationTargetException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            return x.name();
         }
     }
 
@@ -206,7 +188,7 @@ public class PropertyBuilder {
         if (this.allowedValues != null && !this.allowedValues.isEmpty()) {
             return this.allowedValues;
         } else if (Enum.class.isAssignableFrom(rawType)) {
-            return Stream.of(rawType.getEnumConstants()).map(e -> convertEnumToString(
+            return Stream.of(rawType.getEnumConstants()).map(e -> EnumUtil.convertToString(
                     (Enum<? extends Enum<?>>) e)).collect(Collectors.toList());
         } else {
             return Collections.emptyList();

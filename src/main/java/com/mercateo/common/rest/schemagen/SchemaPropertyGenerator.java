@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import com.mercateo.common.rest.schemagen.generator.ObjectContext;
 import com.mercateo.common.rest.schemagen.generator.PathContext;
 import com.mercateo.common.rest.schemagen.generictype.GenericType;
+import com.mercateo.common.rest.schemagen.util.EnumUtil;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
@@ -223,7 +224,7 @@ public class SchemaPropertyGenerator {
 
         return Stream.of(keyType.getEnumConstants())
                 .map(enumConstant -> {
-                    final String enumName = ((Enum<?>) enumConstant).name();
+                    final String enumName = EnumUtil.convertToString((Enum<?>) enumConstant);
                     return updateName(objectContext, valueProperty, enumName);
                 }).collect(Collectors.toList());
     }
