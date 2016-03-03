@@ -118,8 +118,8 @@ public class LinkFactoryTest {
     @Test
     public void testCorrectLinkGenerationPOSTWithParam() {
         Link link = linkMetaFactory.createFactoryFor(ResourceClass.class).forCall(Rel.SELF, r -> r
-                .postSomethingWithId("12", null)).get();
-        assertEquals("basePath/resource/method/12", link.getUri().toString());
+                .postSomethingWithId("12", 100)).get();
+        assertEquals("basePath/resource/method/12?limit=100", link.getUri().toString());
         assertEquals("POST", link.getParams().get("method"));
     }
 
