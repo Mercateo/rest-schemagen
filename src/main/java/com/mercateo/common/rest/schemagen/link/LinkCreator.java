@@ -1,18 +1,9 @@
 package com.mercateo.common.rest.schemagen.link;
 
-import static com.mercateo.common.rest.schemagen.link.helper.ParameterAnnotationVisitor.visitAnnotations;
-import static java.util.Objects.requireNonNull;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.net.URI;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Stream;
+import com.google.common.collect.Iterables;
+import com.googlecode.gentyref.GenericTypeReflector;
+import com.mercateo.common.rest.schemagen.JsonSchemaGenerator;
+import com.mercateo.common.rest.schemagen.link.relation.Relation;
 
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.DELETE;
@@ -21,15 +12,25 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Link;
 import javax.ws.rs.core.Link.Builder;
 import javax.ws.rs.core.UriBuilder;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.net.URI;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
-import com.google.common.collect.Iterables;
-import com.googlecode.gentyref.GenericTypeReflector;
-import com.mercateo.common.rest.schemagen.JsonSchemaGenerator;
-import com.mercateo.common.rest.schemagen.link.relation.Relation;
+import static com.mercateo.common.rest.schemagen.link.helper.ParameterAnnotationVisitor.visitAnnotations;
+import static java.util.Objects.requireNonNull;
 
 public class LinkCreator {
     public static final String TARGET_SCHEMA_PARAM_KEY = "targetSchema";
@@ -37,7 +38,7 @@ public class LinkCreator {
     public static final String SCHEMA_PARAM_KEY = "schema";
 
     public static final String METHOD_PARAM_KEY = "method";
-   
+
 
     private final LinkFactoryContext linkFactoryContext;
 
@@ -46,24 +47,21 @@ public class LinkCreator {
     }
 
     public static Builder setRelation(Relation relation, URI uri) {
-    	requireNonNull(relation);
-    	requireNonNull(uri);
-    	Builder builder = Link.fromUri(uri).rel(relation.getName());
-    	if (requireNonNull(relation).getType().isShouldBeSerialized()) {
-    		builder.param("relType", relation.getType().getName());
-    		builder.param("target", relation.getType().getSerializedName());
-    	}
-    	return builder;
+        requireNonNull(relation);
+        requireNonNull(uri);
+        Builder builder = Link.fromUri(uri).rel(relation.getName());
+        if (requireNonNull(relation).getType().isShouldBeSerialized()) {
+            builder.param("relType", relation.getType().getName());
+            builder.param("target", relation.getType().getSerializedName());
+        }
+        return builder;
     }
+
     /**
      * create a link for a resource method
      *
-     * @param scopes
-     *            list of Scope objects for every scope level
-     *
-     * @param relation
-     *            relation of method
-     *
+     * @param scopes   list of Scope objects for every scope level
+     * @param relation relation of method
      * @return link with schema if applicable
      */
     public Link createFor(List<Scope> scopes, Relation relation) {
@@ -82,10 +80,12 @@ public class LinkCreator {
         }
 
         final URI uri = uriBuilder.buildFromMap(pathParameters);
-        
+
         Builder builder = setRelation(relation, uri);
 
         addLinkProperties(scopes, builder);
+
+        detectMediaType(scopes, builder);
 
         final Scope lastScopedMethod = Iterables.getLast(scopes);
         addHttpMethod(builder, lastScopedMethod);
@@ -96,7 +96,6 @@ public class LinkCreator {
         return builder.build();
     }
 
-
     private void addLinkProperties(List<Scope> scopes, Builder builder) {
         final LinkProperties properties = Iterables.getLast(scopes).getInvokedMethod()
                 .getAnnotation(LinkProperties.class);
@@ -105,8 +104,18 @@ public class LinkCreator {
         }
     }
 
+    private void detectMediaType(Collection<Scope> scopes, Builder builder) {
+        final Method method = Iterables.getLast(scopes).getInvokedMethod();
+        Optional.ofNullable(method.getAnnotation(Produces.class)).ifPresent(produces -> {
+            final String[] values = produces.value();
+            if (values.length > 0) {
+                builder.param("mediaType", values[0]);
+            }
+        });
+    }
+
     private Map<String, Object> collectPathParameters(Scope scope,
-            Object[] parameters) {
+                                                      Object[] parameters) {
         final Map<String, Object> pathParameters = new HashMap<>();
         visitAnnotations((parameter, parameterIndex, annotation) -> {
             if (annotation instanceof PathParam) {
@@ -116,13 +125,13 @@ public class LinkCreator {
                 BeanParamExtractor beanParamExtractor = new BeanParamExtractor();
                 pathParameters.putAll(beanParamExtractor.getPathParameters(parameter));
             }
-        } , scope.getInvokedMethod(), parameters);
+        }, scope.getInvokedMethod(), parameters);
 
         return pathParameters;
     }
 
     private void setQueryParameters(final UriBuilder uriBuilder, Scope scope,
-            Object[] parameters) {
+                                    Object[] parameters) {
         Type[] realParamTypes = GenericTypeReflector.getExactParameterTypes(scope
                 .getInvokedMethod(), scope.getInvokedClass());
         visitAnnotations((parameter, parameterIndex, annotation) -> {
@@ -136,7 +145,7 @@ public class LinkCreator {
                     queryParameter.forEach((uriBuilder::queryParam));
                 }
             }
-        } , scope.getInvokedMethod(), parameters);
+        }, scope.getInvokedMethod(), parameters);
     }
 
     private void addHttpMethod(Builder builder, Scope scope) {
@@ -152,7 +161,7 @@ public class LinkCreator {
             throw new IllegalArgumentException(
                     "LinkCreator: The method has to be annotated with one of: " + String.join(", ",
                             (Iterable<String>) httpMethodAnnotations.stream().map(
-                                    Class::getSimpleName)::iterator));
+                                    Class::getSimpleName).map(m -> '@' + m)::iterator));
         }
     }
 

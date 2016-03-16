@@ -9,10 +9,13 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Link;
 import javax.ws.rs.core.MediaType;
 
+import com.mercateo.common.rest.schemagen.link.Entry;
 import com.mercateo.common.rest.schemagen.link.LinkMetaFactory;
+import com.mercateo.common.rest.schemagen.link.LinkProperties;
 import com.mercateo.common.rest.schemagen.link.relation.Rel;
 import com.mercateo.common.rest.schemagen.types.ObjectWithSchema;
 
@@ -50,13 +53,14 @@ public class ResourceClass implements JerseyResource {
 
     @Path("/method")
     @POST
+    @LinkProperties(@Entry(key="testKey", value="testValue"))
     public void postSomething(Something something) {
         // nothing
     }
 
     @Path("/method/{id}")
     @POST
-    public void postSomethingWithId(@PathParam("id") String id, Something something) {
+    public void postSomethingWithId(@PathParam("id") String id, @QueryParam("limit") int limit) {
         // nothing
     }
 
@@ -69,6 +73,9 @@ public class ResourceClass implements JerseyResource {
     @Path("{id2}")
     public String getTwoIds(@PathParam("id") String id, @PathParam("id2") String id2) {
         return "in two ids";
+    }
+
+    public void noHttpMethod() {
     }
 
     @Path("parentResource")

@@ -1,5 +1,7 @@
 package com.mercateo.common.rest.schemagen.link;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -9,6 +11,7 @@ import java.util.Collections;
 import java.util.Optional;
 
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Link;
 
 import org.junit.Test;
@@ -45,6 +48,7 @@ public class LinkCreatorTest {
         assertEquals("resource/method", link.getUri().toString());
         assertEquals("POST", link.getParams().get("method"));
         assertEquals(testSchema, link.getParams().get("schema"));
+        assertThat(link.getParams().get("testKey")).isEqualTo("testValue");
     }
 
     @Test
@@ -55,6 +59,15 @@ public class LinkCreatorTest {
         assertEquals("http://localhost:8080/resource/method", link.getUri().toString());
         assertEquals("POST", link.getParams().get("method"));
         assertEquals(testSchema, link.getParams().get("schema"));
+    }
+
+    @Test
+    public void failsIfHttpMethodIsMissing() throws NoSuchMethodException, SecurityException {
+        assertThatThrownBy(() ->
+                createFor(ResourceClass.class, ResourceClass.class.getMethod("noHttpMethod"),
+                        Relation.of(Rel.SELF), URI.create("http://localhost:8080/"))) //
+                .isInstanceOf(IllegalArgumentException.class) //
+                .hasMessage("LinkCreator: The method has to be annotated with one of: @GET, @POST, @PUT, @DELETE");
     }
 
     @Test
@@ -112,7 +125,7 @@ public class LinkCreatorTest {
             SecurityException {
 
         @Path("test")
-        class ImplementedGenricResource extends
+        class ImplementedGenericResource extends
                 GenericResource<Something, ImplementedBeanParamType> {
             @Override
             protected Something getReturnType(ImplementedBeanParamType param) {
@@ -123,7 +136,7 @@ public class LinkCreatorTest {
         ImplementedBeanParamType implementedBeanParamType = new ImplementedBeanParamType();
         implementedBeanParamType.setPathParam("path");
         implementedBeanParamType.setElements("foo", "bar", "baz");
-        Scope scope = new CallScope(ImplementedGenricResource.class, ImplementedGenricResource.class.getMethod("get",
+        Scope scope = new CallScope(ImplementedGenericResource.class, ImplementedGenericResource.class.getMethod("get",
                 Object.class), new Object[] { implementedBeanParamType }, null);
 
         Link link = createFor(scope, Relation.of(Rel.SELF), URI.create(
@@ -132,6 +145,7 @@ public class LinkCreatorTest {
         assertEquals("http://localhost:8080/test/path?elements=foo&elements=bar&elements=baz", link
                 .getUri().toString());
         assertEquals("GET", link.getParams().get("method"));
+        assertEquals("application/json", link.getParams().get("mediaType"));
     }
 
     private JsonSchemaGenerator createJsonSchemaGenerator() {
