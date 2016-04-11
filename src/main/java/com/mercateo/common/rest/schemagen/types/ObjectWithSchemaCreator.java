@@ -2,9 +2,9 @@ package com.mercateo.common.rest.schemagen.types;
 
 import com.mercateo.common.rest.schemagen.JsonHyperSchema;
 
-public class ObjectWithSchemaCreator<T> {
+public class ObjectWithSchemaCreator {
 
-    public ObjectWithSchema<T> create(T rto, JsonHyperSchema from) {
+    public <T> ObjectWithSchema<T> create(T rto, JsonHyperSchema from) {
         return ObjectWithSchema.create(rto, from);
     }
 
