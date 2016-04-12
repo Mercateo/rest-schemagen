@@ -8,15 +8,7 @@
       "type": "string"
     },
     "bigDecimal": {
-      "properties": {
-        "precision": {"type": "integer"},
-        "scale": {"type": "integer"}
-      },
-      "required": [
-        "scale",
-        "precision"
-      ],
-      "type": "object"
+      "type": "number"
     },
     "bool": {
       "default": false,

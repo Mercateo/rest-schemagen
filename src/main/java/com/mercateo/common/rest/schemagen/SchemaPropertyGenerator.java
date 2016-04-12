@@ -1,16 +1,8 @@
 package com.mercateo.common.rest.schemagen;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.google.common.collect.ImmutableMap;
-import com.mercateo.common.rest.schemagen.generator.ObjectContext;
-import com.mercateo.common.rest.schemagen.generator.PathContext;
-import com.mercateo.common.rest.schemagen.generictype.GenericType;
-import com.mercateo.common.rest.schemagen.util.EnumUtil;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -21,12 +13,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.google.common.collect.ImmutableMap;
+import com.mercateo.common.rest.schemagen.generator.ObjectContext;
+import com.mercateo.common.rest.schemagen.generator.PathContext;
+import com.mercateo.common.rest.schemagen.generictype.GenericType;
+import com.mercateo.common.rest.schemagen.util.EnumUtil;
+
 public class SchemaPropertyGenerator {
 
     private static final Map<Class<?>, PropertyBuilder> builtins = ImmutableMap.of( //
-            BigDecimal.class, Property.builderFor(BigDecimal.class).withChildren( //
-                    Property.builderFor(Integer.class).withName("scale").setRequired().build(), //
-                    Property.builderFor(Integer.class).withName("precision").setRequired().build()), //
             Date.class, Property.builderFor(Integer.class).setRequired());
 
     /**

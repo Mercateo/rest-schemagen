@@ -78,8 +78,8 @@ public class PropertyJsonSchemaMapper {
                     property.getValueConstraints().getMin().ifPresent(x -> result.put("minimum", x));
                     property.getValueConstraints().getMax().ifPresent(x -> result.put("maximum", x));
                     break;
-                case FLOAT:
-                    result.put("type", "float");
+                case NUMBER:
+                    result.put("type", "number");
                     break;
 
                 case BOOLEAN:
