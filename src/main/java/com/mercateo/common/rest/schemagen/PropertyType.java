@@ -5,8 +5,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 public enum PropertyType {
-    OBJECT, STRING, BOOLEAN, INTEGER, FLOAT, ARRAY;
+    OBJECT, STRING, BOOLEAN, INTEGER, NUMBER, ARRAY;
 
     static final Set<PropertyType> PRIMITIVE_TYPES = new HashSet<>(Arrays.asList(STRING,
-            BOOLEAN, INTEGER, FLOAT));
+            BOOLEAN, INTEGER, NUMBER));
 }

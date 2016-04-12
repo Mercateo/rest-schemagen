@@ -88,11 +88,7 @@ public class LegacySchemaGeneratorTest {
     public void shouldMapBigDecimal() {
         createSchemaFor(TestRto.class);
         Property bigDecimal = getByName("bigDecimal");
-        assertThat(bigDecimal.getType()).isEqualTo(PropertyType.OBJECT);
-        assertThat(getByName(bigDecimal.getProperties(), "scale").getType()).isEqualTo(
-                PropertyType.INTEGER);
-        assertThat(getByName(bigDecimal.getProperties(), "precision").getType()).isEqualTo(
-                PropertyType.INTEGER);
+        assertThat(bigDecimal.getType()).isEqualTo(PropertyType.NUMBER);
     }
 
     @Test
@@ -167,7 +163,7 @@ public class LegacySchemaGeneratorTest {
         assertThat(schema.getPropertyByName("constrainedString").getType()).isEqualTo(
                 PropertyType.STRING);
         assertThat(schema.getPropertyByName("integer").getType()).isEqualTo(PropertyType.INTEGER);
-        assertThat(schema.getPropertyByName("bigDecimal").getType()).isEqualTo(PropertyType.OBJECT);
+        assertThat(schema.getPropertyByName("bigDecimal").getType()).isEqualTo(PropertyType.NUMBER);
         assertThat(schema.getPropertyByName("bool").getType()).isEqualTo(PropertyType.BOOLEAN);
         assertThat(schema.getPropertyByName("boxedBool").getType()).isEqualTo(PropertyType.BOOLEAN);
         assertThat(schema.getPropertyByName("hasOwnGenerator").getType()).isEqualTo(

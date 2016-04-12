@@ -7,17 +7,20 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
-import java.util.*;
-
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import javax.ws.rs.PathParam;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.ImmutableList;
 import com.mercateo.common.rest.schemagen.generator.ObjectContext;
 import com.mercateo.common.rest.schemagen.generictype.GenericType;
@@ -325,7 +328,7 @@ public class SchemaPropertyGeneratorTest {
         assertThat(arrayProperties).hasSize(1);
 
         assertThat(arrayProperties.get(0).getName()).isEqualTo("");
-        assertThat(arrayProperties.get(0).getType()).isEqualTo(PropertyType.FLOAT);
+        assertThat(arrayProperties.get(0).getType()).isEqualTo(PropertyType.NUMBER);
         assertThat(arrayProperties.get(0).getProperties()).isEmpty();
     }
 
@@ -547,11 +550,7 @@ public class SchemaPropertyGeneratorTest {
         assertThat(timestamp.getType()).isEqualTo(PropertyType.INTEGER);
 
         final Property value = property.getPropertyByName("value");
-        assertThat(value.getType()).isEqualTo(PropertyType.OBJECT);
-        final Property valueScale = value.getPropertyByName("scale");
-        assertThat(valueScale.getType()).isEqualTo(PropertyType.INTEGER);
-        final Property valuePrecision = value.getPropertyByName("precision");
-        assertThat(valuePrecision.getType()).isEqualTo(PropertyType.INTEGER);
+        assertThat(value.getType()).isEqualTo(PropertyType.NUMBER);
     }
 
     private Property generateSchemaProperty(Type type) {
