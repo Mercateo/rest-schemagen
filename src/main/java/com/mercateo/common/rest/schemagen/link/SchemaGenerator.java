@@ -8,7 +8,7 @@ import javax.ws.rs.core.Link;
 
 import com.mercateo.common.rest.schemagen.JerseyResource;
 import com.mercateo.common.rest.schemagen.link.helper.MethodInvocation;
-import com.mercateo.common.rest.schemagen.link.relation.Rel;
+import com.mercateo.common.rest.schemagen.link.relation.RelationContainer;
 
 public class SchemaGenerator<T extends JerseyResource> {
     private LinkFactory<T> linkFactory;
@@ -26,7 +26,8 @@ public class SchemaGenerator<T extends JerseyResource> {
         this.links = links;
     }
 
-    public SchemaGenerator<T> withLink(Rel rel, MethodInvocation<T> methodInvocation) {
+    public SchemaGenerator<T> withLink(RelationContainer rel,
+            MethodInvocation<T> methodInvocation) {
         links.add(linkFactory.forCall(rel, methodInvocation));
         return this;
     }
