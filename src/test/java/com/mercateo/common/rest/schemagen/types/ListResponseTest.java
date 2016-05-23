@@ -19,11 +19,10 @@ public class ListResponseTest {
     @Test
     public void testListResponseBuilder() {
 
-        List<Optional<Link>> containerLinks = Collections.singletonList(Optional.of(Link.fromPath(
-                "/").build()));
+        Link containerLink = Link.fromPath( "/").build();
         final ListResponse<String> listResponse = ListResponse.<Integer, String> builder()
                 .withList(Arrays.asList(1, 2, 3)).withElementMapper(this::elementMapper)
-                .withContainerLinks(containerLinks).build();
+                .withContainerLinks(containerLink).build();
 
         final List<String> strings = listResponse.object.members.stream().map(o -> o.object)
                 .collect(Collectors.toList());

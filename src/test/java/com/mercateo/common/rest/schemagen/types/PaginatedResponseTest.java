@@ -6,7 +6,6 @@ import org.junit.Test;
 
 import javax.ws.rs.core.Link;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,13 +17,12 @@ public class PaginatedResponseTest {
     @Test
     public void testPaginatedResponseBuilder() {
 
-        final List<Optional<Link>> containerLinks = Collections.singletonList(Optional.of(Link.fromPath(
-                "/").build()));
+        final Link containerLink = Link.fromPath("/").build();
         final PaginatedResponse<String> listResponse = PaginatedResponse.<Integer, String>builder()
                 .withList(Arrays.asList(1, 2, 3), 1, 2)
                 .withElementMapper(this::elementMapper)
                 .withPaginationLinkCreator(this::paginationLinkCreator)
-                .withContainerLinks(containerLinks)
+                .withContainerLinks(containerLink)
                 .build();
 
         final List<String> strings = listResponse.object.members.stream()
@@ -44,13 +42,12 @@ public class PaginatedResponseTest {
     @Test
     public void testPaginagedResponseBuilderWithList() {
         final PaginatedList<Integer> paginatedList = new PaginatedList<>(10, 3, 2, Arrays.asList(1, 3));
-        final List<Optional<Link>> containerLinks = Collections.singletonList(Optional.of(Link.fromPath(
-                "/").build()));
+        final Link containerLink = Link.fromPath("/").build();
         final PaginatedResponse<String> listResponse = PaginatedResponse.<Integer, String>builder()
                 .withList(paginatedList)
                 .withElementMapper(this::elementMapper)
                 .withPaginationLinkCreator(this::paginationLinkCreator)
-                .withContainerLinks(containerLinks)
+                .withContainerLinks(containerLink)
                 .build();
 
         assertThat(listResponse.object.total).isEqualTo(paginatedList.total);

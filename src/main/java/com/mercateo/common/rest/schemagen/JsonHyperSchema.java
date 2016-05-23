@@ -1,30 +1,38 @@
 package com.mercateo.common.rest.schemagen;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import com.google.common.annotations.VisibleForTesting;
+import com.mercateo.common.rest.schemagen.link.helper.JsonLink;
+import com.mercateo.common.rest.schemagen.link.relation.RelationContainer;
 
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Link;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.mercateo.common.rest.schemagen.link.helper.JsonLink;
-import com.mercateo.common.rest.schemagen.link.relation.RelationContainer;
+import static java.util.Objects.requireNonNull;
 
 public class JsonHyperSchema {
 
     @XmlJavaTypeAdapter(JaxbAdapter.class)
     private List<Link> links;
 
-    public JsonHyperSchema(List<Link> links) {
-        this.links = links;
+    public JsonHyperSchema(Collection<Link> links) {
+        this(links.stream());
+    }
+
+    public JsonHyperSchema(Stream<Link> linkStream) {
+        this.links = requireNonNull(linkStream)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     public List<Link> getLinks() {
@@ -65,26 +73,26 @@ public class JsonHyperSchema {
     }
 
     public static JsonHyperSchema from(Link... links) {
-        return new JsonHyperSchema(Arrays.stream(links).filter(link -> link != null).collect(
-                Collectors.toList()));
+        return new JsonHyperSchema(Arrays.stream(links));
     }
 
     @SafeVarargs
     public static JsonHyperSchema from(Optional<Link>... links) {
-        return new JsonHyperSchema(filterOptionals(Arrays.stream(links)).collect(Collectors
-                .toList()));
+        Stream<Optional<Link>> stream = Arrays.stream(links);
+        return new JsonHyperSchema(filterOptionals(stream));
     }
 
     public static JsonHyperSchema from(Collection<Link> links) {
-        return new JsonHyperSchema(links.stream().filter(link -> link != null).collect(Collectors
-                .toList()));
+        return new JsonHyperSchema(links);
     }
 
     public static JsonHyperSchema fromOptional(Collection<Optional<Link>> links) {
-        return new JsonHyperSchema(filterOptionals(links.stream()).collect(Collectors.toList()));
+        return new JsonHyperSchema(filterOptionals(links.stream()));
     }
 
     private static <T> Stream<T> filterOptionals(Stream<Optional<T>> streamWithOptionals) {
-        return streamWithOptionals.filter(Optional::isPresent).map(Optional::get);
+        return streamWithOptionals
+                .filter(Objects::nonNull)
+                .flatMap(e -> e.map(Stream::of).orElse(Stream.empty()));
     }
 }
