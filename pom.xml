@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>common.rest.schemagen</artifactId>
   <groupId>com.mercateo</groupId>
-  <version>0.14.0</version>
+  <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <name>rest-schemagen</name>
   <description>Jersey add-on for dynamic link and schema building</description>
