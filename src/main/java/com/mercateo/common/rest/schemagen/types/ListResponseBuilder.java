@@ -27,9 +27,8 @@ public class ListResponseBuilder<ElementIn, ElementOut> extends
         List<ObjectWithSchema<ElementOut>> mappedList = list.stream().map(elementMapper).collect(
                 Collectors.toList());
 
-        JsonHyperSchema schema = JsonHyperSchema.fromOptional(containerLinks);
+        JsonHyperSchema schema = JsonHyperSchema.from(containerLinks);
         return ListResponse.create(mappedList, schema);
-
     }
 
     public ListResponseBuilder<ElementIn, ElementOut> withList(List<ElementIn> list) {

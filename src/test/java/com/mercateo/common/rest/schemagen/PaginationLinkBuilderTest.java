@@ -1,18 +1,17 @@
 package com.mercateo.common.rest.schemagen;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertTrue;
+import com.mercateo.common.rest.schemagen.link.relation.Rel;
+import com.mercateo.common.rest.schemagen.link.relation.Relation;
+import com.mercateo.common.rest.schemagen.link.relation.RelationContainer;
+import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import org.junit.Test;
-
-import com.mercateo.common.rest.schemagen.link.relation.Rel;
-import com.mercateo.common.rest.schemagen.link.relation.Relation;
-import com.mercateo.common.rest.schemagen.link.relation.RelationContainer;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @SuppressWarnings("unused")
 public class PaginationLinkBuilderTest {
@@ -27,7 +26,7 @@ public class PaginationLinkBuilderTest {
 
     private static final int OFFSET_FOR_LAST = 45;
 
-    DummyBuilder dummyBuilder = new DummyBuilder();
+    private DummyBuilder dummyBuilder = new DummyBuilder();
 
     @SuppressWarnings("boxing")
     @Test
@@ -35,8 +34,7 @@ public class PaginationLinkBuilderTest {
 
         PaginationLinkBuilder paginationLinkBuilder = PaginationLinkBuilder
                 .of(TOTAL, OFFSET, LIMIT);
-        final List<Optional<Result>> links = new ArrayList<>();
-        createLinks(paginationLinkBuilder, links);
+        final List<Result> links = createLinks(paginationLinkBuilder);
 
         assertThat(filter(links, Rel.SELF).get().offset).isEqualTo(OFFSET);
         assertThat(filter(links, Rel.SELF).get().limit).isEqualTo(LIMIT);
@@ -60,8 +58,7 @@ public class PaginationLinkBuilderTest {
     public void testThatNoLinksAreCreatedIfLimitIs0() {
 
         PaginationLinkBuilder paginationLinkBuilder = PaginationLinkBuilder.of(TOTAL, OFFSET, 0);
-        final List<Optional<Result>> links = new ArrayList<>();
-        createLinks(paginationLinkBuilder, links);
+        final List<Result> links = createLinks(paginationLinkBuilder);
 
         assertThat(links.size()).isEqualTo(0);
     }
@@ -71,8 +68,7 @@ public class PaginationLinkBuilderTest {
 
         PaginationLinkBuilder paginationLinkBuilder = PaginationLinkBuilder.of(TOTAL,
                 TOTAL - LIMIT, LIMIT);
-        final List<Optional<Result>> links = new ArrayList<>();
-        createLinks(paginationLinkBuilder, links);
+        final List<Result> links = createLinks(paginationLinkBuilder);
 
         assertThat(filter(links, Rel.NEXT)).isEqualTo(Optional.empty());
     }
@@ -81,8 +77,7 @@ public class PaginationLinkBuilderTest {
     public void testThatPrevAndFirstAreNotCreatedIfAtTheBeginningOfTheList() {
 
         PaginationLinkBuilder paginationLinkBuilder = PaginationLinkBuilder.of(TOTAL, 0, LIMIT);
-        final List<Optional<Result>> links = new ArrayList<>();
-        createLinks(paginationLinkBuilder, links);
+        final List<Result> links = createLinks(paginationLinkBuilder);
 
         assertThat(filter(links, Rel.FIRST)).isEqualTo(Optional.empty());
         assertThat(filter(links, Rel.PREV)).isEqualTo(Optional.empty());
@@ -94,8 +89,7 @@ public class PaginationLinkBuilderTest {
 
         PaginationLinkBuilder paginationLinkBuilder = PaginationLinkBuilder.of(TOTAL, LIMIT - 1,
                 LIMIT);
-        final List<Optional<Result>> links = new ArrayList<>();
-        createLinks(paginationLinkBuilder, links);
+        final List<Result> links = createLinks(paginationLinkBuilder);
 
         assertThat(filter(links, Rel.PREV).get().offset).isEqualTo(0);
     }
@@ -105,41 +99,43 @@ public class PaginationLinkBuilderTest {
     public void testThatOffsetForLastLinkIsCorrectIfLastPageIsCompletelyFilled() {
 
         PaginationLinkBuilder paginationLinkBuilder = PaginationLinkBuilder.of(TOTAL, 0, LIMIT_2);
-        final List<Optional<Result>> links = new ArrayList<>();
-        createLinks(paginationLinkBuilder, links);
+        final List<Result> links = createLinks(paginationLinkBuilder);
 
-        assertThat(filter(links, Rel.LAST).get().offset).isEqualTo(TOTAL - LIMIT_2);
+        assertThat(filter(links, Rel.LAST)).hasValueSatisfying(
+                l -> assertThat(l.offset).isEqualTo(TOTAL - LIMIT_2));
     }
 
     @Test
     public void testThatLastIsNotBuildIfLimitIsLargerThanTotal() {
 
         PaginationLinkBuilder paginationLinkBuilder = PaginationLinkBuilder.of(TOTAL, 0, TOTAL + 1);
-        final List<Optional<Result>> links = new ArrayList<>();
-        createLinks(paginationLinkBuilder, links);
+        final List<Result> links = createLinks(paginationLinkBuilder);
 
         assertThat(filter(links, Rel.LAST)).isEqualTo(Optional.empty());
     }
 
-    private void createLinks(PaginationLinkBuilder paginationLinkBuilder,
-            final List<Optional<Result>> links) {
+    private List<Result> createLinks(PaginationLinkBuilder paginationLinkBuilder) {
+        List<Result> results = new ArrayList<>();
+
         paginationLinkBuilder.generateLinks((target, off, lim) -> {
-            links.add(dummyBuilder.create(target.getRelation(), off, lim));
+            dummyBuilder.create(target.getRelation(), off, lim).ifPresent(results::add);
             return Optional.empty(); // needed to satisfy type constraints
             });
+
+        return results;
     }
 
     @SuppressWarnings("boxing")
-    private Optional<Result> filter(final List<Optional<Result>> links,
+    private Optional<Result> filter(final List<Result> links,
             RelationContainer relationContainer) {
 
-        List<Optional<Result>> filteredLinks = links.stream().filter(
-                item -> item.get().target.equals(relationContainer.getRelation())).collect(
-                Collectors.toList());
+        List<Result> filteredLinks = links.stream()
+                .filter(item -> item.target.equals(relationContainer.getRelation()))
+                .collect(Collectors.toList());
 
-        assertTrue(filteredLinks.size() <= 1);
+        assertThat(filteredLinks.size()).isLessThanOrEqualTo(1);
 
-        return filteredLinks.size() == 1 ? filteredLinks.get(0) : Optional.empty();
+        return filteredLinks.stream().findFirst();
     }
 
     private class DummyBuilder {

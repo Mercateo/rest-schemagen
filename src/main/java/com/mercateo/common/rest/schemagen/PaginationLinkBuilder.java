@@ -1,13 +1,14 @@
 package com.mercateo.common.rest.schemagen;
 
+import com.mercateo.common.rest.schemagen.link.relation.Rel;
+import com.mercateo.common.rest.schemagen.link.relation.RelationContainer;
+
+import javax.ws.rs.core.Link;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import javax.ws.rs.core.Link;
-
-import com.mercateo.common.rest.schemagen.link.relation.Rel;
-import com.mercateo.common.rest.schemagen.link.relation.RelationContainer;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class PaginationLinkBuilder {
 
@@ -30,21 +31,19 @@ public class PaginationLinkBuilder {
         return new PaginationLinkBuilder(total, offset, limit);
     }
 
-    public interface PaginationLinkCreator {
-        Optional<Link> of(RelationContainer rel, int offset, int limit);
-    }
-
-    public List<Optional<Link>> generateLinks(PaginationLinkCreator linkCreator) {
-        List<Optional<Link>> result = new ArrayList<>();
+    public List<Link> generateLinks(PaginationLinkCreator linkCreator) {
         if (limit == 0) {
-            return result;
+            return new ArrayList<>();
         }
-        result.add(createSelfLink(linkCreator));
-        result.add(createNextLink(linkCreator));
-        result.add(createPrevLink(linkCreator));
-        result.add(createFirstLink(linkCreator));
-        result.add(createLastLink(linkCreator));
-        return result;
+
+        return Stream.of(
+                createSelfLink(linkCreator),
+                createNextLink(linkCreator),
+                createPrevLink(linkCreator),
+                createFirstLink(linkCreator),
+                createLastLink(linkCreator))
+                .flatMap(e -> e.map(Stream::of).orElse(Stream.empty()))
+                .collect(Collectors.toList());
     }
 
     private Optional<Link> createSelfLink(PaginationLinkCreator linkCreator) {
@@ -76,17 +75,21 @@ public class PaginationLinkBuilder {
     private Optional<Link> createLastLink(PaginationLinkCreator linkCreator) {
         int numberOfPages = total / limit;
 
-        if (numberOfPages > 0) {
-            final int offsetForLast;
-
-            if ((total % limit) == 0) {
-                offsetForLast = (numberOfPages - 1) * limit;
-            } else {
-                offsetForLast = numberOfPages * limit;
-            }
-
-            return linkCreator.of(Rel.LAST, offsetForLast, limit);
+        if (numberOfPages == 0) {
+            return Optional.empty();
         }
-        return Optional.empty();
+        final int offsetForLast;
+
+        if ((total % limit) == 0) {
+            offsetForLast = (numberOfPages - 1) * limit;
+        } else {
+            offsetForLast = numberOfPages * limit;
+        }
+
+        return linkCreator.of(Rel.LAST, offsetForLast, limit);
+    }
+
+    public interface PaginationLinkCreator {
+        Optional<Link> of(RelationContainer rel, int offset, int limit);
     }
 }
