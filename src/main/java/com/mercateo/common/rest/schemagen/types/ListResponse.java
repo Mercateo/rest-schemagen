@@ -20,6 +20,7 @@ public class ListResponse<T> extends ObjectWithSchema<WrappedList<ObjectWithSche
     }
 
     public static <ElementIn, ElementOut> ListResponseBuilder<ElementIn, ElementOut> builder() {
+        //noinspection deprecation
         return new ListResponseBuilder<>();
     }
 }

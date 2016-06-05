@@ -7,6 +7,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.lang.reflect.Type;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +15,8 @@ import java.util.Optional;
 import java.util.UUID;
 import javax.ws.rs.PathParam;
 
+import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
+import com.mercateo.common.rest.schemagen.generator.ObjectContextBuilder;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,7 +32,7 @@ import com.mercateo.common.rest.schemagen.types.ListResponse;
 import com.mercateo.common.rest.schemagen.types.ObjectWithSchema;
 
 @RunWith(MockitoJUnitRunner.class)
-public class SchemaPropertyGeneratorTest {
+public class SchemaJsonPropertyGeneratorTest {
 
     private SchemaPropertyGenerator schemaGenerator;
 
@@ -40,18 +43,18 @@ public class SchemaPropertyGeneratorTest {
 
     @Test
     public void testString() {
-        Property property = generateSchemaProperty(String.class);
-        assertThat(property.getName()).isEqualTo("String");
-        assertThat(property.getType()).isEqualTo(PropertyType.STRING);
-        assertThat(property.getProperties()).isEmpty();
+        JsonProperty jsonProperty = generateSchemaProperty(String.class);
+        assertThat(jsonProperty.getName()).isEqualTo("String");
+        assertThat(jsonProperty.getType()).isEqualTo(PropertyType.STRING);
+        assertThat(jsonProperty.getProperties()).isEmpty();
     }
 
     @Test
     public void testObject() {
-        Property property = generateSchemaProperty(SchemaObject.class);
-        assertThat(property.getName()).isEqualTo("SchemaObject");
-        assertThat(property.getType()).isEqualTo(PropertyType.OBJECT);
-        List<Property> properties = property.getProperties();
+        JsonProperty jsonProperty = generateSchemaProperty(SchemaObject.class);
+        assertThat(jsonProperty.getName()).isEqualTo("SchemaObject");
+        assertThat(jsonProperty.getType()).isEqualTo(PropertyType.OBJECT);
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(2);
 
         assertThat(properties.get(0).getName()).isEqualTo("count");
@@ -70,10 +73,10 @@ public class SchemaPropertyGeneratorTest {
         SchemaObject defaultValue = new SchemaObject();
         defaultValue.name = "<default>";
 
-        final Property property = generateSchemaProperty(ObjectContext.buildFor(SchemaObject.class)
+        final JsonProperty jsonProperty = generateSchemaProperty(ObjectContext.buildFor(SchemaObject.class)
                 .withDefaultValue(defaultValue));
 
-        List<Property> properties = property.getProperties();
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(2);
 
         assertThat(properties.get(0).getName()).isEqualTo("count");
@@ -88,10 +91,10 @@ public class SchemaPropertyGeneratorTest {
         SchemaObject allowedValues = new SchemaObject();
         allowedValues.name = "foo";
 
-        final Property property = generateSchemaProperty(ObjectContext.buildFor(SchemaObject.class)
-                .withAllowedValue(allowedValues));
+        final JsonProperty jsonProperty = generateSchemaProperty(ObjectContext.buildFor(SchemaObject.class)
+                .addAllowedValues(allowedValues));
 
-        List<Property> properties = property.getProperties();
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(2);
 
         assertThat(properties.get(0).getName()).isEqualTo("count");
@@ -107,10 +110,10 @@ public class SchemaPropertyGeneratorTest {
     public void testObjectCurrentValuesAndPathParams() {
         SchemaObject currentValue = new SchemaObject();
 
-        final Property property = generateSchemaProperty(ObjectContext.buildFor(SchemaObject.class)
+        final JsonProperty jsonProperty = generateSchemaProperty(ObjectContext.buildFor(SchemaObject.class)
                 .withCurrentValue(currentValue));
 
-        List<Property> properties = property.getProperties();
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(3);
         assertThat(properties.get(2).getName()).isEqualTo("pathParameter");
     }
@@ -120,10 +123,10 @@ public class SchemaPropertyGeneratorTest {
         SchemaObject currentValue = new SchemaObject();
         currentValue.pathParameter = "path";
 
-        final Property property = generateSchemaProperty(ObjectContext.buildFor(SchemaObject.class)
+        final JsonProperty jsonProperty = generateSchemaProperty(ObjectContext.buildFor(SchemaObject.class)
                 .withCurrentValue(currentValue));
 
-        List<Property> properties = property.getProperties();
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(2);
 
     }
@@ -136,10 +139,10 @@ public class SchemaPropertyGeneratorTest {
         SchemaObject defaultValue = new SchemaObject();
         defaultValue.name = "baz";
 
-        final Property property = generateSchemaProperty(ObjectContext.buildFor(SchemaObject.class)
-                .withAllowedValue(allowedValues).withDefaultValue(defaultValue));
+        final JsonProperty jsonProperty = generateSchemaProperty(ObjectContext.buildFor(SchemaObject.class)
+                .addAllowedValues(allowedValues).withDefaultValue(defaultValue));
 
-        List<Property> properties = property.getProperties();
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(2);
 
         assertThat(properties.get(0).getName()).isEqualTo("count");
@@ -162,10 +165,10 @@ public class SchemaPropertyGeneratorTest {
         List<SchemaObject> allowedValues = ImmutableList.of(allowedValue1, allowedValue2,
                 allowedValue3);
 
-        final Property property = generateSchemaProperty(ObjectContext.buildFor(SchemaObject.class)
+        final JsonProperty jsonProperty = generateSchemaProperty(ObjectContext.buildFor(SchemaObject.class)
                 .withAllowedValues(allowedValues));
 
-        List<Property> properties = property.getProperties();
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(2);
 
         assertThat(properties.get(0).getName()).isEqualTo("count");
@@ -184,16 +187,16 @@ public class SchemaPropertyGeneratorTest {
         defaultObject.count = 5;
         defaultValue.schemaObject = defaultObject;
 
-        final Property property = generateSchemaProperty(ObjectContext.buildFor(
+        final JsonProperty jsonProperty = generateSchemaProperty(ObjectContext.buildFor(
                 SchemaMasterObject.class).withDefaultValue(defaultValue));
 
-        List<Property> properties = property.getProperties();
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(1);
 
-        List<Property> nestedProperties = property.getProperties();
+        List<JsonProperty> nestedProperties = jsonProperty.getProperties();
         assertThat(nestedProperties).hasSize(1);
 
-        List<Property> nestedObjectProperties = nestedProperties.get(0).getProperties();
+        List<JsonProperty> nestedObjectProperties = nestedProperties.get(0).getProperties();
         assertThat(nestedObjectProperties).hasSize(2);
 
         assertThat(nestedObjectProperties.get(0).getName()).isEqualTo("count");
@@ -205,8 +208,8 @@ public class SchemaPropertyGeneratorTest {
 
     @Test
     public void testObjectWithEnumDefaultAllowedValues() {
-        Property property = generateSchemaProperty(SchemaObjectWithEnum.class);
-        List<Property> properties = property.getProperties();
+        JsonProperty jsonProperty = generateSchemaProperty(SchemaObjectWithEnum.class);
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(1);
 
         assertThat(properties.get(0).getName()).isEqualTo("mode");
@@ -221,9 +224,9 @@ public class SchemaPropertyGeneratorTest {
         SchemaObjectWithEnum allowedValue = new SchemaObjectWithEnum();
         allowedValue.mode = TestEnum.BAR;
 
-        Property property = generateSchemaProperty(ObjectContext.buildFor(
-                SchemaObjectWithEnum.class).withAllowedValue(allowedValue));
-        List<Property> properties = property.getProperties();
+        JsonProperty jsonProperty = generateSchemaProperty(ObjectContext.buildFor(
+                SchemaObjectWithEnum.class).addAllowedValues(allowedValue));
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(1);
 
         assertThat(properties.get(0).getName()).isEqualTo("mode");
@@ -238,9 +241,9 @@ public class SchemaPropertyGeneratorTest {
         SchemaObjectWithEnum defaultValue = new SchemaObjectWithEnum();
         defaultValue.mode = TestEnum.BAR;
 
-        Property property = generateSchemaProperty(ObjectContext.buildFor(
+        JsonProperty jsonProperty = generateSchemaProperty(ObjectContext.buildFor(
                 SchemaObjectWithEnum.class).withDefaultValue(defaultValue));
-        List<Property> properties = property.getProperties();
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(1);
 
         assertThat(properties.get(0).getName()).isEqualTo("mode");
@@ -252,15 +255,15 @@ public class SchemaPropertyGeneratorTest {
 
     @Test
     public void testObjectWithArray() {
-        Property property = generateSchemaProperty(SchemaObjectWithArray.class);
-        assertThat(property.getName()).isEqualTo("SchemaObjectWithArray");
-        assertThat(property.getType()).isEqualTo(PropertyType.OBJECT);
-        List<Property> properties = property.getProperties();
+        JsonProperty jsonProperty = generateSchemaProperty(SchemaObjectWithArray.class);
+        assertThat(jsonProperty.getName()).isEqualTo("SchemaObjectWithArray");
+        assertThat(jsonProperty.getType()).isEqualTo(PropertyType.OBJECT);
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(1);
 
         assertThat(properties.get(0).getName()).isEqualTo("names");
         assertThat(properties.get(0).getType()).isEqualTo(PropertyType.ARRAY);
-        List<Property> arrayProperties = properties.get(0).getProperties();
+        List<JsonProperty> arrayProperties = properties.get(0).getProperties();
         assertThat(arrayProperties).hasSize(1);
 
         assertThat(arrayProperties.get(0).getName()).isEqualTo("");
@@ -270,20 +273,20 @@ public class SchemaPropertyGeneratorTest {
 
     @Test
     public void testObjectWithGenericArray() {
-        Property property = generateSchemaProperty(SchemaObjectWithGenericArray.class);
-        assertThat(property.getName()).isEqualTo("SchemaObjectWithGenericArray");
-        assertThat(property.getType()).isEqualTo(PropertyType.OBJECT);
-        List<Property> properties = property.getProperties();
+        JsonProperty jsonProperty = generateSchemaProperty(SchemaObjectWithGenericArray.class);
+        assertThat(jsonProperty.getName()).isEqualTo("SchemaObjectWithGenericArray");
+        assertThat(jsonProperty.getType()).isEqualTo(PropertyType.OBJECT);
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(1);
 
         assertThat(properties.get(0).getName()).isEqualTo("names");
         assertThat(properties.get(0).getType()).isEqualTo(PropertyType.ARRAY);
-        List<Property> arrayProperties = properties.get(0).getProperties();
+        List<JsonProperty> arrayProperties = properties.get(0).getProperties();
         assertThat(arrayProperties).hasSize(1);
 
         assertThat(arrayProperties.get(0).getName()).isEqualTo("");
         assertThat(arrayProperties.get(0).getType()).isEqualTo(PropertyType.ARRAY);
-        List<Property> listProperties = arrayProperties.get(0).getProperties();
+        List<JsonProperty> listProperties = arrayProperties.get(0).getProperties();
         assertThat(listProperties).hasSize(1);
 
         assertThat(listProperties.get(0).getName()).isEqualTo("");
@@ -293,20 +296,20 @@ public class SchemaPropertyGeneratorTest {
 
     @Test
     public void testObjectWithGenericWithArray() {
-        Property property = generateSchemaProperty(SchemaObjectWithGenericWithArray.class);
-        assertThat(property.getName()).isEqualTo("SchemaObjectWithGenericWithArray");
-        assertThat(property.getType()).isEqualTo(PropertyType.OBJECT);
-        List<Property> properties = property.getProperties();
+        JsonProperty jsonProperty = generateSchemaProperty(SchemaObjectWithGenericWithArray.class);
+        assertThat(jsonProperty.getName()).isEqualTo("SchemaObjectWithGenericWithArray");
+        assertThat(jsonProperty.getType()).isEqualTo(PropertyType.OBJECT);
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(1);
 
         assertThat(properties.get(0).getName()).isEqualTo("names");
         assertThat(properties.get(0).getType()).isEqualTo(PropertyType.ARRAY);
-        List<Property> arrayProperties = properties.get(0).getProperties();
+        List<JsonProperty> arrayProperties = properties.get(0).getProperties();
         assertThat(arrayProperties).hasSize(1);
 
         assertThat(arrayProperties.get(0).getName()).isEqualTo("");
         assertThat(arrayProperties.get(0).getType()).isEqualTo(PropertyType.ARRAY);
-        List<Property> listProperties = arrayProperties.get(0).getProperties();
+        List<JsonProperty> listProperties = arrayProperties.get(0).getProperties();
         assertThat(listProperties).hasSize(1);
 
         assertThat(listProperties.get(0).getName()).isEqualTo("");
@@ -316,15 +319,15 @@ public class SchemaPropertyGeneratorTest {
 
     @Test
     public void testObjectWithGenericElement() {
-        Property property = generateSchemaProperty(SchemaObjectWithGenericElement.class);
-        assertThat(property.getName()).isEqualTo("SchemaObjectWithGenericElement");
-        assertThat(property.getType()).isEqualTo(PropertyType.OBJECT);
-        List<Property> properties = property.getProperties();
+        JsonProperty jsonProperty = generateSchemaProperty(SchemaObjectWithGenericElement.class);
+        assertThat(jsonProperty.getName()).isEqualTo("SchemaObjectWithGenericElement");
+        assertThat(jsonProperty.getType()).isEqualTo(PropertyType.OBJECT);
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(1);
 
         assertThat(properties.get(0).getName()).isEqualTo("values");
         assertThat(properties.get(0).getType()).isEqualTo(PropertyType.ARRAY);
-        List<Property> arrayProperties = properties.get(0).getProperties();
+        List<JsonProperty> arrayProperties = properties.get(0).getProperties();
         assertThat(arrayProperties).hasSize(1);
 
         assertThat(arrayProperties.get(0).getName()).isEqualTo("");
@@ -334,20 +337,20 @@ public class SchemaPropertyGeneratorTest {
 
     @Test
     public void testObjectWithNestedArrayElement() {
-        Property property = generateSchemaProperty(SchemaObjectWithNestedArrayElement.class);
-        assertThat(property.getName()).isEqualTo("SchemaObjectWithNestedArrayElement");
-        assertThat(property.getType()).isEqualTo(PropertyType.OBJECT);
-        List<Property> properties = property.getProperties();
+        JsonProperty jsonProperty = generateSchemaProperty(SchemaObjectWithNestedArrayElement.class);
+        assertThat(jsonProperty.getName()).isEqualTo("SchemaObjectWithNestedArrayElement");
+        assertThat(jsonProperty.getType()).isEqualTo(PropertyType.OBJECT);
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(1);
 
         assertThat(properties.get(0).getName()).isEqualTo("values");
         assertThat(properties.get(0).getType()).isEqualTo(PropertyType.ARRAY);
-        List<Property> outerArrayProperties = properties.get(0).getProperties();
+        List<JsonProperty> outerArrayProperties = properties.get(0).getProperties();
         assertThat(outerArrayProperties).hasSize(1);
 
         assertThat(outerArrayProperties.get(0).getName()).isEqualTo("");
         assertThat(outerArrayProperties.get(0).getType()).isEqualTo(PropertyType.ARRAY);
-        List<Property> innerArrayProperties = outerArrayProperties.get(0).getProperties();
+        List<JsonProperty> innerArrayProperties = outerArrayProperties.get(0).getProperties();
         assertThat(innerArrayProperties).hasSize(1);
 
         assertThat(innerArrayProperties.get(0).getName()).isEqualTo("");
@@ -357,24 +360,24 @@ public class SchemaPropertyGeneratorTest {
 
     @Test
     public void testObjectWithMapAsObject() {
-        final Property property = generateSchemaProperty(SchemaObjectWithMapAsObject.class);
-        assertThat(property.getType()).isEqualTo(PropertyType.OBJECT);
-        List<Property> properties = property.getProperties();
+        final JsonProperty jsonProperty = generateSchemaProperty(SchemaObjectWithMapAsObject.class);
+        assertThat(jsonProperty.getType()).isEqualTo(PropertyType.OBJECT);
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(1);
     }
 
     @Test
     public void testObjectWithMapAsDict() {
-        final Property property = generateSchemaProperty(SchemaObjectWithMapAsDict.class);
-        assertThat(property.getType()).isEqualTo(PropertyType.OBJECT);
-        List<Property> properties = property.getProperties();
+        final JsonProperty jsonProperty = generateSchemaProperty(SchemaObjectWithMapAsDict.class);
+        assertThat(jsonProperty.getType()).isEqualTo(PropertyType.OBJECT);
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(1);
 
-        final List<Property> dictProperties = properties.get(0).getProperties();
+        final List<JsonProperty> dictProperties = properties.get(0).getProperties();
 
         assertThat(dictProperties.get(0).getName()).isEqualTo("FOO");
         assertThat(dictProperties.get(0).getType()).isEqualTo(PropertyType.ARRAY);
-        List<Property> innerArrayProperties = dictProperties.get(0).getProperties();
+        List<JsonProperty> innerArrayProperties = dictProperties.get(0).getProperties();
         assertThat(innerArrayProperties).hasSize(1);
 
         assertThat(dictProperties.get(1).getName()).isEqualTo("BAR");
@@ -385,16 +388,16 @@ public class SchemaPropertyGeneratorTest {
 
     @Test
     public void testObjectWithMapAsDictWithEnumJsonValue() {
-        final Property property = generateSchemaProperty(SchemaObjectWithMapAsDictEnumJsonValue.class);
-        assertThat(property.getType()).isEqualTo(PropertyType.OBJECT);
-        List<Property> properties = property.getProperties();
+        final JsonProperty jsonProperty = generateSchemaProperty(SchemaObjectWithMapAsDictEnumJsonValue.class);
+        assertThat(jsonProperty.getType()).isEqualTo(PropertyType.OBJECT);
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(1);
 
-        final List<Property> dictProperties = properties.get(0).getProperties();
+        final List<JsonProperty> dictProperties = properties.get(0).getProperties();
 
         assertThat(dictProperties.get(0).getName()).isEqualTo("fooOne");
         assertThat(dictProperties.get(0).getType()).isEqualTo(PropertyType.ARRAY);
-        List<Property> innerArrayProperties = dictProperties.get(0).getProperties();
+        List<JsonProperty> innerArrayProperties = dictProperties.get(0).getProperties();
         assertThat(innerArrayProperties).hasSize(1);
 
         assertThat(dictProperties.get(1).getName()).isEqualTo("barTwo");
@@ -405,10 +408,10 @@ public class SchemaPropertyGeneratorTest {
 
     @Test
     public void testObjectWithUnwrappedContent() {
-        Property property = generateSchemaProperty(SchemaObjectWithUnwrappedContent.class);
-        assertThat(property.getName()).isEqualTo("SchemaObjectWithUnwrappedContent");
-        assertThat(property.getType()).isEqualTo(PropertyType.OBJECT);
-        List<Property> properties = property.getProperties();
+        JsonProperty jsonProperty = generateSchemaProperty(SchemaObjectWithUnwrappedContent.class);
+        assertThat(jsonProperty.getName()).isEqualTo("SchemaObjectWithUnwrappedContent");
+        assertThat(jsonProperty.getType()).isEqualTo(PropertyType.OBJECT);
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(2);
 
         assertThat(properties.get(0).getName()).isEqualTo("count");
@@ -422,15 +425,15 @@ public class SchemaPropertyGeneratorTest {
 
     @Test
     public void testObjectWithGenericTypeComponent() {
-        Property property = generateSchemaProperty(SchemaObjectWithIgnoredTypeComponent.class);
-        assertThat(property.getName()).isEqualTo("SchemaObjectWithIgnoredTypeComponent");
-        assertThat(property.getType()).isEqualTo(PropertyType.OBJECT);
-        List<Property> properties = property.getProperties();
+        JsonProperty jsonProperty = generateSchemaProperty(SchemaObjectWithIgnoredTypeComponent.class);
+        assertThat(jsonProperty.getName()).isEqualTo("SchemaObjectWithIgnoredTypeComponent");
+        assertThat(jsonProperty.getType()).isEqualTo(PropertyType.OBJECT);
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(1);
 
         assertThat(properties.get(0).getName()).isEqualTo("optional");
         assertThat(properties.get(0).getType()).isEqualTo(PropertyType.OBJECT);
-        List<Property> optionalProperties = properties.get(0).getProperties();
+        List<JsonProperty> optionalProperties = properties.get(0).getProperties();
         assertThat(optionalProperties).hasSize(1);
 
         assertThat(optionalProperties.get(0).getName()).isEqualTo("value");
@@ -440,10 +443,10 @@ public class SchemaPropertyGeneratorTest {
 
     @Test
     public void testInheritedObject() {
-        Property property = generateSchemaProperty(InheritedSchemaObject.class);
-        assertThat(property.getName()).isEqualTo("InheritedSchemaObject");
-        assertThat(property.getType()).isEqualTo(PropertyType.OBJECT);
-        List<Property> properties = property.getProperties();
+        JsonProperty jsonProperty = generateSchemaProperty(InheritedSchemaObject.class);
+        assertThat(jsonProperty.getName()).isEqualTo("InheritedSchemaObject");
+        assertThat(jsonProperty.getType()).isEqualTo(PropertyType.OBJECT);
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(3);
 
         assertThat(properties.get(0).getName()).isEqualTo("count");
@@ -468,10 +471,10 @@ public class SchemaPropertyGeneratorTest {
 
     @Test
     public void testInheritedGenericObjectWithWrappedObject() {
-        Property property = generateSchemaProperty(WrappedObject.class);
-        assertThat(property.getName()).isEqualTo("WrappedObject");
-        assertThat(property.getType()).isEqualTo(PropertyType.OBJECT);
-        List<Property> properties = property.getProperties();
+        JsonProperty jsonProperty = generateSchemaProperty(WrappedObject.class);
+        assertThat(jsonProperty.getName()).isEqualTo("WrappedObject");
+        assertThat(jsonProperty.getType()).isEqualTo(PropertyType.OBJECT);
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(2);
 
         assertThat(properties.get(0).getName()).isEqualTo("count");
@@ -485,29 +488,29 @@ public class SchemaPropertyGeneratorTest {
 
     @Test
     public void testRecursiveObject() {
-        Property property = generateSchemaProperty(RecursiveSchemaObject.class);
-        assertThat(property.getName()).isEqualTo("RecursiveSchemaObject");
-        assertThat(property.getType()).isEqualTo(PropertyType.OBJECT);
-        List<Property> properties = property.getProperties();
+        JsonProperty jsonProperty = generateSchemaProperty(RecursiveSchemaObject.class);
+        assertThat(jsonProperty.getName()).isEqualTo("RecursiveSchemaObject");
+        assertThat(jsonProperty.getType()).isEqualTo(PropertyType.OBJECT);
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(2);
     }
 
     @Test
     public void testInheritedGenericObject() {
-        Property property = generateSchemaProperty(ListObject.class);
-        assertThat(property.getName()).isEqualTo("ListObject");
-        assertThat(property.getType()).isEqualTo(PropertyType.OBJECT);
-        List<Property> properties = property.getProperties();
+        JsonProperty jsonProperty = generateSchemaProperty(ListObject.class);
+        assertThat(jsonProperty.getName()).isEqualTo("ListObject");
+        assertThat(jsonProperty.getType()).isEqualTo(PropertyType.OBJECT);
+        List<JsonProperty> properties = jsonProperty.getProperties();
         assertThat(properties).hasSize(1);
 
         assertThat(properties.get(0).getName()).isEqualTo("members");
         assertThat(properties.get(0).getType()).isEqualTo(PropertyType.ARRAY);
-        List<Property> array = properties.get(0).getProperties();
+        List<JsonProperty> array = properties.get(0).getProperties();
         assertThat(array).hasSize(1);
 
         assertThat(array.get(0).getName()).isEqualTo("");
         assertThat(array.get(0).getType()).isEqualTo(PropertyType.OBJECT);
-        List<Property> object = array.get(0).getProperties();
+        List<JsonProperty> object = array.get(0).getProperties();
         assertThat(object).hasSize(2);
 
         assertThat(object.get(0).getName()).isEqualTo("count");
@@ -530,40 +533,40 @@ public class SchemaPropertyGeneratorTest {
     public void testUnwrappedObjectWithDependencyLoopShouldThrow() {
         assertThatThrownBy(() -> generateSchemaProperty(UnwrappedObject.class)) //
                 .isInstanceOf(IllegalStateException.class) //
-                .hasMessageStartingWith("recursion detected while unwrapping field <object> in <com.mercateo.common.rest.schemagen.SchemaPropertyGeneratorTest$UnwrappedObject>");
+                .hasMessageStartingWith("recursion detected while unwrapping field <object> in <com.mercateo.common.rest.schemagen.SchemaJsonPropertyGeneratorTest$UnwrappedObject>");
     }
 
     @Test
     public void testUUIDSchemaGeneration() {
-        final Property property = generateSchemaProperty(UUIDSchemaObject.class);
+        final JsonProperty jsonProperty = generateSchemaProperty(UUIDSchemaObject.class);
 
-        final Property idProperty = property.getPropertyByName("id");
+        final JsonProperty idJsonProperty = jsonProperty.getPropertyByName("id");
 
-        assertThat(idProperty.getType()).isEqualTo(PropertyType.STRING);
+        assertThat(idJsonProperty.getType()).isEqualTo(PropertyType.STRING);
     }
 
     @Test
     public void testClassWithComplexType() {
-        Property property = generateSchemaProperty(TestClassWithBuiltins.class);
+        JsonProperty jsonProperty = generateSchemaProperty(TestClassWithBuiltins.class);
 
-        final Property timestamp = property.getPropertyByName("timestamp");
+        final JsonProperty timestamp = jsonProperty.getPropertyByName("timestamp");
         assertThat(timestamp.getType()).isEqualTo(PropertyType.INTEGER);
 
-        final Property value = property.getPropertyByName("value");
+        final JsonProperty value = jsonProperty.getPropertyByName("value");
         assertThat(value.getType()).isEqualTo(PropertyType.NUMBER);
     }
 
-    private Property generateSchemaProperty(Type type) {
+    private JsonProperty generateSchemaProperty(Type type) {
         return generateSchemaProperty(ObjectContext.buildFor(GenericType.of(type)));
     }
 
-    private Property generateSchemaProperty(ObjectContext.Builder<?> objectContextBuilder) {
+    private JsonProperty generateSchemaProperty(ObjectContextBuilder<?> objectContextBuilder) {
         return generateSchemaProperty(objectContextBuilder, new SchemaPropertyContext(CallContext
-                .create(), (r, c) -> true));
+                .create(), (r, c) -> true)).getRoot();
     }
 
-    private Property generateSchemaProperty(ObjectContext.Builder<?> objectContextBuilder,
-            SchemaPropertyContext context) {
+    private JsonPropertyResult generateSchemaProperty(ObjectContextBuilder<?> objectContextBuilder,
+                                                      SchemaPropertyContext context) {
         return schemaGenerator.generateSchemaProperty(objectContextBuilder, context);
     }
 

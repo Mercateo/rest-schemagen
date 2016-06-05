@@ -1,5 +1,16 @@
 package com.mercateo.common.rest.schemagen;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.google.common.collect.ImmutableMap;
+import com.mercateo.common.rest.schemagen.generator.ImmutableJsonPropertyResult;
+import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
+import com.mercateo.common.rest.schemagen.generator.ObjectContext;
+import com.mercateo.common.rest.schemagen.generator.ObjectContextBuilder;
+import com.mercateo.common.rest.schemagen.generator.PathContext;
+import com.mercateo.common.rest.schemagen.generator.ReferencedJsonPropertyFinder;
+import com.mercateo.common.rest.schemagen.generictype.GenericType;
+import com.mercateo.common.rest.schemagen.util.EnumUtil;
+
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -13,33 +24,30 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.google.common.collect.ImmutableMap;
-import com.mercateo.common.rest.schemagen.generator.ObjectContext;
-import com.mercateo.common.rest.schemagen.generator.PathContext;
-import com.mercateo.common.rest.schemagen.generictype.GenericType;
-import com.mercateo.common.rest.schemagen.util.EnumUtil;
-
 public class SchemaPropertyGenerator {
 
-    private static final Map<Class<?>, PropertyBuilder> builtins = ImmutableMap.of( //
-            Date.class, Property.builderFor(Integer.class).setRequired());
+    private static final Map<Class<?>, JsonProperty> builtins = ImmutableMap.of( //
+            Date.class, JsonProperty.builderFor(Integer.class).withName("n/a").withIsRequired(true).build());
+
+    private final ReferencedJsonPropertyFinder referencedJsonPropertyFinder;
+
+    public SchemaPropertyGenerator() {
+        referencedJsonPropertyFinder = new ReferencedJsonPropertyFinder();
+    }
 
     /**
      * Generate and return a property hierarchy for the object defined by the
      * given
-     * {@link com.mercateo.common.rest.schemagen.generator.ObjectContext.Builder}
+     * {@link com.mercateo.common.rest.schemagen.generator.ObjectContextBuilder}
      * {@code objectContextBuilder}
      *
-     * @param objectContextBuilder
-     *            the object context builder for the object to build the
-     *            property hierarchy for
-     * @param context
-     *            the current schema property context
+     * @param objectContextBuilder the object context builder for the object to build the
+     *                             property hierarchy for
+     * @param context              the current schema property context
      * @return property hierarchy
      */
-    public Property generateSchemaProperty(ObjectContext.Builder<?> objectContextBuilder,
-            SchemaPropertyContext context) {
+    public JsonPropertyResult generateSchemaProperty(ObjectContextBuilder<?> objectContextBuilder,
+                                               SchemaPropertyContext context) {
         return generateSchemaProperty(objectContextBuilder.build(), context);
     }
 
@@ -47,45 +55,26 @@ public class SchemaPropertyGenerator {
      * Generate and return a property hierarchy for the object defined by the
      * given {@link ObjectContext} {@code objectContext}
      *
-     * @param objectContext
-     *            the object context for the object to build the property
-     *            hierarchy for
-     * @param context
-     *            the current schema property context
+     * @param objectContext the object context for the object to build the property
+     *                      hierarchy for
+     * @param context       the current schema property context
      * @return property hierarchy
      */
-    public Property generateSchemaProperty(ObjectContext<?> objectContext,
-            SchemaPropertyContext context) {
-        final Property property = determineProperty("#", objectContext, new PathContext(), context);
-        addIdsToReferencedElements(property, new HashMap<>());
-        final String name = objectContext.getRawType().getSimpleName();
-        return updateName(objectContext, property, name);
+    public JsonPropertyResult generateSchemaProperty(ObjectContext<?> objectContext,
+                                                     SchemaPropertyContext context) {
+        JsonProperty rootJsonProperty = determineProperty("#", objectContext, new PathContext(), context);
+        rootJsonProperty = updateName(rootJsonProperty, objectContext.getRawType().getSimpleName());
+        return ImmutableJsonPropertyResult.of(
+                rootJsonProperty,
+                referencedJsonPropertyFinder.getReferencedJsonProperties(rootJsonProperty));
     }
 
-    private Property updateName(ObjectContext<?> objectContext, Property property, String name) {
-        return Property.builderFor(objectContext).withProperty(property).withName(
-                name).build();
+    private JsonProperty updateName(JsonProperty jsonProperty, String name) {
+        return JsonProperty.builderFrom(jsonProperty).withName(name).build();
     }
 
-    private void addIdsToReferencedElements(Property property, Map<String, Property> pathMap) {
-        pathMap.put(property.getPath(), property);
-
-        if (property.getRef() != null) {
-            final Property referencedProperty = pathMap.get(property.getRef());
-            if (referencedProperty == null) {
-                throw new IllegalStateException("There is an reference id (+" + property.getRef()
-                        + "), but no referenced object for it");
-            }
-            referencedProperty.enableId();
-        }
-
-        for (Property childProperty : property.getProperties()) {
-            addIdsToReferencedElements(childProperty, pathMap);
-        }
-    }
-
-    private List<Property> getProperties(final ObjectContext<?> objectContext,
-            final PathContext pathContext, final SchemaPropertyContext context) {
+    private List<JsonProperty> getProperties(final ObjectContext<?> objectContext,
+                                             final PathContext pathContext, final SchemaPropertyContext context) {
 
         final Map<Field, ObjectContext> fieldContextMap = getFieldContextMap(objectContext, context);
 
@@ -109,13 +98,13 @@ public class SchemaPropertyGenerator {
     }
 
     private Map<Field, ObjectContext> getFieldContextMap(ObjectContext objectContext,
-            SchemaPropertyContext context) {
+                                                         SchemaPropertyContext context) {
         return getFieldContextMap(objectContext, new HashMap<>(), new HashSet<>(), context);
     }
 
     private Map<Field, ObjectContext> getFieldContextMap(ObjectContext objectContext,
-            final Map<Field, ObjectContext> fieldContextMap, final Set<Type> unwrappedTypes,
-            SchemaPropertyContext context) {
+                                                         final Map<Field, ObjectContext> fieldContextMap, final Set<Type> unwrappedTypes,
+                                                         SchemaPropertyContext context) {
         do {
             for (Field field : objectContext.getType().getDeclaredFields()) {
                 addFieldToMap(field, objectContext, fieldContextMap, unwrappedTypes, context);
@@ -125,8 +114,8 @@ public class SchemaPropertyGenerator {
     }
 
     private void addFieldToMap(Field field, ObjectContext objectContext,
-            Map<Field, ObjectContext> fieldContextMap, Set<Type> unwrappedTypes,
-            SchemaPropertyContext context) {
+                               Map<Field, ObjectContext> fieldContextMap, Set<Type> unwrappedTypes,
+                               SchemaPropertyContext context) {
         if (objectContext.isApplicable(field, context)) {
             if (field.getAnnotation(JsonUnwrapped.class) != null) {
                 fieldContextMap.putAll(getUnwrappedFieldsMap(field, objectContext, unwrappedTypes,
@@ -138,7 +127,7 @@ public class SchemaPropertyGenerator {
     }
 
     private Map<Field, ObjectContext> getUnwrappedFieldsMap(Field field,
-            ObjectContext objectContext, Set<Type> unwrappedTypes, SchemaPropertyContext context) {
+                                                            ObjectContext objectContext, Set<Type> unwrappedTypes, SchemaPropertyContext context) {
         objectContext = objectContext.forField(field);
         final Type unwrappedType = objectContext.getType().getType();
         if (unwrappedTypes.contains(unwrappedType)) {
@@ -158,35 +147,38 @@ public class SchemaPropertyGenerator {
         return field1.getName().compareTo(field2.getName());
     }
 
-    private Property determineProperty(String name, ObjectContext<?> objectContext,
-            PathContext pathContext, SchemaPropertyContext context) {
+    private JsonProperty determineProperty(String name, ObjectContext<?> objectContext,
+                                           PathContext pathContext, SchemaPropertyContext context) {
         if (builtins.containsKey(objectContext.getRawType())) {
-            return builtins.get(objectContext.getRawType()).withName(name).build();
+            JsonProperty jsonPropertyTemplate = builtins.get(objectContext.getRawType());
+            return JsonProperty.builderFrom(jsonPropertyTemplate).withName(name).build();
         } else {
-            return determineProperty(Property.builderFor(objectContext).withName(name),
-                    objectContext, pathContext, context);
+            return determineObjectProperty(name, objectContext, pathContext, context);
         }
     }
 
-    private Property determineProperty(PropertyBuilder builder, ObjectContext<?> objectContext,
-            PathContext pathContext, SchemaPropertyContext context) {
+    private JsonProperty determineObjectProperty(String name, ObjectContext<?> objectContext,
+                                                 PathContext pathContext, SchemaPropertyContext context) {
+
+        JsonProperty.Builder builder = JsonProperty.builderFor(objectContext).withName(name);
+
         final Class<?> rawType = objectContext.getRawType();
 
         if (pathContext.isKnown(rawType)) {
-            return builder.withPath(pathContext.getCurrentPath() + "/" + builder.getName())
+            return builder.withPath(pathContext.getCurrentPath() + "/" + name)
                     .withRef(pathContext.getPath(rawType)).build();
         }
 
         final PropertyType propertyType = objectContext.getPropertyType();
-        pathContext = pathContext.enter(builder.getName(),
+        pathContext = pathContext.enter(name,
                 propertyType == PropertyType.OBJECT ? rawType : null);
-        return builder.withPath(pathContext.getCurrentPath()).withChildren(
+        return builder.withPath(pathContext.getCurrentPath()).withProperties(
                 getNestedProperties(objectContext, pathContext, context)).build();
     }
 
-    private List<Property> getNestedProperties(ObjectContext<?> objectContext,
-            PathContext pathContext, SchemaPropertyContext context) {
-        List<Property> properties = new ArrayList<>();
+    private List<JsonProperty> getNestedProperties(ObjectContext<?> objectContext,
+                                                   PathContext pathContext, SchemaPropertyContext context) {
+        List<JsonProperty> properties = new ArrayList<>();
         switch (objectContext.getPropertyType()) {
             case OBJECT:
                 final PropertySubType subType = objectContext.getPropertySubType();
@@ -210,18 +202,18 @@ public class SchemaPropertyGenerator {
         return properties;
     }
 
-    private List<Property> getDictProperties(ObjectContext<?> objectContext, PathContext pathContext, SchemaPropertyContext context) {
+    private List<JsonProperty> getDictProperties(ObjectContext<?> objectContext, PathContext pathContext, SchemaPropertyContext context) {
         ParameterizedType parameterizedType = (ParameterizedType) objectContext.getType().getType();
 
         final Class<?> keyType = (Class<?>) parameterizedType.getActualTypeArguments()[0];
         final Type valueType = parameterizedType.getActualTypeArguments()[1];
         final ObjectContext<?> valueObjectContext = ObjectContext.buildFor(GenericType.of(valueType)).build();
-        Property valueProperty = determineProperty("", valueObjectContext, pathContext, context);
+        JsonProperty valueJsonProperty = determineProperty("", valueObjectContext, pathContext, context);
 
         return Stream.of(keyType.getEnumConstants())
                 .map(enumConstant -> {
                     final String enumName = EnumUtil.convertToString((Enum<?>) enumConstant);
-                    return updateName(objectContext, valueProperty, enumName);
+                    return updateName(JsonProperty.builderFor(objectContext).from(valueJsonProperty).build(), enumName);
                 }).collect(Collectors.toList());
     }
 

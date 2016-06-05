@@ -16,6 +16,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
+import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
+import com.mercateo.common.rest.schemagen.generator.ObjectContextBuilder;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +31,7 @@ import com.mercateo.common.rest.schemagen.link.Scope;
 import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 
 public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
-    static final Set<Class<?>> INVALID_OUTPUT_TYPES = new HashSet<>(Arrays.asList(void.class,
+    private static final Set<Class<?>> INVALID_OUTPUT_TYPES = new HashSet<>(Arrays.asList(void.class,
             Void.class));
 
     private final static Logger logger = LoggerFactory.getLogger(RestJsonSchemaGenerator.class);
@@ -99,7 +101,7 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
 
             if (!ignore) {
                 @SuppressWarnings("rawtypes")
-                final ObjectContext.Builder objectContextBuilder = ObjectContext.buildFor(
+                final ObjectContextBuilder objectContextBuilder = ObjectContext.buildFor(
                         GenericType.of(types[i]));
 
                 if (scope.hasAllowedValues(i)) {
@@ -152,12 +154,13 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
 
     private Optional<ObjectNode> generateJsonSchema(ObjectContext<?> objectContext,
             SchemaPropertyContext schemaPropertyContext) {
-        final Property property = schemaPropertyGenerator.generateSchemaProperty(objectContext,
+        final JsonPropertyResult jsonPropertyResult = schemaPropertyGenerator.generateSchemaProperty(objectContext,
                 schemaPropertyContext);
-        if (property.getProperties().isEmpty() && property.getType() == PropertyType.OBJECT) {
+        JsonProperty rootJsonProperty = jsonPropertyResult.getRoot();
+        if (rootJsonProperty.getProperties().isEmpty() && rootJsonProperty.getType() == PropertyType.OBJECT) {
             return Optional.empty();
         }
-        return Optional.of(propertyJsonSchemaMapper.toJson(property));
+        return Optional.of(propertyJsonSchemaMapper.toJson(jsonPropertyResult));
     }
 
     private ObjectNode createObjectNode() {

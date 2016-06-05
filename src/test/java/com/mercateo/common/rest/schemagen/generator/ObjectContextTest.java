@@ -78,7 +78,7 @@ public class ObjectContextTest {
     public void testAllowedValues() throws NoSuchFieldException {
         final TestClass testClass = new TestClass();
         testClass.setNotEmptyString("allowed");
-        uut = ObjectContext.buildFor(TestClass.class).withAllowedValue(testClass).build();
+        uut = ObjectContext.buildFor(TestClass.class).addAllowedValues(testClass).build();
         Field f1 = TestClass.class.getDeclaredField("notEmptyString");
 
         final ObjectContext<Object> objectObjectContext = uut.forField(f1);
