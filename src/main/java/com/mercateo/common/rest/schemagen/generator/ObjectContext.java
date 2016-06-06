@@ -1,28 +1,6 @@
 package com.mercateo.common.rest.schemagen.generator;
 
-import static java.util.Objects.requireNonNull;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-
-import javax.validation.Constraint;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.ws.rs.PathParam;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.common.collect.ImmutableList;
 import com.googlecode.gentyref.GenericTypeReflector;
 import com.mercateo.common.rest.schemagen.IgnoreInRestSchema;
 import com.mercateo.common.rest.schemagen.PropertySubType;
@@ -34,150 +12,145 @@ import com.mercateo.common.rest.schemagen.SizeConstraints;
 import com.mercateo.common.rest.schemagen.ValueConstraints;
 import com.mercateo.common.rest.schemagen.generictype.GenericClass;
 import com.mercateo.common.rest.schemagen.generictype.GenericType;
+import com.mercateo.common.rest.schemagen.internal.DataClassStyle;
 import com.mercateo.common.rest.schemagen.plugin.IndividualSchemaGenerator;
 import com.mercateo.common.rest.schemagen.plugin.PropertySchema;
 import com.mercateo.common.rest.schemagen.types.ObjectWithSchema;
+import org.immutables.value.Value;
 
-public class ObjectContext<T> {
+import javax.annotation.Nullable;
+import javax.validation.Constraint;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import javax.ws.rs.PathParam;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+@Value.Immutable
+@DataClassStyle
+public abstract class ObjectContext<T> {
 
     private static final Set<Class<? extends Annotation>> IGNORE_ANNOTATIONS = new HashSet<>(Arrays
             .asList(JsonIgnore.class, IgnoreInRestSchema.class));
 
-    private final GenericType<T> type;
-
-    private final PropertyType propertyType;
-
-    private final T defaultValue;
-
-    private final List<T> allowedValues;
-
-    private final boolean required;
-
-    private final SizeConstraints sizeConstraints;
-
-    private final ValueConstraints valueConstraints;
-
-    private final Class<? extends IndividualSchemaGenerator> schemaGenerator;
-
-    private T currentValue;
-    private PropertySubType propertySubType;
-
-    ObjectContext(GenericType<T> type, T defaultValue, List<T> allowedValues, boolean required,
-                  SizeConstraints sizeConstraints,
-                  ValueConstraints valueConstraints, Class<? extends IndividualSchemaGenerator> schemaGenerator, T currentValue) {
-        this.type = requireNonNull(type);
-        this.currentValue = currentValue;
-        this.propertyType = PropertyTypeMapper.of(type);
-        this.propertySubType = PropertySubTypeMapper.of(type, this.propertyType);
-        this.defaultValue = defaultValue;
-        this.allowedValues = allowedValues;
-        this.required = required;
-        this.sizeConstraints = sizeConstraints;
-        this.valueConstraints = valueConstraints;
-        this.schemaGenerator = schemaGenerator;
+    public static <T> ObjectContextBuilder<T> buildFor(Type type, Class<T> clazz) {
+        return buildFor(GenericType.of(type, clazz));
     }
 
-    public static <T> Builder<T> buildFor(Type type, Class<T> clazz) {
-        return new Builder<>(GenericType.of(type, clazz));
+    public static <T> ObjectContextBuilder<T> buildFor(Class<T> clazz) {
+        return buildFor(new GenericClass<>(clazz));
     }
 
-    public static <T> Builder<T> buildFor(Class<T> clazz) {
-        return new Builder<>(new GenericClass<>(clazz));
-    }
-
-    public static <T> Builder<T> buildFor(GenericType<T> type) {
-        return new Builder<>(type);
+    public static <T> ObjectContextBuilder<T> buildFor(GenericType<T> type) {
+        PropertyType propertyType = PropertyTypeMapper.of(type);
+        return new ObjectContextBuilder<T>()
+                .withType(type)
+                .withPropertyType(propertyType)
+                .withPropertySubType(PropertySubTypeMapper.of(type, propertyType));
     }
 
     private static <U, T extends U> ObjectContext<U> buildObjectContextForSuper(
             GenericType<U> superType, List<T> allowedValues, T defaultValue) {
-        List<U> newAllowedValues = new ArrayList<>();
-        if (allowedValues != null) {
-            allowedValues.stream().forEach(newAllowedValues::add);
-        }
 
-        return ObjectContext.buildFor(superType).withDefaultValue(defaultValue).withAllowedValues(
-                newAllowedValues).build();
+        return ObjectContext.buildFor(superType)
+                .withDefaultValue(defaultValue)
+                .withAllowedValues(allowedValues != null ? allowedValues : Collections.emptyList())
+                .build();
     }
 
-    public GenericType<T> getType() {
-        return type;
-    }
+    public abstract GenericType<T> getType();
 
-    public T getDefaultValue() {
-        return defaultValue;
-    }
+    @Nullable
+    public abstract T getDefaultValue();
 
-    public List<T> getAllowedValues() {
-        return allowedValues;
-    }
+    @Nullable
+    public abstract T getCurrentValue();
 
+    public abstract List<T> getAllowedValues();
+
+    @Value.Default
     public boolean isRequired() {
-        return required;
+        return false;
     }
 
+    @Value.Default
     public SizeConstraints getSizeConstraints() {
-        return sizeConstraints;
+        return SizeConstraints.empty();
     }
 
+    @Value.Default
     public ValueConstraints getValueConstraints() {
-        return valueConstraints;
+        return ValueConstraints.empty();
     }
 
-    public PropertyType getPropertyType() {
-        return propertyType;
-    }
+    public abstract PropertyType getPropertyType();
 
+    @Value.Default
     public PropertySubType getPropertySubType() {
-        return propertySubType;
+        return PropertySubType.NONE;
     }
 
-    public Class<? extends IndividualSchemaGenerator> getSchemaGenerator() {
-        return schemaGenerator;
-    }
+    @Nullable
+    public abstract Class<? extends IndividualSchemaGenerator> getSchemaGenerator();
 
     public ObjectContext<?> forSuperType() {
-        GenericType<? super T> superType = type.getSuperType();
+        GenericType<? super T> superType = getType().getSuperType();
         if (superType != null) {
-            return buildObjectContextForSuper(superType, allowedValues, defaultValue);
+            return buildObjectContextForSuper(superType, getAllowedValues(), getDefaultValue());
         } else {
             return null;
         }
     }
 
     public ObjectContext<?> getContained() {
-        final GenericType<?> containedType = type.getContainedType();
+        final GenericType<?> containedType = getType().getContainedType();
         return ObjectContext.buildFor(containedType).build();
     }
 
     @SuppressWarnings("unchecked")
     public <U> ObjectContext<U> forField(Field field) {
         final GenericType<U> fieldType = GenericType.of(GenericTypeReflector.getExactFieldType(
-                field, type.getType()), (Class<U>) field.getType());
-        final Builder<U> builder = ObjectContext.buildFor(fieldType);
+                field, getType().getType()), (Class<U>) field.getType());
+        final ObjectContextBuilder<U> builder = ObjectContext.buildFor(fieldType);
 
+        T defaultValue = getDefaultValue();
         if (defaultValue != null) {
-            try {
-                builder.withDefaultValue((U) field.get(defaultValue));
-            } catch (IllegalAccessException e) {
-                throw new IllegalStateException(e);
-            }
+            builder.withDefaultValue(getFieldValue(field, defaultValue));
         }
 
+        List<T> allowedValues = getAllowedValues();
         if (allowedValues != null && !fieldType.getRawType().isPrimitive()) {
             if (!field.isAccessible()) {
                 field.setAccessible(true);
             }
-            List<U> newAllowedValues = new ArrayList<>();
-            allowedValues.stream().forEach(x -> addToAllowedValues(field, newAllowedValues, x));
-            builder.withAllowedValues(newAllowedValues);
+            builder.withAllowedValues(allowedValues.stream()
+                    .filter(Objects::nonNull)
+                    .flatMap(value -> (Stream<U>) addToAllowedValues(field, value))
+                    .collect(Collectors.toList())
+            );
         }
 
         if (isRequired(field)) {
-            builder.setRequired();
+            builder.withIsRequired(true);
         }
 
-        determineConstraints(Size.class, field, SizeConstraints::new).ifPresent(builder::withSizeConstraints);
+        determineConstraints(Size.class, field, SizeConstraints::new)
+                .ifPresent(builder::withSizeConstraints);
+
         builder.withValueConstraints(new ValueConstraints(
                 determineConstraints(Max.class, field, Max::value),
                 determineConstraints(Min.class, field, Min::value)));
@@ -220,14 +193,9 @@ public class ObjectContext<T> {
     }
 
     @SuppressWarnings("unchecked")
-    private <U> void addToAllowedValues(Field field, List<U> newAllowedValues, T x) {
-        try {
-            if (x != null) {
-                newAllowedValues.add((U) field.get(x));
-            }
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        }
+    private <U> Stream<U> addToAllowedValues(Field field, T object) {
+        U fieldValue = getFieldValue(field, object);
+        return fieldValue != null ? Stream.of(fieldValue) : Stream.<U>empty();
     }
 
     public boolean isApplicable(Field field, SchemaPropertyContext context) {
@@ -243,15 +211,11 @@ public class ObjectContext<T> {
         if (pathParamAnnotation == null) {
             return true;
         }
-        if (currentValue == null) {
-            return false;
-        }
-        try {
-            field.setAccessible(true);
-            return (field.get(currentValue) == null);
-        } catch (IllegalArgumentException | IllegalAccessException e) {
-            return false;
-        }
+
+        T currentValue = getCurrentValue();
+
+        return currentValue != null && getFieldValue(field, currentValue) == null;
+
     }
 
     private boolean isApplicableFor(Field field, SchemaPropertyContext context) {
@@ -260,74 +224,17 @@ public class ObjectContext<T> {
     }
 
     public Class<?> getRawType() {
-        return type.getRawType();
+        return getType().getRawType();
     }
 
-    public static class Builder<T> {
-
-        private final GenericType<T> type;
-
-        private T defaultValue;
-
-        private List<T> allowedValues;
-
-        private T currentValue;
-
-        private boolean required;
-
-        private SizeConstraints sizeConstraints = SizeConstraints.empty();
-
-        private ValueConstraints valueConstraints = ValueConstraints.empty();
-
-        private Class<? extends IndividualSchemaGenerator> schemaGenerator;
-
-        private Builder(GenericType<T> type) {
-            this.type = type;
-        }
-
-        public Builder<T> withDefaultValue(T defaultValue) {
-            this.defaultValue = defaultValue;
-            return this;
-        }
-
-        public Builder<T> withAllowedValues(List<T> allowedValues) {
-            this.allowedValues = allowedValues;
-            return this;
-        }
-
-        public Builder<T> withAllowedValue(T allowedValue) {
-            this.allowedValues = ImmutableList.of(allowedValue);
-            return this;
-        }
-
-        public Builder<T> withCurrentValue(T currentValue) {
-            this.currentValue = currentValue;
-            return this;
-        }
-
-        public ObjectContext<T> build() {
-            return new ObjectContext<>(type, defaultValue, allowedValues, required, sizeConstraints, valueConstraints,
-                    schemaGenerator, currentValue);
-        }
-
-        Builder<T> setRequired() {
-            required = true;
-            return this;
-        }
-
-        Builder<T> withSizeConstraints(SizeConstraints sizeConstraints) {
-            this.sizeConstraints = sizeConstraints;
-            return this;
-        }
-
-        Builder<T> withValueConstraints(ValueConstraints valueConstraints) {
-            this.valueConstraints = valueConstraints;
-            return this;
-        }
-
-        Builder<T> withSchemaGenerator(Class<? extends IndividualSchemaGenerator> schemaGenerator) {
-            this.schemaGenerator = schemaGenerator;
-            return this;
+    private <U> U getFieldValue(Field field, T object) {
+        try {
+            field.setAccessible(true);
+            //noinspection unchecked
+            return (U) field.get(object);
+        } catch (IllegalAccessException e) {
+            throw new IllegalStateException(e);
         }
     }
+
 }

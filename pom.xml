@@ -65,7 +65,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.3</version>
+        <version>3.5.1</version>
         <configuration>
           <compilerVersion>1.8</compilerVersion>
           <source>1.8</source>
@@ -74,6 +74,8 @@
           <showDeprecation>true</showDeprecation>
           <showWarnings>true</showWarnings>
           <optimize>true</optimize>
+          <!-- Prevents an endPosTable exception during compilation -->
+          <useIncrementalCompilation>false</useIncrementalCompilation>
           <encoding>UTF-8</encoding>
         </configuration>
       </plugin>
@@ -130,7 +132,7 @@
       <plugin>
         <groupId>org.eluder.coveralls</groupId>
         <artifactId>coveralls-maven-plugin</artifactId>
-        <version>4.1.0</version>
+        <version>4.2.0</version>
       </plugin>
     </plugins>
  </build>
@@ -197,6 +199,12 @@
     <artifactId>jackson-annotations</artifactId>
     <version>2.4.1</version>
   </dependency>
+    <dependency>
+      <groupId>org.immutables</groupId>
+      <artifactId>value</artifactId>
+      <version>2.2.2</version>
+      <scope>provided</scope>
+    </dependency>
   <dependency>
     <groupId>com.fasterxml.jackson.core</groupId>
     <artifactId>jackson-databind</artifactId>

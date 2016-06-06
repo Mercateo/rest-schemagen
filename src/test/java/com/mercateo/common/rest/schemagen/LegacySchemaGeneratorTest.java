@@ -5,13 +5,19 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import javax.ws.rs.NotFoundException;
 
+import com.mercateo.common.rest.schemagen.generator.ImmutableJsonPropertyResult;
+import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
+import com.mercateo.common.rest.schemagen.generator.ObjectContextBuilder;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.Property;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,7 +29,9 @@ import com.mercateo.common.rest.schemagen.types.ObjectWithSchema;
 
 public class LegacySchemaGeneratorTest {
 
-    private Property schema;
+    private JsonProperty rootJsonProperty;
+
+    private Set<JsonProperty> referencedElements;
 
     private SchemaPropertyGenerator schemaGenerator;
 
@@ -38,19 +46,33 @@ public class LegacySchemaGeneratorTest {
     }
 
     private void createSchemaFor(Class<?> clazz) {
-        schema = schemaGenerator.generateSchemaProperty(ObjectContext.buildFor(clazz),
-                schemaPropertyContext);
+        updateSchemaPropertyResult(schemaGenerator.generateSchemaProperty(createObjectContextBuilderFor(clazz),
+                schemaPropertyContext));
     }
 
+    private <T> ObjectContextBuilder<T> createObjectContextBuilderFor(Class<T> clazz) {
+        return ObjectContext.buildFor(clazz);
+    }
+
+
     private void createSchemaFor(GenericType<?> clazz) {
-        schema = schemaGenerator.generateSchemaProperty(ObjectContext.buildFor(clazz),
-                schemaPropertyContext);
+        updateSchemaPropertyResult(schemaGenerator.generateSchemaProperty(createObjectContextBuilderFor(clazz),
+                schemaPropertyContext));
+    }
+
+    private <T> ObjectContextBuilder<T> createObjectContextBuilderFor(GenericType<T> genericType) {
+        return ObjectContext.buildFor(genericType);
     }
 
     @SuppressWarnings("unchecked")
     private <T> void createAllowedValuesSchema(T object) {
-        schema = schemaGenerator.generateSchemaProperty(ObjectContext.buildFor((Class<T>) object
-                .getClass()).withAllowedValue(object), schemaPropertyContext);
+        updateSchemaPropertyResult(schemaGenerator.generateSchemaProperty(createObjectContextBuilderFor((Class<T>) object
+                .getClass()).addAllowedValues(object), schemaPropertyContext));
+    }
+
+    private void updateSchemaPropertyResult(JsonPropertyResult jsonPropertyResult) {
+        rootJsonProperty = jsonPropertyResult.getRoot();
+        referencedElements = jsonPropertyResult.getReferencedElements();
     }
 
     @Test
@@ -87,7 +109,7 @@ public class LegacySchemaGeneratorTest {
     @Test
     public void shouldMapBigDecimal() {
         createSchemaFor(TestRto.class);
-        Property bigDecimal = getByName("bigDecimal");
+        JsonProperty bigDecimal = getByName("bigDecimal");
         assertThat(bigDecimal.getType()).isEqualTo(PropertyType.NUMBER);
     }
 
@@ -101,7 +123,7 @@ public class LegacySchemaGeneratorTest {
     @Test
     public void shouldMapEnumAllowedValues() {
         createSchemaFor(TestRto.class);
-        Property anEnum = getByName("anEnum");
+        JsonProperty anEnum = getByName("anEnum");
         assertThat(anEnum.getType()).isEqualTo(PropertyType.STRING);
         List<String> allowedValues = anEnum.getAllowedValues();
         assertThat(allowedValues).isNotNull().hasSize(2).contains("VALUE_1", "VALUE_2");
@@ -110,11 +132,11 @@ public class LegacySchemaGeneratorTest {
     @Test
     public void shouldUnrollGenerics() {
         createSchemaFor(TestRto.class);
-        Property array = getByName("twoDimStringArray");
+        JsonProperty array = getByName("twoDimStringArray");
         assertThat(array.getType()).isEqualTo(PropertyType.ARRAY);
-        Property nestedProperty = array.getProperties().get(0);
-        assertThat(nestedProperty.getType()).isEqualTo(PropertyType.ARRAY);
-        assertThat(nestedProperty.getProperties().get(0).getType()).isEqualTo(PropertyType.STRING);
+        JsonProperty nestedJsonProperty = array.getProperties().get(0);
+        assertThat(nestedJsonProperty.getType()).isEqualTo(PropertyType.ARRAY);
+        assertThat(nestedJsonProperty.getProperties().get(0).getType()).isEqualTo(PropertyType.STRING);
     }
 
     @Test
@@ -126,17 +148,18 @@ public class LegacySchemaGeneratorTest {
     @Test
     public void shouldDelegateToAnnotatedGenerator() {
         createSchemaFor(TestRto.class);
-        assertThat(getByName("hasOwnGenerator").getGenerator()).isEqualTo(
+        assertThat(getByName("hasOwnGenerator").getIndividualSchemaGenerator()).isEqualTo(
                 TestSchemaGenerator.class);
     }
 
     @Test
     public void shouldMapRecursiveNonRootElements() {
         createSchemaFor(TestRto.class);
-        Property element = getByName("nestedRecursiveElement");
+        JsonProperty element = getByName("nestedRecursiveElement");
         assertThat(element.getType()).isEqualTo(PropertyType.OBJECT);
-        assertThat(element.getId()).isEqualTo(getByName(element.getProperties(), "nextThing")
+        assertThat(element.getPath()).isEqualTo(getByName(element.getProperties(), "nextThing")
                 .getRef());
+        assertThat(referencedElements).contains(element);
     }
 
     @Test
@@ -146,7 +169,7 @@ public class LegacySchemaGeneratorTest {
                 .getResourceAsStream("/SchemaGeneratorOutputTestFile.json");
         final InputStreamReader inputStreamReader = new InputStreamReader(resourceAsStream, "UTF-8");
         JSONObject target = new JSONObject(CharStreams.toString(inputStreamReader));
-        JSONObject actual = new JSONObject(new PropertyJsonSchemaMapper().toJson(schema)
+        JSONObject actual = new JSONObject(new PropertyJsonSchemaMapper().toJson(ImmutableJsonPropertyResult.of(rootJsonProperty, referencedElements))
                 .toString());
         assertThat(actual.toString(2)).isEqualTo(target.toString(2));
     }
@@ -155,33 +178,33 @@ public class LegacySchemaGeneratorTest {
     public void shouldMapHierarchicalUserRto() throws NoSuchMethodException {
         createSchemaFor(GenericType.of(getClass().getDeclaredMethod("unused")
                 .getGenericReturnType()));
-        assertThat(schema.getType()).isEqualTo(PropertyType.OBJECT);
-        assertThat(schema.getProperties()).hasSize(12);
-        assertThat(schema.getPropertyByName("string").getType()).isEqualTo(PropertyType.STRING);
-        assertThat(schema.getPropertyByName("requiredString").getType()).isEqualTo(
+        assertThat(rootJsonProperty.getType()).isEqualTo(PropertyType.OBJECT);
+        assertThat(rootJsonProperty.getProperties()).hasSize(12);
+        assertThat(rootJsonProperty.getPropertyByName("string").getType()).isEqualTo(PropertyType.STRING);
+        assertThat(rootJsonProperty.getPropertyByName("requiredString").getType()).isEqualTo(
                 PropertyType.STRING);
-        assertThat(schema.getPropertyByName("constrainedString").getType()).isEqualTo(
+        assertThat(rootJsonProperty.getPropertyByName("constrainedString").getType()).isEqualTo(
                 PropertyType.STRING);
-        assertThat(schema.getPropertyByName("integer").getType()).isEqualTo(PropertyType.INTEGER);
-        assertThat(schema.getPropertyByName("bigDecimal").getType()).isEqualTo(PropertyType.NUMBER);
-        assertThat(schema.getPropertyByName("bool").getType()).isEqualTo(PropertyType.BOOLEAN);
-        assertThat(schema.getPropertyByName("boxedBool").getType()).isEqualTo(PropertyType.BOOLEAN);
-        assertThat(schema.getPropertyByName("hasOwnGenerator").getType()).isEqualTo(
+        assertThat(rootJsonProperty.getPropertyByName("integer").getType()).isEqualTo(PropertyType.INTEGER);
+        assertThat(rootJsonProperty.getPropertyByName("bigDecimal").getType()).isEqualTo(PropertyType.NUMBER);
+        assertThat(rootJsonProperty.getPropertyByName("bool").getType()).isEqualTo(PropertyType.BOOLEAN);
+        assertThat(rootJsonProperty.getPropertyByName("boxedBool").getType()).isEqualTo(PropertyType.BOOLEAN);
+        assertThat(rootJsonProperty.getPropertyByName("hasOwnGenerator").getType()).isEqualTo(
                 PropertyType.OBJECT);
-        assertThat(schema.getPropertyByName("anEnum").getType()).isEqualTo(PropertyType.STRING);
-        assertThat(schema.getPropertyByName("twoDimStringArray").getType()).isEqualTo(
+        assertThat(rootJsonProperty.getPropertyByName("anEnum").getType()).isEqualTo(PropertyType.STRING);
+        assertThat(rootJsonProperty.getPropertyByName("twoDimStringArray").getType()).isEqualTo(
                 PropertyType.ARRAY);
-        assertThat(schema.getPropertyByName("recursiveElement").getType()).isEqualTo(
+        assertThat(rootJsonProperty.getPropertyByName("recursiveElement").getType()).isEqualTo(
                 PropertyType.OBJECT);
-        assertThat(schema.getPropertyByName("nestedRecursiveElement").getType()).isEqualTo(
+        assertThat(rootJsonProperty.getPropertyByName("nestedRecursiveElement").getType()).isEqualTo(
                 PropertyType.OBJECT);
-        Property firstArray = schema.getPropertyByName("twoDimStringArray");
+        JsonProperty firstArray = rootJsonProperty.getPropertyByName("twoDimStringArray");
         assertThat(firstArray.getType()).isEqualTo(PropertyType.ARRAY);
         assertThat(firstArray.getProperties()).hasSize(1);
-        Property secondArray = firstArray.getProperties().get(0);
+        JsonProperty secondArray = firstArray.getProperties().get(0);
         assertThat(secondArray.getType()).isEqualTo(PropertyType.ARRAY);
         assertThat(secondArray.getProperties()).hasSize(1);
-        Property arrayType = secondArray.getProperties().get(0);
+        JsonProperty arrayType = secondArray.getProperties().get(0);
         assertThat(arrayType.getType()).isEqualTo(PropertyType.STRING);
         assertThat(arrayType.getProperties()).isEmpty();
     }
@@ -192,10 +215,10 @@ public class LegacySchemaGeneratorTest {
         testRto.requiredString = "allowed_string";
         testRto.string = "this|is|an|enum";
         createAllowedValuesSchema(testRto);
-        final List<String> prop = schema.getPropertyByName("requiredString").getAllowedValues();
+        final List<String> prop = rootJsonProperty.getPropertyByName("requiredString").getAllowedValues();
         assertThat(prop).hasSize(1);
         assertThat(prop).contains("allowed_string");
-        final List<String> otherProp = schema.getPropertyByName("string").getAllowedValues();
+        final List<String> otherProp = rootJsonProperty.getPropertyByName("string").getAllowedValues();
         assertThat(otherProp).hasSize(1);
         assertThat(otherProp).contains("this|is|an|enum");
     }
@@ -203,7 +226,7 @@ public class LegacySchemaGeneratorTest {
     @Test(expected = NoSuchElementException.class)
     public void getPropertyByNameShouldThrow() {
         createSchemaFor(TestRto.class);
-        schema.getPropertyByName("nonExistentProperty");
+        rootJsonProperty.getPropertyByName("nonExistentProperty");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -221,12 +244,12 @@ public class LegacySchemaGeneratorTest {
         return null;
     }
 
-    private Property getByName(String name) {
-        return getByName(schema.getProperties(), name);
+    private JsonProperty getByName(String name) {
+        return getByName(rootJsonProperty.getProperties(), name);
     }
 
-    private Property getByName(List<Property> properties, String name) {
-        for (Property p : properties) {
+    private JsonProperty getByName(List<JsonProperty> properties, String name) {
+        for (JsonProperty p : properties) {
             if (p.getName().equals(name))
                 return p;
         }
@@ -236,12 +259,12 @@ public class LegacySchemaGeneratorTest {
     @Test
     public void testPaginated() {
         createSchemaFor(TestPaginatedResponse.class);
-        assertThat(schema.getType()).isEqualTo(PropertyType.OBJECT);
-        assertThat(schema.getProperties()).hasSize(4);
-        assertThat(schema.getPropertyByName("members").getType()).isEqualTo(PropertyType.ARRAY);
-        assertThat(schema.getPropertyByName("total").getType()).isEqualTo(PropertyType.INTEGER);
-        assertThat(schema.getPropertyByName("offset").getType()).isEqualTo(PropertyType.INTEGER);
-        assertThat(schema.getPropertyByName("limit").getType()).isEqualTo(PropertyType.INTEGER);
+        assertThat(rootJsonProperty.getType()).isEqualTo(PropertyType.OBJECT);
+        assertThat(rootJsonProperty.getProperties()).hasSize(4);
+        assertThat(rootJsonProperty.getPropertyByName("members").getType()).isEqualTo(PropertyType.ARRAY);
+        assertThat(rootJsonProperty.getPropertyByName("total").getType()).isEqualTo(PropertyType.INTEGER);
+        assertThat(rootJsonProperty.getPropertyByName("offset").getType()).isEqualTo(PropertyType.INTEGER);
+        assertThat(rootJsonProperty.getPropertyByName("limit").getType()).isEqualTo(PropertyType.INTEGER);
     }
 
     @Test

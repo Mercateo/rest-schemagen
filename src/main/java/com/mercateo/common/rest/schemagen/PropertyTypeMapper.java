@@ -10,9 +10,6 @@ import com.mercateo.common.rest.schemagen.generictype.GenericType;
 
 public final class PropertyTypeMapper {
 
-    private PropertyTypeMapper() {
-    }
-
     private static final Map<Class<?>, PropertyType> TYPE_MAP = new HashMap<>();
 
     static {

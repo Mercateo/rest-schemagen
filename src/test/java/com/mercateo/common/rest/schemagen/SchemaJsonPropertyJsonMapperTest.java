@@ -4,6 +4,8 @@ package com.mercateo.common.rest.schemagen;
 import java.lang.reflect.Type;
 import java.net.URL;
 
+import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
+import com.mercateo.common.rest.schemagen.generator.ObjectContextBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,7 +16,7 @@ import com.mercateo.common.rest.schemagen.parameter.CallContext;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SchemaPropertyJsonMapperTest {
+public class SchemaJsonPropertyJsonMapperTest {
 
     private SchemaPropertyGenerator schemaGenerator;
 
@@ -28,24 +30,24 @@ public class SchemaPropertyJsonMapperTest {
 
     @Test
     public void testClassHierarchiyWithSameType() {
-        Property property = generateSchemaProperty(ExtendedResponse.class);
+        JsonPropertyResult jsonProperty = generateSchemaProperty(ExtendedResponse.class);
 
-        final ObjectNode jsonNodes = propertyJsonSchemaMapper.toJson(property);
+        final ObjectNode jsonNodes = propertyJsonSchemaMapper.toJson(jsonProperty);
 
         assertThat(jsonNodes.size()).isEqualTo(2);
     }
 
-    private Property generateSchemaProperty(Type type) {
+    private JsonPropertyResult generateSchemaProperty(Type type) {
         return generateSchemaProperty(ObjectContext.buildFor(GenericType.of(type)));
     }
 
-    private Property generateSchemaProperty(ObjectContext.Builder<?> objectContextBuilder) {
+    private JsonPropertyResult generateSchemaProperty(ObjectContextBuilder<?> objectContextBuilder) {
         return generateSchemaProperty(objectContextBuilder, new SchemaPropertyContext(CallContext
                 .create(), (r, o) -> true));
     }
 
-    private Property generateSchemaProperty(ObjectContext.Builder<?> objectContextBuilder,
-            SchemaPropertyContext context) {
+    private JsonPropertyResult generateSchemaProperty(ObjectContextBuilder<?> objectContextBuilder,
+                                                SchemaPropertyContext context) {
         return schemaGenerator.generateSchemaProperty(objectContextBuilder, context);
     }
 

@@ -185,7 +185,7 @@ public class RestJsonSchemaGeneratorTest {
                 enumValue, new Object[]{null}, CallContext.create()) {
         }, fieldCheckerForSchema);
 
-        assertThat(inputSchema.isPresent()).isTrue();
+        assertThat(inputSchema).isPresent();
         assertThat(inputSchema.get()).containsIgnoringCase(
                 "{\"type\":\"string\",\"enum\":[\"fooValue\",\"barValue\"]}");
     }
