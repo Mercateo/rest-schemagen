@@ -34,21 +34,28 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
     private static final Set<Class<?>> INVALID_OUTPUT_TYPES = new HashSet<>(Arrays.asList(void.class,
             Void.class));
 
-    private final static Logger logger = LoggerFactory.getLogger(RestJsonSchemaGenerator.class);
+    private static final Logger logger = LoggerFactory.getLogger(RestJsonSchemaGenerator.class);
 
     private final SchemaPropertyGenerator schemaPropertyGenerator;
 
     private final PropertyJsonSchemaMapper propertyJsonSchemaMapper;
 
+    private final boolean isDebugEnabled;
+
     public RestJsonSchemaGenerator() {
         schemaPropertyGenerator = new SchemaPropertyGenerator();
         propertyJsonSchemaMapper = new PropertyJsonSchemaMapper();
+        isDebugEnabled = logger.isDebugEnabled();
     }
 
     @Override
     public Optional<String> createOutputSchema(Scope scope,
             FieldCheckerForSchema fieldCheckerForSchema) {
-        logger.debug("createOutputSchema {}", scope);
+
+        if (isDebugEnabled) {
+            logger.debug("createOutputSchema {}", scope);
+        }
+
         final GenericType<?> genericType = GenericType.of(scope.getReturnType(), scope
                 .getInvokedMethod().getReturnType());
 
@@ -72,7 +79,9 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
             FieldCheckerForSchema fieldCheckerForSchema) {
         Map<String, ObjectNode> objectNodes = new HashMap<>();
 
-        logger.debug("createInputSchema {}", scope);
+        if (isDebugEnabled) {
+            logger.debug("createInputSchema {}", scope);
+        }
 
         final Type[] types = scope.getParameterTypes();
 
