@@ -106,7 +106,7 @@ public class SchemaPropertyGenerator {
                                                          final Map<Field, ObjectContext> fieldContextMap, final Set<Type> unwrappedTypes,
                                                          SchemaPropertyContext context) {
         do {
-            for (Field field : objectContext.getType().getDeclaredFields()) {
+            for (Field field : objectContext.getGenericType().getDeclaredFields()) {
                 addFieldToMap(field, objectContext, fieldContextMap, unwrappedTypes, context);
             }
         } while ((objectContext = objectContext.forSuperType()) != null);
@@ -129,7 +129,7 @@ public class SchemaPropertyGenerator {
     private Map<Field, ObjectContext> getUnwrappedFieldsMap(Field field,
                                                             ObjectContext objectContext, Set<Type> unwrappedTypes, SchemaPropertyContext context) {
         objectContext = objectContext.forField(field);
-        final Type unwrappedType = objectContext.getType().getType();
+        final Type unwrappedType = objectContext.getType();
         if (unwrappedTypes.contains(unwrappedType)) {
             throw new IllegalStateException(String.format(
                     "recursion detected while unwrapping field <%s> in <%s>", field.getName(),
@@ -162,16 +162,16 @@ public class SchemaPropertyGenerator {
 
         JsonProperty.Builder builder = JsonProperty.builderFor(objectContext).withName(name);
 
-        final Class<?> rawType = objectContext.getRawType();
+        final Type type = objectContext.getType();
 
-        if (pathContext.isKnown(rawType)) {
+        if (pathContext.isKnown(type)) {
             return builder.withPath(pathContext.getCurrentPath() + "/" + name)
-                    .withRef(pathContext.getPath(rawType)).build();
+                    .withRef(pathContext.getPath(type)).build();
         }
 
         final PropertyType propertyType = objectContext.getPropertyType();
         pathContext = pathContext.enter(name,
-                propertyType == PropertyType.OBJECT ? rawType : null);
+                propertyType == PropertyType.OBJECT ? type : null);
         return builder.withPath(pathContext.getCurrentPath()).withProperties(
                 getNestedProperties(objectContext, pathContext, context)).build();
     }
@@ -203,7 +203,7 @@ public class SchemaPropertyGenerator {
     }
 
     private List<JsonProperty> getDictProperties(ObjectContext<?> objectContext, PathContext pathContext, SchemaPropertyContext context) {
-        ParameterizedType parameterizedType = (ParameterizedType) objectContext.getType().getType();
+        ParameterizedType parameterizedType = (ParameterizedType) objectContext.getType();
 
         final Class<?> keyType = (Class<?>) parameterizedType.getActualTypeArguments()[0];
         final Type valueType = parameterizedType.getActualTypeArguments()[1];
