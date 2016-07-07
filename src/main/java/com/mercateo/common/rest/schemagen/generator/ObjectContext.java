@@ -55,12 +55,12 @@ public abstract class ObjectContext<T> {
         return buildFor(new GenericClass<>(clazz));
     }
 
-    public static <T> ObjectContextBuilder<T> buildFor(GenericType<T> type) {
-        PropertyType propertyType = PropertyTypeMapper.of(type);
+    public static <T> ObjectContextBuilder<T> buildFor(GenericType<T> genericType) {
+        PropertyType propertyType = PropertyTypeMapper.of(genericType);
         return new ObjectContextBuilder<T>()
-                .withType(type)
+                .withGenericType(genericType)
                 .withPropertyType(propertyType)
-                .withPropertySubType(PropertySubTypeMapper.of(type, propertyType));
+                .withPropertySubType(PropertySubTypeMapper.of(genericType, propertyType));
     }
 
     private static <U, T extends U> ObjectContext<U> buildObjectContextForSuper(
@@ -72,7 +72,7 @@ public abstract class ObjectContext<T> {
                 .build();
     }
 
-    public abstract GenericType<T> getType();
+    public abstract GenericType<T> getGenericType();
 
     @Nullable
     public abstract T getDefaultValue();
@@ -108,7 +108,7 @@ public abstract class ObjectContext<T> {
     public abstract Class<? extends IndividualSchemaGenerator> getSchemaGenerator();
 
     public ObjectContext<?> forSuperType() {
-        GenericType<? super T> superType = getType().getSuperType();
+        GenericType<? super T> superType = getGenericType().getSuperType();
         if (superType != null) {
             return buildObjectContextForSuper(superType, getAllowedValues(), getDefaultValue());
         } else {
@@ -117,14 +117,14 @@ public abstract class ObjectContext<T> {
     }
 
     public ObjectContext<?> getContained() {
-        final GenericType<?> containedType = getType().getContainedType();
+        final GenericType<?> containedType = getGenericType().getContainedType();
         return ObjectContext.buildFor(containedType).build();
     }
 
     @SuppressWarnings("unchecked")
     public <U> ObjectContext<U> forField(Field field) {
         final GenericType<U> fieldType = GenericType.of(GenericTypeReflector.getExactFieldType(
-                field, getType().getType()), (Class<U>) field.getType());
+                field, getType()), (Class<U>) field.getType());
         final ObjectContextBuilder<U> builder = ObjectContext.buildFor(fieldType);
 
         T defaultValue = getDefaultValue();
@@ -224,7 +224,11 @@ public abstract class ObjectContext<T> {
     }
 
     public Class<?> getRawType() {
-        return getType().getRawType();
+        return getGenericType().getRawType();
+    }
+
+    public Type getType() {
+        return getGenericType().getType();
     }
 
     private <U> U getFieldValue(Field field, T object) {
@@ -236,5 +240,4 @@ public abstract class ObjectContext<T> {
             throw new IllegalStateException(e);
         }
     }
-
 }

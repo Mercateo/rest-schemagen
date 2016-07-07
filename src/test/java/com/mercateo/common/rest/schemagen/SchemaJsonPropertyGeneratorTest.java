@@ -1,35 +1,29 @@
 package com.mercateo.common.rest.schemagen;
 
-import static com.google.common.base.CaseFormat.LOWER_CAMEL;
-import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-import java.lang.reflect.Type;
-import java.math.BigDecimal;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import javax.ws.rs.PathParam;
-
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.google.common.collect.ImmutableList;
 import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
+import com.mercateo.common.rest.schemagen.generator.ObjectContext;
 import com.mercateo.common.rest.schemagen.generator.ObjectContextBuilder;
+import com.mercateo.common.rest.schemagen.generictype.GenericType;
+import com.mercateo.common.rest.schemagen.parameter.CallContext;
+import com.mercateo.common.rest.schemagen.types.ListResponse;
+import com.mercateo.common.rest.schemagen.types.ObjectWithSchema;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.google.common.collect.ImmutableList;
-import com.mercateo.common.rest.schemagen.generator.ObjectContext;
-import com.mercateo.common.rest.schemagen.generictype.GenericType;
-import com.mercateo.common.rest.schemagen.parameter.CallContext;
-import com.mercateo.common.rest.schemagen.types.ListResponse;
-import com.mercateo.common.rest.schemagen.types.ObjectWithSchema;
+import javax.ws.rs.PathParam;
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.util.*;
+
+import static com.google.common.base.CaseFormat.LOWER_CAMEL;
+import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SchemaJsonPropertyGeneratorTest {
@@ -491,8 +485,49 @@ public class SchemaJsonPropertyGeneratorTest {
         JsonProperty jsonProperty = generateSchemaProperty(RecursiveSchemaObject.class);
         assertThat(jsonProperty.getName()).isEqualTo("RecursiveSchemaObject");
         assertThat(jsonProperty.getType()).isEqualTo(PropertyType.OBJECT);
+        assertThat(jsonProperty.getPath()).isEqualTo("#");
+        assertThat(jsonProperty.getRef()).isNull();
         List<JsonProperty> properties = jsonProperty.getProperties();
-        assertThat(properties).hasSize(2);
+        assertThat(properties).extracting(JsonProperty::getName).containsExactly("children", "name");
+        assertThat(properties).extracting(JsonProperty::getPath).containsExactly("#/children", "#/name");
+        assertThat(properties).extracting(JsonProperty::getRef).containsExactly(null, null);
+
+        final List<JsonProperty> childProperties = getPropertiesOfNamedElement(properties, "children");
+
+        assertThat(childProperties).extracting(JsonProperty::getName).containsExactly("");
+        assertThat(childProperties).extracting(JsonProperty::getPath).containsExactly("#/children/");
+        assertThat(childProperties).extracting(JsonProperty::getRef).containsExactly("#");
+    }
+
+    @Test
+    public void testObjectWithReferences() {
+        JsonProperty jsonProperty = generateSchemaProperty(ObjectWithInternalReferences.class);
+        assertThat(jsonProperty.getName()).isEqualTo("ObjectWithInternalReferences");
+        assertThat(jsonProperty.getType()).isEqualTo(PropertyType.OBJECT);
+        List<JsonProperty> properties = jsonProperty.getProperties();
+        assertThat(properties).extracting(JsonProperty::getName).containsExactly("object1", "object2");
+        assertThat(properties).extracting(JsonProperty::getPath).containsExactly("#/object1", "#/object2");
+        assertThat(properties).extracting(JsonProperty::getRef).containsExactly(null, null);
+
+        final List<JsonProperty> childProperties = getPropertiesOfNamedElement(properties, "object2");
+
+        assertThat(childProperties).extracting(JsonProperty::getName).containsExactly("");
+        assertThat(childProperties).extracting(JsonProperty::getPath).containsExactly("#/object2/");
+        assertThat(childProperties).extracting(JsonProperty::getRef).containsNull();
+
+        final List<JsonProperty> childChildProperties = getPropertiesOfNamedElement(childProperties, "");
+
+        assertThat(childChildProperties).extracting(JsonProperty::getName).containsExactly("");
+        assertThat(childChildProperties).extracting(JsonProperty::getPath).containsExactly("#/object2//");
+        assertThat(childChildProperties).extracting(JsonProperty::getRef).containsExactly("#/object1/");
+    }
+
+    private List<JsonProperty> getPropertiesOfNamedElement(List<JsonProperty> properties, String propertyName) {
+        return properties.stream()
+                  .filter(p -> propertyName.equals(p.getName()))
+                  .findFirst()
+                  .map(JsonProperty::getProperties)
+                  .orElse(Collections.emptyList());
     }
 
     @Test
@@ -670,6 +705,12 @@ public class SchemaJsonPropertyGeneratorTest {
         public String name;
 
         public List<RecursiveSchemaObject> children;
+    }
+
+    public static class ObjectWithInternalReferences {
+        public List<SchemaObject> object1;
+
+        public List<List<SchemaObject>> object2;
     }
 
     public static abstract class SuperObject {
