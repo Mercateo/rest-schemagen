@@ -140,5 +140,6 @@ public enum OwnRel implements RelationContainer {
 }
 ```
 
-# Example
-A simple example project can be found [here](https://github.com/TNG/rest-demo-jersey).
+# Examples 
+* [example with roles](https://github.com/TNG/rest-demo-jersey)
+* [example with feature toggles](https://github.com/Mercateo/rest-demo-feature)
