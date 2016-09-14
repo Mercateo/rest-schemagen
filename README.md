@@ -11,9 +11,7 @@ It also works for reverse proxies (like jetty behind apache/nginx)
 
 
 # Quick start
-You can find the latest artifact on [Maven Central](http://search.maven.org/#search%7Cga%7C1%7Ca%3A%22common.rest.schemagen%22).
-
-In your jersey configuration simply type:
+In your jersey configuration simply include:
 ```java
 LinkFactoryResourceConfig.configure(rs); 
 ```
