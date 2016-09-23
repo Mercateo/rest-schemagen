@@ -1,18 +1,20 @@
 package com.mercateo.common.rest.schemagen;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.mercateo.common.rest.schemagen.generator.ObjectContext;
-import com.mercateo.common.rest.schemagen.internal.DataClassStyle;
-import com.mercateo.common.rest.schemagen.plugin.IndividualSchemaGenerator;
-import com.mercateo.common.rest.schemagen.util.EnumUtil;
-import org.immutables.value.Value;
-
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import javax.annotation.Nullable;
+
+import org.immutables.value.Value;
+
+import com.google.common.annotations.VisibleForTesting;
+import com.mercateo.common.rest.schemagen.generator.ObjectContext;
+import com.mercateo.common.rest.schemagen.internal.DataClassStyle;
+import com.mercateo.common.rest.schemagen.plugin.IndividualSchemaGenerator;
+import com.mercateo.common.rest.schemagen.util.EnumUtil;
 
 @Value.Immutable
 @DataClassStyle
@@ -55,11 +57,15 @@ public abstract class JsonProperty {
 
     public abstract List<JsonProperty> getProperties();
 
-    @Nullable
-    public abstract SizeConstraints getSizeConstraints();
+    @Value.Default
+    public SizeConstraints getSizeConstraints() {
+        return SizeConstraints.empty();
+    }
 
-    @Nullable
-    public abstract ValueConstraints getValueConstraints();
+    @Value.Default
+    public ValueConstraints getValueConstraints() {
+        return ValueConstraints.empty();
+    }
 
     @Nullable
     public abstract Class<? extends IndividualSchemaGenerator> getIndividualSchemaGenerator();
@@ -99,9 +105,11 @@ public abstract class JsonProperty {
 
         public Builder withAllowedValues(List<?> allowedValues, Class<?> rawType) {
             if (allowedValues != null && !allowedValues.isEmpty()) {
-                withAllowedValues(allowedValues.stream().map(o -> convertToString(o, rawType)).filter(Objects::nonNull).collect(Collectors.toSet()));
+                withAllowedValues(allowedValues.stream().map(o -> convertToString(o, rawType))
+                        .filter(Objects::nonNull).collect(Collectors.toSet()));
             } else if (Enum.class.isAssignableFrom(rawType)) {
-                withAllowedValues(Stream.of(rawType.getEnumConstants()).map(this::convertEnumToString).collect(Collectors.toList()));
+                withAllowedValues(Stream.of(rawType.getEnumConstants()).map(
+                        this::convertEnumToString).collect(Collectors.toList()));
             }
             return this;
         }
@@ -123,4 +131,3 @@ public abstract class JsonProperty {
         }
     }
 }
-

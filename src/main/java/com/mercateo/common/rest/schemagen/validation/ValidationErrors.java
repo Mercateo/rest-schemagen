@@ -3,8 +3,8 @@ package com.mercateo.common.rest.schemagen.validation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -66,7 +66,8 @@ public class ValidationErrors {
             return entries;
         }
 
-        public ValidationError(ValidationErrorCodeContainer code, Map<MessageKey, String> otherEntries) {
+        public ValidationError(ValidationErrorCodeContainer code,
+                Map<MessageKey, String> otherEntries) {
             HashMap<MessageKey, String> entries = new HashMap<>();
             entries.put(MessageKey.validationErrorCode, code.name());
             if (otherEntries != null) {
@@ -81,10 +82,8 @@ public class ValidationErrors {
     }
 
     public enum ValidationErrorCode implements ValidationErrorCodeContainer {
-        REQUIRED, UNKNOWN, STRING_LENGTH_SHORT, STRING_LENGTH_LONG, DUPLICATE,
-        @Deprecated NO_PACKSTATION_ALLOWED,
-        @Deprecated NO_POST_OFFICE_BOX_ALLOWED, @Deprecated NO_VALID_EMAIL, UNRECOGNIZED_FIELD,
-        VALUE_BELOW_MIN, VALUE_ABOVE_MAX, @Deprecated NO_VALID_ZIP, @Deprecated USER_EXISTS, WRONG_PASSWORD
+        REQUIRED, UNKNOWN, STRING_LENGTH_SHORT, STRING_LENGTH_LONG, DUPLICATE, UNRECOGNIZED_FIELD,
+        VALUE_BELOW_MIN, VALUE_ABOVE_MAX, ARRAY_TO_LONG, ARRAY_TO_SHORT
     }
 
     public interface ValidationErrorCodeContainer {

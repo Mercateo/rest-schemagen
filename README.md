@@ -87,7 +87,7 @@ There is a way to manipulate allowed and default values. The central class is Ca
 ```java
 Optional<Link> link = Optional.empty();
  
-final Parameter.Context context = Parameter.createContext();
+final CallContext context = Parameter.createContext();
  
 final Parameter.Builder<AddressJson> addressJsonBuilder = context.builderFor(AddressJson.class) //
         .allowValues(getAllowedAddressTypes());
@@ -141,3 +141,6 @@ public enum OwnRel implements RelationContainer {
 # Examples 
 * [example with roles](https://github.com/TNG/rest-demo-jersey)
 * [example with feature toggles](https://github.com/Mercateo/rest-demo-feature)
+
+#Troubleshooting import in IDEs
+If you have compile errors using an IDE, it is most likely because of immutables. Please refer to the immutables [help page](https://immutables.github.io/apt.html). Keep in mind to choose the right package version of the value-jar.  

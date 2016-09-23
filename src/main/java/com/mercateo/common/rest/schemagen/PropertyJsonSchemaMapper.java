@@ -24,20 +24,24 @@ public class PropertyJsonSchemaMapper {
      *         hierarchy
      */
     public ObjectNode toJson(JsonPropertyResult jsonProperty) {
-        return createPropertyEntry(jsonProperty.getRoot(), createObjectNode(), jsonProperty.getReferencedElements());
+        return createPropertyEntry(jsonProperty.getRoot(), createObjectNode(), jsonProperty
+                .getReferencedElements());
     }
 
     public ObjectNode createObjectNode() {
         return new ObjectNode(nodeFactory);
     }
 
-    private ObjectNode createPropertyEntry(JsonProperty jsonProperty, Set<JsonProperty> referencedElements) {
+    private ObjectNode createPropertyEntry(JsonProperty jsonProperty,
+            Set<JsonProperty> referencedElements) {
         return createPropertyEntry(jsonProperty, createObjectNode(), referencedElements);
     }
 
-    private ObjectNode createPropertyEntry(JsonProperty jsonProperty, final ObjectNode result, Set<JsonProperty> referencedElements) {
+    private ObjectNode createPropertyEntry(JsonProperty jsonProperty, final ObjectNode result,
+            Set<JsonProperty> referencedElements) {
 
-        final Class<? extends IndividualSchemaGenerator> generator = jsonProperty.getIndividualSchemaGenerator();
+        final Class<? extends IndividualSchemaGenerator> generator = jsonProperty
+                .getIndividualSchemaGenerator();
 
         if (generator == null) {
             if (jsonProperty.getRef() != null) {
@@ -50,7 +54,8 @@ public class PropertyJsonSchemaMapper {
                 switch (jsonProperty.getType()) {
                 case OBJECT:
                     result.put("type", "object");
-                    result.set("properties", createProperties(jsonProperty.getProperties(), referencedElements));
+                    result.set("properties", createProperties(jsonProperty.getProperties(),
+                            referencedElements));
                     final ArrayNode requiredElements = createRequiredElementsArray(jsonProperty
                             .getProperties());
                     if (requiredElements.size() > 0) {
@@ -60,7 +65,12 @@ public class PropertyJsonSchemaMapper {
 
                 case ARRAY:
                     result.put("type", "array");
-                    result.set("items", createPropertyEntry(jsonProperty.getProperties().get(0), referencedElements));
+                    result.set("items", createPropertyEntry(jsonProperty.getProperties().get(0),
+                            referencedElements));
+                    jsonProperty.getSizeConstraints().getMin().ifPresent(x -> result.put("minItems",
+                            x));
+                    jsonProperty.getSizeConstraints().getMax().ifPresent(x -> result.put("maxItems",
+                            x));
                     break;
 
                 case STRING:
@@ -71,14 +81,18 @@ public class PropertyJsonSchemaMapper {
                     if (hasDefaultValue(jsonProperty)) {
                         result.set("default", getDefaultValue(jsonProperty));
                     }
-                    jsonProperty.getSizeConstraints().getMin().ifPresent(x -> result.put("minLength", x));
-                    jsonProperty.getSizeConstraints().getMax().ifPresent(x -> result.put("maxLength", x));
+                    jsonProperty.getSizeConstraints().getMin().ifPresent(x -> result.put(
+                            "minLength", x));
+                    jsonProperty.getSizeConstraints().getMax().ifPresent(x -> result.put(
+                            "maxLength", x));
                     break;
 
                 case INTEGER:
                     result.put("type", "integer");
-                    jsonProperty.getValueConstraints().getMin().ifPresent(x -> result.put("minimum", x));
-                    jsonProperty.getValueConstraints().getMax().ifPresent(x -> result.put("maximum", x));
+                    jsonProperty.getValueConstraints().getMin().ifPresent(x -> result.put("minimum",
+                            x));
+                    jsonProperty.getValueConstraints().getMax().ifPresent(x -> result.put("maximum",
+                            x));
                     break;
                 case NUMBER:
                     result.put("type", "number");
@@ -133,10 +147,12 @@ public class PropertyJsonSchemaMapper {
         return new TextNode(jsonProperty.getDefaultValue());
     }
 
-    private ObjectNode createProperties(List<JsonProperty> properties, Set<JsonProperty> referencedElements) {
+    private ObjectNode createProperties(List<JsonProperty> properties,
+            Set<JsonProperty> referencedElements) {
         final ObjectNode result = createObjectNode();
         for (JsonProperty jsonProperty : properties) {
-            result.set(jsonProperty.getName(), createPropertyEntry(jsonProperty, referencedElements));
+            result.set(jsonProperty.getName(), createPropertyEntry(jsonProperty,
+                    referencedElements));
         }
         return result;
     }
