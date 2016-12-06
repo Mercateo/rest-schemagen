@@ -120,7 +120,12 @@ public class LinkCreator {
         visitAnnotations((parameter, parameterIndex, annotation) -> {
             if (annotation instanceof PathParam) {
                 PathParam pathParamAnnotation = (PathParam) annotation;
-                pathParameters.put(pathParamAnnotation.value(), parameter);
+                String paramName = pathParamAnnotation.value();
+                if(parameter != null) {
+                	pathParameters.put(paramName, parameter);
+                } else {
+                	pathParameters.put(paramName, "{" + paramName + "}");
+                }
             } else if (annotation instanceof BeanParam) {
                 BeanParamExtractor beanParamExtractor = new BeanParamExtractor();
                 pathParameters.putAll(beanParamExtractor.getPathParameters(parameter));
