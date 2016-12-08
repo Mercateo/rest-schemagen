@@ -54,12 +54,13 @@ public class JsonLink {
 	@VisibleForTesting
 	String getHref(Link link) {
 		String rawPath = link.getUri().getRawPath();
+		String uriString = link.getUri().toString();
+
 		// hack for templates
 		if (rawPath.contains("%7B")) {
-			String uriString = link.getUri().toString();
 			return uriString.replace("%7B", "{").replace("%7D", "}");
 		}
-		return link.getUri().toString();
+		return uriString;
 	}
 
 	public JsonLink() {
