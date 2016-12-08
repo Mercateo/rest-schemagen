@@ -22,6 +22,10 @@ public class JsonLinkTest {
 
 	private String uriString;
 
+	private JsonLink jsonLinkTemplate;
+
+	private String uriStringTemplate;
+
 	@Before
 	public void setUp() throws IOException {
 		uriString = "https://localhost:1234/base?parm1=val1&parm2=val2#test";
@@ -31,11 +35,24 @@ public class JsonLinkTest {
 				.param(LinkCreator.TARGET_SCHEMA_PARAM_KEY, TARGET_SCHEMA_VALUE) //
 				.param("foo", "bar") //
 				.build());
+
+		uriStringTemplate = "https://localhost:1234/{id}/base?parm1=val1&parm2=val2#test";
+		jsonLinkTemplate = new JsonLink(Link //
+				.fromUri(uriStringTemplate) //
+				.param(LinkCreator.SCHEMA_PARAM_KEY, SCHEMA_VALUE) //
+				.param(LinkCreator.TARGET_SCHEMA_PARAM_KEY, TARGET_SCHEMA_VALUE) //
+				.param("foo", "bar") //
+				.build("{id}"));
 	}
 
 	@Test
 	public void testGetHref() {
 		assertThat(jsonLink.getHref()).isEqualTo(uriString);
+	}
+
+	@Test
+	public void testTemplate() {
+		assertThat(jsonLinkTemplate.getHref()).isEqualTo(uriStringTemplate);
 	}
 
 	@Test
