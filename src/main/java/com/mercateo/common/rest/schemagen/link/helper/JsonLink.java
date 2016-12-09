@@ -1,6 +1,8 @@
 package com.mercateo.common.rest.schemagen.link.helper;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -58,7 +60,12 @@ public class JsonLink {
 
 		// hack for templates
 		if (rawPath.contains("%7B")) {
-			return uriString.replace("%7B", "{").replace("%7D", "}");
+			try {
+				return URLDecoder.decode(uriString, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				// UTF-8 is supported
+				throw new RuntimeException(e);
+			}
 		}
 		return uriString;
 	}
