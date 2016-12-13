@@ -1,6 +1,8 @@
 package com.mercateo.common.rest.schemagen.link.helper;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.mercateo.common.rest.schemagen.link.LinkCreator;
 
 /**
@@ -34,7 +37,7 @@ public class JsonLink {
 	private JsonNode targetSchema;
 
 	public JsonLink(Link link) throws JsonProcessingException, IOException {
-		href = link.getUri().toString();
+		href = getHref(link);
 		map = new HashMap<>(link.getParams());
 		ObjectMapper mapper = new ObjectMapper();
 		String schemaString = link.getParams().get(LinkCreator.SCHEMA_PARAM_KEY);
@@ -48,6 +51,23 @@ public class JsonLink {
 			map.remove(LinkCreator.TARGET_SCHEMA_PARAM_KEY);
 		}
 
+	}
+
+	@VisibleForTesting
+	String getHref(Link link) {
+		String rawPath = link.getUri().getRawPath();
+		String uriString = link.getUri().toString();
+
+		// hack for templates
+		if (rawPath.contains("%7B")) {
+			try {
+				return URLDecoder.decode(uriString, "UTF-8");
+			} catch (UnsupportedEncodingException e) {
+				// UTF-8 is supported
+				throw new RuntimeException(e);
+			}
+		}
+		return uriString;
 	}
 
 	public JsonLink() {
