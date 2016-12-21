@@ -169,13 +169,16 @@ public class LinkFactoryTest {
                                         .getSomethingArray("14"));
 
         assertTrue(linkOption.isPresent());
-
+ 
         final Link link = linkOption.get();
 
         assertThat(link.getUri().getPath()).isEqualTo(
                 "basePath/parentResource/subresource/sub/submethod/14");
-        assertThat(link.getParams()).hasSize(2);
-        assertThat(link.getParams()).containsEntry("rel", "self").containsEntry("method", "GET");
+        assertThat(link.getParams()).hasSize(3);
+		assertThat(link.getParams())//
+				.containsEntry("rel", "self")//
+				.containsEntry("method", "GET")//
+				.containsEntry("schema", "{\"type\":\"string\"}");
     }
 
     private void allowRole(String test) {
