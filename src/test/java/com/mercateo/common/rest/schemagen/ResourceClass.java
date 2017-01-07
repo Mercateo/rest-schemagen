@@ -32,7 +32,6 @@ public class ResourceClass implements JerseyResource {
 
     @Path("/method/{id}")
     @GET
-
     @RolesAllowed("test")
     public ObjectWithSchema<Something> getSomething(@PathParam("id") String id) {
         Optional<Link> link = linkMetaFactory.createFactoryFor(ResourceClass.class).forCall(

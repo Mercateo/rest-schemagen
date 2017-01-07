@@ -2,6 +2,7 @@ package com.mercateo.common.rest.schemagen.link.injection;
 
 import javax.inject.Singleton;
 
+import com.mercateo.common.rest.schemagen.link.LinkFactoryContext;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;
@@ -25,8 +26,9 @@ public class LinkFactoryResourceConfig {
                 bindFactory(RestJsonSchemaGeneratorFactory.class, Singleton.class).to(JsonSchemaGenerator.class).in(
                         Singleton.class);
                 bind(BaseUriCreatorDefault.class).to(BaseUriCreator.class).in(Singleton.class);
-                bindFactory(BaseUriFactory.class).to(BaseUri.class).in(RequestScoped.class).proxy(true);
-                bindFactory(LinkMetaFactoryFactory.class).to(LinkMetaFactory.class).in(RequestScoped.class).proxy(true);
+                bindFactory(LinkFactoryContextFactory.class).to(LinkFactoryContext.class).in(RequestScoped.class).proxy(
+                        true);
+                bindFactory(LinkMetaFactoryFactory.class).to(LinkMetaFactory.class);
             }
         });
 

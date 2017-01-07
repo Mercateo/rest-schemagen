@@ -13,6 +13,6 @@ import com.mercateo.common.rest.schemagen.parameter.CallContext;
  */
 public interface FieldCheckerForSchema extends BiPredicate<Field, CallContext> {
     static FieldCheckerForSchema fromBiPredicate(BiPredicate<Field, CallContext> predicate) {
-        return (f, c) -> predicate.test(f, c);
+        return predicate::test;
     }
 }

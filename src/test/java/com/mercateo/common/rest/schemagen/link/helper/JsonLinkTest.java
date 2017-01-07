@@ -1,6 +1,7 @@
 package com.mercateo.common.rest.schemagen.link.helper;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.in;
 
 import java.io.IOException;
 
@@ -37,12 +38,12 @@ public class JsonLinkTest {
 				.build());
 
 		uriStringTemplate = "https://localhost:1234/{id}/base?parm1=val1&parm2=val2#test";
-		jsonLinkTemplate = new JsonLink(Link //
-				.fromUri(uriStringTemplate) //
-				.param(LinkCreator.SCHEMA_PARAM_KEY, SCHEMA_VALUE) //
-				.param(LinkCreator.TARGET_SCHEMA_PARAM_KEY, TARGET_SCHEMA_VALUE) //
-				.param("foo", "bar") //
-				.build("{id}"));
+				jsonLinkTemplate = new JsonLink(Link //
+								.fromUri(uriStringTemplate) //
+								.param(LinkCreator.SCHEMA_PARAM_KEY, SCHEMA_VALUE) //
+								.param(LinkCreator.TARGET_SCHEMA_PARAM_KEY, TARGET_SCHEMA_VALUE) //
+								.param("foo", "bar") //
+								.build("{id}"));
 	}
 
 	@Test
@@ -52,7 +53,7 @@ public class JsonLinkTest {
 
 	@Test
 	public void testTemplate() {
-		assertThat(jsonLinkTemplate.getHref()).isEqualTo(uriStringTemplate);
+			assertThat(jsonLinkTemplate.getHref()).isEqualTo(uriStringTemplate);
 	}
 
 	@Test
