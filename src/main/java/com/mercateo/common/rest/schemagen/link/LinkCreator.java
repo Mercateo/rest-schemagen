@@ -169,15 +169,11 @@ public class LinkCreator {
         final JsonSchemaGenerator schemaGenerator = linkFactoryContext.getSchemaGenerator();
         Optional<String> optionalInputSchema = schemaGenerator.createInputSchema(method,
                 linkFactoryContext.getFieldCheckerForSchema());
-        if (optionalInputSchema.isPresent()) {
-            builder.param(SCHEMA_PARAM_KEY, optionalInputSchema.get());
-        }
+        optionalInputSchema.ifPresent(s -> builder.param(SCHEMA_PARAM_KEY, s));
 
         Optional<String> optionalOutputSchema = schemaGenerator.createOutputSchema(method,
                 linkFactoryContext.getFieldCheckerForSchema());
-        if (optionalOutputSchema.isPresent()) {
-            builder.param(TARGET_SCHEMA_PARAM_KEY, optionalOutputSchema.get());
-        }
+        optionalOutputSchema.ifPresent(s -> builder.param(TARGET_SCHEMA_PARAM_KEY, s));
     }
 
 }

@@ -6,7 +6,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import org.objenesis.ObjenesisHelper;
+
+import net.sf.cglib.proxy.Callback;
 import net.sf.cglib.proxy.Enhancer;
+import net.sf.cglib.proxy.Factory;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
 
@@ -28,76 +32,87 @@ public class ProxyFactory {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T createProxy(Class<T> ct) {
-        checkClassForFinalPublicMethods(ct);
-        try {
-            return (T) Enhancer.create(ct, new Class[] { InvocationRecorder.class },
-                    new MethodInterceptor() {
+    public static <T> T createProxy(Class<T> creatorClass) {
+        checkClassForFinalPublicMethods(creatorClass);
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(creatorClass);
+        enhancer.setInterfaces(new Class[]{InvocationRecorder.class});
+        enhancer.setCallbackType(MethodInterceptor.class);
 
-                        private Map<Method, Supplier<?>> passThroughs = new HashMap<>();
+        final Class<T> proxyClass = enhancer.createClass();
 
-                        {
-                            passThroughs.put(InvocationRecorder.class.getMethod(
-                                    "getInvocationRecordingResult"),
-                                    () -> new InvocationRecordingResult(this.method, this.args,
-                                            this.invokedClass));
+        Factory factory = (Factory) ObjenesisHelper.newInstance(proxyClass);
+        factory.setCallbacks(new Callback[]{createInterceptor(creatorClass)});
+        return (T) factory;
+    }
 
-                            passThroughs.put(Object.class.getMethod("toString"),
-                                    () -> "MethodInterceptor(" + ct.getSimpleName() + ")");
+    private static <T> MethodInterceptor createInterceptor(final Class<T> creatorClass) {
+        return new MethodInterceptor() {
 
-                        }
+            private Map<Method, Supplier<?>> passThroughs = new HashMap<>();
 
-                        private Method method;
+            {
+                try {
+                    passThroughs.put(InvocationRecorder.class.getMethod(
+                            "getInvocationRecordingResult"),
+                            () -> new InvocationRecordingResult(this.method, this.args,
+                                    this.invokedClass));
 
-                        private Object[] args;
+                    passThroughs.put(Object.class.getMethod("toString"),
+                            () -> "MethodInterceptor(" + creatorClass.getSimpleName() + ")");
+                } catch (NoSuchMethodException e) {
+                    throw new RuntimeException("Error creating proxy for class " + creatorClass.getSimpleName(), e);
+                }
+            }
 
-                        private Class<T> invokedClass;
+            private Method method;
 
-                        @Override
-                        public Object intercept(Object obj, Method method, Object[] args,
-                                MethodProxy proxy) {
+            private Object[] args;
 
-                            if (passThroughs.containsKey(method)) {
-                                return passThroughs.get(method).get();
-                            }
+            private Class<T> invokedClass;
 
-                            this.method = method;
-                            this.args = args;
-                            this.invokedClass = ct;
+            @Override
+            public Object intercept(Object obj, Method method, Object[] args,
+                    MethodProxy proxy) {
 
-                            return bogusReturn(method.getReturnType());
-                        }
+                if (passThroughs.containsKey(method)) {
+                    return passThroughs.get(method).get();
+                }
 
-                        @SuppressWarnings("boxing")
-                        private Object bogusReturn(Class<?> returnType) {
-                            if (returnType.isPrimitive()) {
-                                if (returnType.equals(byte.class)) {
-                                    return (byte) 0;
-                                } else if (returnType.equals(short.class)) {
-                                    return (short) 0;
-                                } else if (returnType.equals(int.class)) {
-                                    return 0;
-                                } else if (returnType.equals(long.class)) {
-                                    return (long) 0;
-                                } else if (returnType.equals(float.class)) {
-                                    return (float) 0;
-                                } else if (returnType.equals(double.class)) {
-                                    return (double) 0;
-                                } else if (returnType.equals(boolean.class)) {
-                                    return false;
-                                } else if (returnType.equals(char.class)) {
-                                    return (char) 0;
-                                } else if (returnType.equals(void.class)) {
-                                    return null;
-                                }
-                                throw new IllegalArgumentException();
-                            } else {
-                                return null;
-                            }
-                        }
-                    });
-        } catch (Exception e) {
-            throw new RuntimeException("Error creating proxy for class " + ct.getSimpleName(), e);
-        }
+                this.method = method;
+                this.args = args;
+                this.invokedClass = creatorClass;
+
+                return bogusReturn(method.getReturnType());
+            }
+
+            @SuppressWarnings("boxing")
+            private Object bogusReturn(Class<?> returnType) {
+                if (returnType.isPrimitive()) {
+                    if (returnType.equals(byte.class)) {
+                        return (byte) 0;
+                    } else if (returnType.equals(short.class)) {
+                        return (short) 0;
+                    } else if (returnType.equals(int.class)) {
+                        return 0;
+                    } else if (returnType.equals(long.class)) {
+                        return (long) 0;
+                    } else if (returnType.equals(float.class)) {
+                        return (float) 0;
+                    } else if (returnType.equals(double.class)) {
+                        return (double) 0;
+                    } else if (returnType.equals(boolean.class)) {
+                        return false;
+                    } else if (returnType.equals(char.class)) {
+                        return (char) 0;
+                    } else if (returnType.equals(void.class)) {
+                        return null;
+                    }
+                    throw new IllegalArgumentException();
+                } else {
+                    return null;
+                }
+            }
+        };
     }
 }
