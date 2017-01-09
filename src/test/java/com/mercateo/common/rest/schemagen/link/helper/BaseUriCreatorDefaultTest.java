@@ -14,7 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class BaseUriCreatorTest {
+public class BaseUriCreatorDefaultTest {
 
     private MultivaluedMap<String, String> requestHeaders;
 
@@ -26,7 +26,7 @@ public class BaseUriCreatorTest {
     public void setUp() throws URISyntaxException {
         defaultBaseUri = new URI("http://host:8090/base/");
         requestHeaders = new MultivaluedHashMap<>();
-        baseUriFactory = new BaseUriCreator();
+        baseUriFactory = new BaseUriCreatorDefault();
     }
 
     @Test
@@ -38,7 +38,7 @@ public class BaseUriCreatorTest {
 
     @Test
     public void testWithProtocolHeader() {
-        requestHeaders.putSingle(BaseUriCreator.TLS_STATUS_HEADER, "Off");
+        requestHeaders.putSingle(BaseUriCreatorDefault.TLS_STATUS_HEADER, "Off");
 
         URI baseUri = baseUriFactory.createBaseUri(defaultBaseUri, requestHeaders);
 
@@ -47,7 +47,7 @@ public class BaseUriCreatorTest {
 
     @Test
     public void testWithHostHeader() {
-        requestHeaders.putSingle(BaseUriCreator.HOST_HEADER, "server");
+        requestHeaders.putSingle(BaseUriCreatorDefault.HOST_HEADER, "server");
 
         URI baseUri = baseUriFactory.createBaseUri(defaultBaseUri, requestHeaders);
 
@@ -56,7 +56,7 @@ public class BaseUriCreatorTest {
 
     @Test
     public void testWithMultipleHostHeaders() {
-        requestHeaders.putSingle(BaseUriCreator.HOST_HEADER, "firstServer, secondServer");
+        requestHeaders.putSingle(BaseUriCreatorDefault.HOST_HEADER, "firstServer, secondServer");
 
         URI baseUri = baseUriFactory.createBaseUri(defaultBaseUri, requestHeaders);
 
@@ -65,7 +65,7 @@ public class BaseUriCreatorTest {
 
     @Test
     public void testWithBasePathHeader() {
-        requestHeaders.putSingle(BaseUriCreator.SERVICE_BASE_HEADER, "/service-api/");
+        requestHeaders.putSingle(BaseUriCreatorDefault.SERVICE_BASE_HEADER, "/service-api/");
 
         URI baseUri = baseUriFactory.createBaseUri(defaultBaseUri, requestHeaders);
 
@@ -74,9 +74,9 @@ public class BaseUriCreatorTest {
 
     @Test
     public void testWithAllHeaders() {
-        requestHeaders.putSingle(BaseUriCreator.TLS_STATUS_HEADER, "On");
-        requestHeaders.putSingle(BaseUriCreator.HOST_HEADER, "server");
-        requestHeaders.putSingle(BaseUriCreator.SERVICE_BASE_HEADER, "/service-api/");
+        requestHeaders.putSingle(BaseUriCreatorDefault.TLS_STATUS_HEADER, "On");
+        requestHeaders.putSingle(BaseUriCreatorDefault.HOST_HEADER, "server");
+        requestHeaders.putSingle(BaseUriCreatorDefault.SERVICE_BASE_HEADER, "/service-api/");
 
         URI baseUri = baseUriFactory.createBaseUri(defaultBaseUri, requestHeaders);
 

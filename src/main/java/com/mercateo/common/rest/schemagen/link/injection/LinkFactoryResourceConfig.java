@@ -9,6 +9,8 @@ import org.glassfish.jersey.server.ResourceConfig;
 import com.mercateo.common.rest.schemagen.JsonSchemaGenerator;
 import com.mercateo.common.rest.schemagen.RestJsonSchemaGeneratorFactory;
 import com.mercateo.common.rest.schemagen.link.LinkMetaFactory;
+import com.mercateo.common.rest.schemagen.link.helper.BaseUriCreator;
+import com.mercateo.common.rest.schemagen.link.helper.BaseUriCreatorDefault;
 import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 import com.mercateo.common.rest.schemagen.plugin.MethodCheckerForLink;
 import com.mercateo.common.rest.schemagen.plugin.common.FieldCheckerForSchemaFactory;
@@ -20,12 +22,11 @@ public class LinkFactoryResourceConfig {
         config.register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bindFactory(RestJsonSchemaGeneratorFactory.class, Singleton.class).to(
-                        JsonSchemaGenerator.class).in(Singleton.class);
-                bindFactory(LinkMetaFactoryFactory.class).to(LinkMetaFactory.class).in(
-                        RequestScoped.class).proxy(true);
-                bindFactory(BaseUriFactory.class).to(BaseUri.class).in(RequestScoped.class).proxy(
-                        true);
+                bindFactory(RestJsonSchemaGeneratorFactory.class, Singleton.class).to(JsonSchemaGenerator.class).in(
+                        Singleton.class);
+                bind(BaseUriCreatorDefault.class).to(BaseUriCreator.class).in(Singleton.class);
+                bindFactory(BaseUriFactory.class).to(BaseUri.class).in(RequestScoped.class).proxy(true);
+                bindFactory(LinkMetaFactoryFactory.class).to(LinkMetaFactory.class).in(RequestScoped.class).proxy(true);
             }
         });
 
@@ -35,10 +36,12 @@ public class LinkFactoryResourceConfig {
         config.register(new AbstractBinder() {
             @Override
             protected void configure() {
-                bindFactory(MethodCheckerForLinkFactory.class).to(MethodCheckerForLink.class).in(
-                        RequestScoped.class).proxy(true);
-                bindFactory(FieldCheckerForSchemaFactory.class, Singleton.class).to(
-                        FieldCheckerForSchema.class).in(Singleton.class);
+                bindFactory(MethodCheckerForLinkFactory.class)
+                        .to(MethodCheckerForLink.class)
+                        .in(RequestScoped.class)
+                        .proxy(true);
+                bindFactory(FieldCheckerForSchemaFactory.class, Singleton.class).to(FieldCheckerForSchema.class).in(
+                        Singleton.class);
             }
         });
     }
