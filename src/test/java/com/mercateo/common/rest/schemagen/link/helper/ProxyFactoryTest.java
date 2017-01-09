@@ -58,6 +58,13 @@ public class ProxyFactoryTest {
         proxy.getVoid();
     }
 
+    @Test
+    public void shouldCreateProxyFromClassWithoutDefaultConstructor() {
+        final WithoutDefaultConstructor proxy = ProxyFactory.createProxy(WithoutDefaultConstructor.class);
+
+        assertThat(proxy).isNotNull();
+    }
+
     public static class A {
         public int primitiveReturn() {
             return 1;
@@ -86,6 +93,10 @@ public class ProxyFactoryTest {
         public String objectReturn() {
             return "in method";
         }
+    }
+
+    public static class WithoutDefaultConstructor {
+        public WithoutDefaultConstructor(String foo) {}
     }
 
     public static class PrimitiveReturnTypes {
