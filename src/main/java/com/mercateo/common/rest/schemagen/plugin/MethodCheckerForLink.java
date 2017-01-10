@@ -13,7 +13,6 @@ import com.mercateo.common.rest.schemagen.link.Scope;
 public interface MethodCheckerForLink extends Predicate<Scope> {
 
     static MethodCheckerForLink fromPredicate(Predicate<Scope> predicate) {
-        return s -> predicate.test(s);
+        return predicate::test;
     }
-
 }

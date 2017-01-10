@@ -39,11 +39,18 @@ public class LinkCreator {
 
     public static final String METHOD_PARAM_KEY = "method";
 
+    private final JsonSchemaGenerator jsonSchemaGenerator;
 
     private final LinkFactoryContext linkFactoryContext;
 
-    LinkCreator(LinkFactoryContext linkFactoryContext) {
-        this.linkFactoryContext = requireNonNull(linkFactoryContext);
+    /**
+     * @param jsonSchemaGenerator
+     * @param linkFactoryContext
+     *
+     */
+    LinkCreator(JsonSchemaGenerator jsonSchemaGenerator, LinkFactoryContext linkFactoryContext) {
+        this.jsonSchemaGenerator = requireNonNull(jsonSchemaGenerator);
+        this.linkFactoryContext = linkFactoryContext;
     }
 
     public static Builder setRelation(Relation relation, URI uri) {
@@ -65,6 +72,18 @@ public class LinkCreator {
      * @return link with schema if applicable
      */
     public Link createFor(List<Scope> scopes, Relation relation) {
+        return createFor(scopes, relation, requireNonNull(linkFactoryContext));
+    }
+
+    /**
+     * create a link for a resource method
+     *
+     * @param scopes             list of Scope objects for every scope level
+     * @param relation           relation of method
+     * @param linkFactoryContext the base URI for resolution of relative URIs and method and property checkers
+     * @return link with schema if applicable
+     */
+    public Link createFor(List<Scope> scopes, Relation relation, LinkFactoryContext linkFactoryContext) {
         final Class<?> resourceClass = scopes.get(0).getInvokedClass();
         UriBuilder uriBuilder = UriBuilder.fromResource(resourceClass);
 
@@ -79,7 +98,7 @@ public class LinkCreator {
             setQueryParameters(uriBuilder, scope, parameters);
         }
 
-        final URI uri = uriBuilder.buildFromMap(pathParameters);
+        URI uri = mergeUri(linkFactoryContext.getBaseUri(), uriBuilder, pathParameters);
 
         Builder builder = setRelation(relation, uri);
 
@@ -89,11 +108,21 @@ public class LinkCreator {
 
         final Scope lastScopedMethod = Iterables.getLast(scopes);
         addHttpMethod(builder, lastScopedMethod);
-        addSchemaIfNeeded(builder, lastScopedMethod);
-        if (linkFactoryContext.getBaseUri() != null) {
-            builder.baseUri(linkFactoryContext.getBaseUri());
-        }
+        addSchemaIfNeeded(builder, lastScopedMethod, linkFactoryContext);
         return builder.build();
+    }
+
+    private URI mergeUri(URI baseUri, UriBuilder uriBuilder, Map<String, Object> pathParameters) {
+        URI uri = uriBuilder.buildFromMap(pathParameters);
+
+        if (baseUri != null) {
+            UriBuilder mergedUriBuilder = UriBuilder.fromUri(baseUri);
+            mergedUriBuilder.path(uri.getPath());
+            mergedUriBuilder.replaceQuery(uri.getQuery());
+            return mergedUriBuilder.buildFromMap(pathParameters);
+        }
+
+        return uri;
     }
 
     private void addLinkProperties(List<Scope> scopes, Builder builder) {
@@ -165,13 +194,12 @@ public class LinkCreator {
         }
     }
 
-    private void addSchemaIfNeeded(Builder builder, Scope method) {
-        final JsonSchemaGenerator schemaGenerator = linkFactoryContext.getSchemaGenerator();
-        Optional<String> optionalInputSchema = schemaGenerator.createInputSchema(method,
+    private void addSchemaIfNeeded(Builder builder, Scope method, LinkFactoryContext linkFactoryContext) {
+        Optional<String> optionalInputSchema = jsonSchemaGenerator.createInputSchema(method,
                 linkFactoryContext.getFieldCheckerForSchema());
         optionalInputSchema.ifPresent(s -> builder.param(SCHEMA_PARAM_KEY, s));
 
-        Optional<String> optionalOutputSchema = schemaGenerator.createOutputSchema(method,
+        Optional<String> optionalOutputSchema = jsonSchemaGenerator.createOutputSchema(method,
                 linkFactoryContext.getFieldCheckerForSchema());
         optionalOutputSchema.ifPresent(s -> builder.param(TARGET_SCHEMA_PARAM_KEY, s));
     }

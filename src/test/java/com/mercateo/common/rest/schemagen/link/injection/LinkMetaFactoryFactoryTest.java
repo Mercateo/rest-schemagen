@@ -1,6 +1,8 @@
 package com.mercateo.common.rest.schemagen.link.injection;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.net.URI;
@@ -24,30 +26,24 @@ public class LinkMetaFactoryFactoryTest {
     private JsonSchemaGenerator schemaGenerator;
 
     @Mock
-    private BaseUri baseUri;
-
-    @Mock
-    private MethodCheckerForLink methodCheckerForLink;
-
-    @Mock
-    private FieldCheckerForSchema fieldCheckerForSchema;
+    private LinkFactoryContext linkFactoryContext;
 
     @InjectMocks
     private LinkMetaFactoryFactory linkMetaFactoryFactory;
 
-    private URI baseUriValue;
-
     @Test
     public void testProvideLinkMetaFactory() {
-        baseUriValue = URI.create("/base");
-        when(baseUri.get()).thenReturn(baseUriValue);
         final LinkMetaFactory linkMetaFactory = linkMetaFactoryFactory.provide();
 
-        final LinkFactoryContext linkFactoryContext = linkMetaFactory.getFactoryContext();
+        assertThat(linkMetaFactory.getSchemaGenerator()).isEqualTo(schemaGenerator);
+        assertThat(linkMetaFactory.getFactoryContext()).isEqualTo(linkFactoryContext);
+    }
 
-        assertThat(linkFactoryContext.getSchemaGenerator()).isEqualTo(schemaGenerator);
-        assertThat(linkFactoryContext.getBaseUri()).isEqualTo(baseUriValue);
-        assertThat(linkFactoryContext.getMethodCheckerForLink()).isEqualTo(methodCheckerForLink);
-        assertThat(linkFactoryContext.getFieldCheckerForSchema()).isEqualTo(fieldCheckerForSchema);
+    @Test
+    public void disposeShouldDoNothing() throws Exception {
+        final LinkMetaFactory linkMetaFactory = mock(LinkMetaFactory.class);
+        linkMetaFactoryFactory.dispose(linkMetaFactory);
+
+        verifyZeroInteractions(schemaGenerator, linkFactoryContext, linkMetaFactory);
     }
 }
