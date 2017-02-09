@@ -2,7 +2,6 @@ package com.mercateo.common.rest.schemagen.link.helper;
 
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,6 +23,11 @@ public class BaseUriCreatorDefault implements BaseUriCreator {
 
     @Override
     public URI createBaseUri(final URI requestBaseUri, final Map<String, List<String>> requestHeaders) {
+        return createBaseUri(requestBaseUri, new HttpRequestHeaders(requestHeaders));
+    }
+
+    @Override
+    public URI createBaseUri(final URI requestBaseUri, HttpRequestHeaders requestHeaders) {
 
         try {
             String scheme = requestBaseUri.getScheme();
@@ -44,22 +48,9 @@ public class BaseUriCreatorDefault implements BaseUriCreator {
         }
     }
 
-    private static Optional<String> headerValue(final Map<String, List<String>> requestHeaders,
-            final String parameterName) {
-        final List<String> requestHeader = getRequestHeader(requestHeaders, parameterName);
-        if (!requestHeader.isEmpty()) {
-            String valueFromHeader = requestHeader.get(0);
-            log.debug("use value '{}' from header {}", valueFromHeader, parameterName);
-            return Optional.ofNullable(valueFromHeader);
-        }
-        return Optional.empty();
-    }
-
-    private static List<String> getRequestHeader(final Map<String, List<String>> requestHeaders,
-            final String headerName) {
-        if (requestHeaders != null && requestHeaders.containsKey(headerName)) {
-            return requestHeaders.get(headerName);
-        }
-        return Collections.emptyList();
+    private static Optional<String> headerValue(final HttpRequestHeaders requestHeaders, final String parameterName) {
+        final Optional<String> headerValue = requestHeaders.getValues(parameterName).stream().findFirst();
+        headerValue.ifPresent(value -> log.debug("use value '{}' from header {}", value, parameterName));
+        return headerValue;
     }
 }

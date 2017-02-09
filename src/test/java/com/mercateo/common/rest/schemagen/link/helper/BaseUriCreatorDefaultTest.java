@@ -1,6 +1,7 @@
 package com.mercateo.common.rest.schemagen.link.helper;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -89,5 +90,14 @@ public class BaseUriCreatorDefaultTest {
 
         URI baseUri = baseUriFactory.createBaseUri(defaultBaseUri, requestHeaders);
         assertThat(baseUri.getScheme()).isEqualTo("https");
+    }
+
+    @Test
+    public void shouldRethrowUriSyntaxException() {
+        requestHeaders.putSingle(BaseUriCreatorDefault.HOST_HEADER, ".");
+
+        assertThatThrownBy(() -> baseUriFactory.createBaseUri(defaultBaseUri, new HttpRequestHeaders(requestHeaders)))
+                .isInstanceOf(IllegalStateException.class)
+                .hasCauseExactlyInstanceOf(URISyntaxException.class);
     }
 }
