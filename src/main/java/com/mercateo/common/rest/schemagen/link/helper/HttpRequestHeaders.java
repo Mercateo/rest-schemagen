@@ -26,10 +26,14 @@ public class HttpRequestHeaders {
     }
 
     public HttpRequestHeaders(HttpRequestHeaders other) {
-        this.requestHeaders = other.requestHeaders;
+        this.requestHeaders = other.getHeaders();
     }
 
     public List<String> getValues(String headername) {
         return requestHeaders.getOrDefault(headername.toLowerCase(), Collections.emptyList());
+    }
+
+    public Map<String, List<String>> getHeaders() {
+        return requestHeaders;
     }
 }
