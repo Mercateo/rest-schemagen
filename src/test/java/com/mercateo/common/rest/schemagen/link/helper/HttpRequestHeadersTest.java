@@ -1,6 +1,7 @@
 package com.mercateo.common.rest.schemagen.link.helper;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,6 +11,18 @@ import java.util.List;
 import org.junit.Test;
 
 public class HttpRequestHeadersTest {
+
+    @Test
+    public void shouldReturnAllHeaders() throws Exception {
+        final HashMap<String, List<String>> requestHeaders = new HashMap<>();
+        requestHeaders.put("foo", Collections.singletonList("bar"));
+        requestHeaders.put("baz", Collections.singletonList("qux"));
+
+        final HttpRequestHeaders headers = new HttpRequestHeaders(requestHeaders);
+
+        assertThat(headers.getHeaders()).containsOnly(entry("foo", Collections.singletonList("bar")), entry("baz",
+                Collections.singletonList("qux")));
+    }
 
     @Test
     public void shouldIgnoreCaseOfName() throws Exception {
