@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -15,9 +14,9 @@ import javax.ws.rs.NotFoundException;
 import com.mercateo.common.rest.schemagen.generator.ImmutableJsonPropertyResult;
 import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
 import com.mercateo.common.rest.schemagen.generator.ObjectContextBuilder;
+import com.mercateo.common.rest.schemagen.json.mapper.PropertyJsonSchemaMapper;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.Property;
 import org.junit.Before;
 import org.junit.Test;
 

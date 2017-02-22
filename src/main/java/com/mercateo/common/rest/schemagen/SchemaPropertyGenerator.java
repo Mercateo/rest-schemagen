@@ -1,16 +1,5 @@
 package com.mercateo.common.rest.schemagen;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.google.common.collect.ImmutableMap;
-import com.mercateo.common.rest.schemagen.generator.ImmutableJsonPropertyResult;
-import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
-import com.mercateo.common.rest.schemagen.generator.ObjectContext;
-import com.mercateo.common.rest.schemagen.generator.ObjectContextBuilder;
-import com.mercateo.common.rest.schemagen.generator.PathContext;
-import com.mercateo.common.rest.schemagen.generator.ReferencedJsonPropertyFinder;
-import com.mercateo.common.rest.schemagen.generictype.GenericType;
-import com.mercateo.common.rest.schemagen.util.EnumUtil;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -24,6 +13,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.google.common.collect.ImmutableMap;
+import com.mercateo.common.rest.schemagen.generator.ImmutableJsonPropertyResult;
+import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
+import com.mercateo.common.rest.schemagen.generator.ObjectContext;
+import com.mercateo.common.rest.schemagen.generator.ObjectContextBuilder;
+import com.mercateo.common.rest.schemagen.generator.PathContext;
+import com.mercateo.common.rest.schemagen.generator.ReferencedJsonPropertyFinder;
+import com.mercateo.common.rest.schemagen.generictype.GenericType;
+import com.mercateo.common.rest.schemagen.util.EnumUtil;
 
 public class SchemaPropertyGenerator {
 
@@ -194,8 +194,7 @@ public class SchemaPropertyGenerator {
                 break;
 
             case ARRAY:
-                properties
-                        .add(determineProperty("", objectContext.getContained(), pathContext, context));
+                properties.add(determineProperty("", objectContext.getContained(), pathContext, context));
                 break;
 
             default:

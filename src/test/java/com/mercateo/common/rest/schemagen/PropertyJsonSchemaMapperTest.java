@@ -8,6 +8,7 @@ import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
 import com.mercateo.common.rest.schemagen.generator.ObjectContext;
 import com.mercateo.common.rest.schemagen.generator.ObjectContextBuilder;
 import com.mercateo.common.rest.schemagen.generictype.GenericType;
+import com.mercateo.common.rest.schemagen.json.mapper.PropertyJsonSchemaMapper;
 import com.mercateo.common.rest.schemagen.parameter.CallContext;
 import org.junit.Before;
 import org.junit.Test;
