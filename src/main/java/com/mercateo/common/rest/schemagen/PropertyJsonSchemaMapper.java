@@ -1,26 +1,17 @@
 package com.mercateo.common.rest.schemagen;
 
-import java.util.List;
-import java.util.Set;
-
-import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.google.common.collect.ImmutableMap;
 import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
 import com.mercateo.common.rest.schemagen.plugin.IndividualSchemaGenerator;
 
+import java.util.Map;
+import java.util.Set;
+
 public class PropertyJsonSchemaMapper {
 
-    private static final JsonNodeFactory nodeFactory = new JsonNodeFactory(true);
-
-    private final PropertyJsonMapper propertyJsonMapper;
-
     public PropertyJsonSchemaMapper() {
-        this(new PropertyJsonMapper(nodeFactory));
-    }
-
-    public PropertyJsonSchemaMapper(PropertyJsonMapper propertyJsonMapper) {
-        this.propertyJsonMapper = propertyJsonMapper;
     }
 
     /**
@@ -33,89 +24,62 @@ public class PropertyJsonSchemaMapper {
      *         hierarchy
      */
     public ObjectNode toJson(JsonPropertyResult jsonProperty) {
-        return createPropertyEntry(jsonProperty.getRoot(), createObjectNode(), jsonProperty
-                .getReferencedElements());
+        return new PropertyJsonSchemaMapperForRoot(jsonProperty).toJson(jsonProperty
+                .getRoot());
     }
 
-    public ObjectNode createObjectNode() {
-        return new ObjectNode(nodeFactory);
+}
+
+class PropertyJsonSchemaMapperForRoot {
+    private static final JsonNodeFactory nodeFactory = new JsonNodeFactory(true);
+
+    private static final Map<PropertyType, JsonPropertyMapper> primitivePropertyMappers = ImmutableMap
+            .<PropertyType, JsonPropertyMapper>builder()//
+            .put(PropertyType.STRING, new StringJsonPropertyMapper(nodeFactory))
+            .put(PropertyType.INTEGER, new IntegerJsonPropertyMapper(nodeFactory))
+            .put(PropertyType.NUMBER, new NumberJsonPropertyMapper(nodeFactory))
+            .put(PropertyType.BOOLEAN, new BooleanJsonPropertyMapper(nodeFactory))
+            .build();
+
+    private final Map<PropertyType, JsonPropertyMapper> objectPropertyMappers;
+
+    private final Set<JsonProperty> referencedElements;
+
+    PropertyJsonSchemaMapperForRoot(JsonPropertyResult jsonProperty) {
+        this.referencedElements = jsonProperty.getReferencedElements();
+        this.objectPropertyMappers = ImmutableMap
+                .<PropertyType, JsonPropertyMapper>builder()//
+                .put(PropertyType.OBJECT, new ObjectJsonPropertyMapper(this, nodeFactory))
+                .put(PropertyType.ARRAY, new ArrayJsonPropertyMapper(this, nodeFactory))
+                .build();
     }
 
-    private ObjectNode createPropertyEntry(JsonProperty jsonProperty,
-            Set<JsonProperty> referencedElements) {
-        return createPropertyEntry(jsonProperty, createObjectNode(), referencedElements);
-    }
-
-    private ObjectNode createPropertyEntry(JsonProperty jsonProperty, final ObjectNode result,
-            Set<JsonProperty> referencedElements) {
+    ObjectNode toJson(JsonProperty jsonProperty) {
 
         final Class<? extends IndividualSchemaGenerator> generator = jsonProperty
                 .getIndividualSchemaGenerator();
 
         if (generator == null) {
             if (jsonProperty.getRef() != null) {
-                result.put("$ref", jsonProperty.getRef());
-
+                final ObjectNode propertyNode = createObjectNode();
+                propertyNode.put("$ref", jsonProperty.getRef());
+                return propertyNode;
             } else {
+                final JsonPropertyMapper jsonPropertyMapper;
+                if (primitivePropertyMappers.containsKey(jsonProperty.getType())) {
+                    jsonPropertyMapper = primitivePropertyMappers.get(jsonProperty.getType());
+                } else if (objectPropertyMappers.containsKey(jsonProperty.getType())) {
+                    jsonPropertyMapper = objectPropertyMappers.get(jsonProperty.getType());
+                } else {
+                    jsonPropertyMapper = objectPropertyMappers.get(PropertyType.OBJECT);
+                }
+                final ObjectNode propertyNode = jsonPropertyMapper.toJson(jsonProperty);
                 if (referencedElements.contains(jsonProperty)) {
-                    result.put("id", jsonProperty.getPath());
+                    propertyNode.put("id", jsonProperty.getPath());
                 }
-                switch (jsonProperty.getType()) {
-                case OBJECT:
-                    result.put("type", "object");
-                    result.set("properties", createProperties(jsonProperty.getProperties(),
-                            referencedElements));
-                    final ArrayNode requiredElements = createRequiredElementsArray(jsonProperty
-                            .getProperties());
-                    if (requiredElements.size() > 0) {
-                        result.set("required", requiredElements);
-                    }
-                    break;
-
-                case ARRAY:
-                    result.put("type", "array");
-                    result.set("items", createPropertyEntry(jsonProperty.getProperties().get(0),
-                            referencedElements));
-                    jsonProperty.getSizeConstraints().getMin().ifPresent(x -> result.put("minItems",
-                            x));
-                    jsonProperty.getSizeConstraints().getMax().ifPresent(x -> result.put("maxItems",
-                            x));
-                    break;
-
-                case STRING:
-                    result.put("type", "string");
-                    propertyJsonMapper.addStringDefaultAndAllowedValues(result, jsonProperty);
-                    jsonProperty.getSizeConstraints().getMin().ifPresent(x -> result.put(
-                            "minLength", x));
-                    jsonProperty.getSizeConstraints().getMax().ifPresent(x -> result.put(
-                            "maxLength", x));
-                    break;
-
-                case INTEGER:
-                    result.put("type", "integer");
-                    propertyJsonMapper.addIntegerDefaultAndAllowedValues(result, jsonProperty);
-                    jsonProperty.getValueConstraints().getMin().ifPresent(x -> result.put("minimum",
-                            x));
-                    jsonProperty.getValueConstraints().getMax().ifPresent(x -> result.put("maximum",
-                            x));
-                    break;
-
-                case NUMBER:
-                    result.put("type", "number");
-                    propertyJsonMapper.addNumberDefaultAndAllowedValues(result, jsonProperty);
-                    break;
-
-                case BOOLEAN:
-                    result.put("type", "boolean");
-                    propertyJsonMapper.getBooleanDefaultAndAllowedValues(result, jsonProperty);
-                    break;
-
-                default:
-
-                    break;
-                }
+                return propertyNode;
             }
-            return result;
+
         } else {
             final IndividualSchemaGenerator individualSchemaGenerator;
 
@@ -129,24 +93,8 @@ public class PropertyJsonSchemaMapper {
         }
     }
 
-    private ObjectNode createProperties(List<JsonProperty> properties,
-            Set<JsonProperty> referencedElements) {
-        final ObjectNode result = createObjectNode();
-        for (JsonProperty jsonProperty : properties) {
-            result.set(jsonProperty.getName(), createPropertyEntry(jsonProperty,
-                    referencedElements));
-        }
-        return result;
-    }
-
-    private ArrayNode createRequiredElementsArray(List<JsonProperty> properties) {
-        final ArrayNode result = new ArrayNode(nodeFactory);
-        for (JsonProperty jsonProperty : properties) {
-            if (jsonProperty.isRequired()) {
-                result.add(jsonProperty.getName());
-            }
-        }
-        return result;
+    private ObjectNode createObjectNode() {
+        return new ObjectNode(nodeFactory);
     }
 
 }

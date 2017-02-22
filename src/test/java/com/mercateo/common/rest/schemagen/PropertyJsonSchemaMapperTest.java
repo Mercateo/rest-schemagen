@@ -1,26 +1,23 @@
 package com.mercateo.common.rest.schemagen;
 
 
-import java.lang.reflect.Type;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collections;
-
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableList;
 import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
+import com.mercateo.common.rest.schemagen.generator.ObjectContext;
 import com.mercateo.common.rest.schemagen.generator.ObjectContextBuilder;
+import com.mercateo.common.rest.schemagen.generictype.GenericType;
+import com.mercateo.common.rest.schemagen.parameter.CallContext;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.mercateo.common.rest.schemagen.generator.ObjectContext;
-import com.mercateo.common.rest.schemagen.generictype.GenericType;
-import com.mercateo.common.rest.schemagen.parameter.CallContext;
+import java.lang.reflect.Type;
+import java.net.URL;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SchemaJsonPropertyJsonMapperTest {
+public class PropertyJsonSchemaMapperTest {
 
     private SchemaPropertyGenerator schemaGenerator;
 
@@ -111,28 +108,51 @@ public class SchemaJsonPropertyJsonMapperTest {
     }
 
     @Test
-    public void shouldMapNumberValue() {
+    public void shouldMapFloatNumberValue() {
         final ValueResponse allowedValue = new ValueResponse();
-        allowedValue.number1 = 10.5f;
+        allowedValue.floatNumber1 = 10.5f;
 
         final ValueResponse defaultValue = new ValueResponse();
-        defaultValue.number1 = 2.0f;
+        defaultValue.floatNumber1 = 2.0f;
 
         final JsonPropertyResult jsonPropertyResult = generateSchemaProperty(ObjectContext.buildFor(ValueResponse.class).addAllowedValues(allowedValue).withDefaultValue(defaultValue));
 
         final ObjectNode rootNode = propertyJsonSchemaMapper.toJson(jsonPropertyResult);
 
-        final JsonNode integer = rootNode.get("properties").get("number1");
+        final JsonNode floatNumber = rootNode.get("properties").get("floatNumber1");
 
-        assertThat(integer.get("type").asText()).isEqualTo("number");
+        assertThat(floatNumber.get("type").asText()).isEqualTo("number");
 
-        final ImmutableList<JsonNode> allowedValues = ImmutableList.copyOf(integer.get("enum").elements());
+        final ImmutableList<JsonNode> allowedValues = ImmutableList.copyOf(floatNumber.get("enum").elements());
         assertThat(allowedValues).extracting(JsonNode::asDouble).containsExactly(10.5);
 
-        final JsonNode defaultValueNode = integer.get("default");
+        final JsonNode defaultValueNode = floatNumber.get("default");
         assertThat(defaultValueNode.asDouble()).isEqualTo(2.0f);
     }
 
+
+    @Test
+    public void shouldMapDoubleNumberValue() {
+        final ValueResponse allowedValue = new ValueResponse();
+        allowedValue.doubleNumber1 = 10.5d;
+
+        final ValueResponse defaultValue = new ValueResponse();
+        defaultValue.doubleNumber1 = 2.0d;
+
+        final JsonPropertyResult jsonPropertyResult = generateSchemaProperty(ObjectContext.buildFor(ValueResponse.class).addAllowedValues(allowedValue).withDefaultValue(defaultValue));
+
+        final ObjectNode rootNode = propertyJsonSchemaMapper.toJson(jsonPropertyResult);
+
+        final JsonNode doubleNumber = rootNode.get("properties").get("doubleNumber1");
+
+        assertThat(doubleNumber.get("type").asText()).isEqualTo("number");
+
+        final ImmutableList<JsonNode> allowedValues = ImmutableList.copyOf(doubleNumber.get("enum").elements());
+        assertThat(allowedValues).extracting(JsonNode::asDouble).containsExactly(10.5);
+
+        final JsonNode defaultValueNode = doubleNumber.get("default");
+        assertThat(defaultValueNode.asDouble()).isEqualTo(2.0d);
+    }
     private JsonPropertyResult generateSchemaProperty(Type type) {
         return generateSchemaProperty(ObjectContext.buildFor(GenericType.of(type)));
     }
@@ -148,25 +168,27 @@ public class SchemaJsonPropertyJsonMapperTest {
     }
 
 
-    public static class ValueResponse {
-        public EmbeddedResponse embedded;
+    private static class ValueResponse {
+        EmbeddedResponse embedded;
 
-        public URL url;
+        URL url;
 
-        public String string1;
+        String string1;
 
-        public Integer integer1;
+        Integer integer1;
 
-        public Float number1;
+        Float floatNumber1;
 
-        public Boolean boolean1;
+        Double doubleNumber1;
+
+        Boolean boolean1;
     }
 
-    public static class ExtendedResponse extends ValueResponse {
+    private static class ExtendedResponse extends ValueResponse {
         URL subUrl;
     }
 
-    public static class EmbeddedResponse {
+    private static class EmbeddedResponse {
         public URL embeddedUrl;
     }
 }
