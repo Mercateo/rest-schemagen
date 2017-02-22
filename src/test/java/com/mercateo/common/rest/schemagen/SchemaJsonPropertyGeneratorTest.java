@@ -194,7 +194,7 @@ public class SchemaJsonPropertyGeneratorTest {
         assertThat(nestedObjectProperties).hasSize(2);
 
         assertThat(nestedObjectProperties.get(0).getName()).isEqualTo("count");
-        assertThat(nestedObjectProperties.get(0).getDefaultValue()).isEqualTo("5");
+        assertThat(nestedObjectProperties.get(0).getDefaultValue()).isEqualTo(5);
 
         assertThat(nestedObjectProperties.get(1).getName()).isEqualTo("name");
         assertThat(nestedObjectProperties.get(1).getDefaultValue()).isNull();

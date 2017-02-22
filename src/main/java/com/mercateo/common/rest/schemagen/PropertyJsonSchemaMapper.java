@@ -6,13 +6,22 @@ import java.util.Set;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
 import com.mercateo.common.rest.schemagen.plugin.IndividualSchemaGenerator;
 
 public class PropertyJsonSchemaMapper {
 
-    public static final JsonNodeFactory nodeFactory = new JsonNodeFactory(true);
+    private static final JsonNodeFactory nodeFactory = new JsonNodeFactory(true);
+
+    private final PropertyJsonMapper propertyJsonMapper;
+
+    public PropertyJsonSchemaMapper() {
+        this(new PropertyJsonMapper(nodeFactory));
+    }
+
+    public PropertyJsonSchemaMapper(PropertyJsonMapper propertyJsonMapper) {
+        this.propertyJsonMapper = propertyJsonMapper;
+    }
 
     /**
      * Convert the property hierarchy given in {@code property} to a JSON
@@ -75,12 +84,7 @@ public class PropertyJsonSchemaMapper {
 
                 case STRING:
                     result.put("type", "string");
-                    if (hasAllowedValues(jsonProperty)) {
-                        result.set("enum", getAllowedValues(jsonProperty));
-                    }
-                    if (hasDefaultValue(jsonProperty)) {
-                        result.set("default", getDefaultValue(jsonProperty));
-                    }
+                    propertyJsonMapper.addStringDefaultAndAllowedValues(result, jsonProperty);
                     jsonProperty.getSizeConstraints().getMin().ifPresent(x -> result.put(
                             "minLength", x));
                     jsonProperty.getSizeConstraints().getMax().ifPresent(x -> result.put(
@@ -89,21 +93,21 @@ public class PropertyJsonSchemaMapper {
 
                 case INTEGER:
                     result.put("type", "integer");
+                    propertyJsonMapper.addIntegerDefaultAndAllowedValues(result, jsonProperty);
                     jsonProperty.getValueConstraints().getMin().ifPresent(x -> result.put("minimum",
                             x));
                     jsonProperty.getValueConstraints().getMax().ifPresent(x -> result.put("maximum",
                             x));
                     break;
+
                 case NUMBER:
                     result.put("type", "number");
+                    propertyJsonMapper.addNumberDefaultAndAllowedValues(result, jsonProperty);
                     break;
 
                 case BOOLEAN:
                     result.put("type", "boolean");
-                    result.put("default", false);
-                    if (hasAllowedValues(jsonProperty)) {
-                        result.set("enum", getAllowedValues(jsonProperty));
-                    }
+                    propertyJsonMapper.getBooleanDefaultAndAllowedValues(result, jsonProperty);
                     break;
 
                 default:
@@ -123,28 +127,6 @@ public class PropertyJsonSchemaMapper {
 
             return individualSchemaGenerator.create();
         }
-    }
-
-    private boolean hasAllowedValues(JsonProperty jsonProperty) {
-        return !jsonProperty.getAllowedValues().isEmpty();
-    }
-
-    private ArrayNode getAllowedValues(JsonProperty jsonProperty) {
-        final ArrayNode arrayNode = new ArrayNode(nodeFactory);
-        final List<String> allowedValues = jsonProperty.getAllowedValues();
-        for (String allowedValue : allowedValues) {
-            arrayNode.add(new TextNode(allowedValue));
-        }
-        return arrayNode;
-    }
-
-    private boolean hasDefaultValue(JsonProperty jsonProperty) {
-        final String defaultValue = jsonProperty.getDefaultValue();
-        return defaultValue != null && !defaultValue.isEmpty();
-    }
-
-    private TextNode getDefaultValue(JsonProperty jsonProperty) {
-        return new TextNode(jsonProperty.getDefaultValue());
     }
 
     private ObjectNode createProperties(List<JsonProperty> properties,

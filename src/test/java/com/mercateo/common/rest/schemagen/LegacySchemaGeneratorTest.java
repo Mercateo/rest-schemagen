@@ -125,7 +125,7 @@ public class LegacySchemaGeneratorTest {
         createSchemaFor(TestRto.class);
         JsonProperty anEnum = getByName("anEnum");
         assertThat(anEnum.getType()).isEqualTo(PropertyType.STRING);
-        List<String> allowedValues = anEnum.getAllowedValues();
+        List<Object> allowedValues = anEnum.getAllowedValues();
         assertThat(allowedValues).isNotNull().hasSize(2).contains("VALUE_1", "VALUE_2");
     }
 
@@ -215,10 +215,10 @@ public class LegacySchemaGeneratorTest {
         testRto.requiredString = "allowed_string";
         testRto.string = "this|is|an|enum";
         createAllowedValuesSchema(testRto);
-        final List<String> prop = rootJsonProperty.getPropertyByName("requiredString").getAllowedValues();
+        final List<Object> prop = rootJsonProperty.getPropertyByName("requiredString").getAllowedValues();
         assertThat(prop).hasSize(1);
         assertThat(prop).contains("allowed_string");
-        final List<String> otherProp = rootJsonProperty.getPropertyByName("string").getAllowedValues();
+        final List<Object> otherProp = rootJsonProperty.getPropertyByName("string").getAllowedValues();
         assertThat(otherProp).hasSize(1);
         assertThat(otherProp).contains("this|is|an|enum");
     }

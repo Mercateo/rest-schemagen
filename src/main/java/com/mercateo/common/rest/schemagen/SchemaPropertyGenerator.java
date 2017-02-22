@@ -14,6 +14,7 @@ import com.mercateo.common.rest.schemagen.util.EnumUtil;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,7 +28,8 @@ import java.util.stream.Stream;
 public class SchemaPropertyGenerator {
 
     private static final Map<Class<?>, JsonProperty> builtins = ImmutableMap.of( //
-            Date.class, JsonProperty.builderFor(Integer.class).withName("n/a").withIsRequired(true).build());
+            Date.class, JsonProperty.builderFor(Integer.class).withName("n/a").withIsRequired(true).build(),
+            URL.class, JsonProperty.builderFor(String.class).withName("n/a").build());
 
     private final ReferencedJsonPropertyFinder referencedJsonPropertyFinder;
 

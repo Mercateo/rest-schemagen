@@ -163,7 +163,11 @@ public class RestJsonSchemaGeneratorTest {
 
         assertThat(inputSchema.isPresent()).isTrue();
         assertThat(inputSchema.get()).containsIgnoringCase(
-                "{\"type\":\"string\",\"enum\":[\"FOO_VALUE\",\"BAR_VALUE\"],\"default\":\"FOO_VALUE\"}");
+                "\"type\":\"string\"");
+        assertThat(inputSchema.get()).containsIgnoringCase(
+                "\"enum\":[\"FOO_VALUE\",\"BAR_VALUE\"]");
+        assertThat(inputSchema.get()).containsIgnoringCase(
+                "\"default\":\"FOO_VALUE\"");
     }
 
     @Test
@@ -175,7 +179,9 @@ public class RestJsonSchemaGeneratorTest {
 
         assertThat(inputSchema.isPresent()).isTrue();
         assertThat(inputSchema.get()).containsIgnoringCase(
-                "{\"type\":\"string\",\"enum\":[\"FOO_VALUE\",\"BAR_VALUE\"]}");
+                "\"type\":\"string\"");
+        assertThat(inputSchema.get()).containsIgnoringCase(
+                "\"enum\":[\"FOO_VALUE\",\"BAR_VALUE\"]");
     }
 
     @Test
