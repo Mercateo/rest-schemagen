@@ -7,18 +7,18 @@ import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mercateo.common.rest.schemagen.JsonProperty;
 
-class NumberJsonPropertyMapper extends PrimitiveJsonPropertyMapperAbstract {
+class NumberJsonPropertyMapper implements JsonPropertyMapper {
+
+    private final PrimitiveJsonPropertyBuilder primitiveJsonPropertyBuilder;
 
     NumberJsonPropertyMapper(JsonNodeFactory nodeFactory) {
-        super(nodeFactory);
+        primitiveJsonPropertyBuilder = new PrimitiveJsonPropertyBuilder(nodeFactory);
     }
 
     @Override
     public ObjectNode toJson(JsonProperty jsonProperty) {
-        final ObjectNode propertyNode = createObjectNode();
-        propertyNode.put("type", "number");
-        addDefaultAndAllowedValues(propertyNode, jsonProperty, this::createNode);
-        return propertyNode;
+        return primitiveJsonPropertyBuilder.forProperty(jsonProperty) //
+                .withType("number").withDefaultAndAllowedValues(this::createNode).build();
     }
 
     private JsonNode createNode(Object value) {
