@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -15,9 +14,9 @@ import javax.ws.rs.NotFoundException;
 import com.mercateo.common.rest.schemagen.generator.ImmutableJsonPropertyResult;
 import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
 import com.mercateo.common.rest.schemagen.generator.ObjectContextBuilder;
+import com.mercateo.common.rest.schemagen.json.mapper.PropertyJsonSchemaMapper;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.Property;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -125,7 +124,7 @@ public class LegacySchemaGeneratorTest {
         createSchemaFor(TestRto.class);
         JsonProperty anEnum = getByName("anEnum");
         assertThat(anEnum.getType()).isEqualTo(PropertyType.STRING);
-        List<String> allowedValues = anEnum.getAllowedValues();
+        List<Object> allowedValues = anEnum.getAllowedValues();
         assertThat(allowedValues).isNotNull().hasSize(2).contains("VALUE_1", "VALUE_2");
     }
 
@@ -215,10 +214,10 @@ public class LegacySchemaGeneratorTest {
         testRto.requiredString = "allowed_string";
         testRto.string = "this|is|an|enum";
         createAllowedValuesSchema(testRto);
-        final List<String> prop = rootJsonProperty.getPropertyByName("requiredString").getAllowedValues();
+        final List<Object> prop = rootJsonProperty.getPropertyByName("requiredString").getAllowedValues();
         assertThat(prop).hasSize(1);
         assertThat(prop).contains("allowed_string");
-        final List<String> otherProp = rootJsonProperty.getPropertyByName("string").getAllowedValues();
+        final List<Object> otherProp = rootJsonProperty.getPropertyByName("string").getAllowedValues();
         assertThat(otherProp).hasSize(1);
         assertThat(otherProp).contains("this|is|an|enum");
     }

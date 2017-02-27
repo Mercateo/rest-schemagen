@@ -1,5 +1,19 @@
 package com.mercateo.common.rest.schemagen;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.collect.ImmutableMap;
 import com.mercateo.common.rest.schemagen.generator.ImmutableJsonPropertyResult;
@@ -11,23 +25,11 @@ import com.mercateo.common.rest.schemagen.generator.ReferencedJsonPropertyFinder
 import com.mercateo.common.rest.schemagen.generictype.GenericType;
 import com.mercateo.common.rest.schemagen.util.EnumUtil;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 public class SchemaPropertyGenerator {
 
     private static final Map<Class<?>, JsonProperty> builtins = ImmutableMap.of( //
-            Date.class, JsonProperty.builderFor(Integer.class).withName("n/a").withIsRequired(true).build());
+            Date.class, JsonProperty.builderFor(Integer.class).withName("n/a").withIsRequired(true).build(),
+            URL.class, JsonProperty.builderFor(String.class).withName("n/a").build());
 
     private final ReferencedJsonPropertyFinder referencedJsonPropertyFinder;
 
@@ -192,8 +194,7 @@ public class SchemaPropertyGenerator {
                 break;
 
             case ARRAY:
-                properties
-                        .add(determineProperty("", objectContext.getContained(), pathContext, context));
+                properties.add(determineProperty("", objectContext.getContained(), pathContext, context));
                 break;
 
             default:

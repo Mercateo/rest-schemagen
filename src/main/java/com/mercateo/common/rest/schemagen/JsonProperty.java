@@ -48,7 +48,7 @@ public abstract class JsonProperty {
     public abstract String getRef();
 
     @Nullable
-    public abstract String getDefaultValue();
+    public abstract Object getDefaultValue();
 
     @Value.Default
     public boolean isRequired() {
@@ -70,7 +70,7 @@ public abstract class JsonProperty {
     @Nullable
     public abstract Class<? extends IndividualSchemaGenerator> getIndividualSchemaGenerator();
 
-    public abstract List<String> getAllowedValues();
+    public abstract List<Object> getAllowedValues();
 
     @Nullable
     public abstract String getPath();
@@ -115,14 +115,14 @@ public abstract class JsonProperty {
         }
 
         @SuppressWarnings("unchecked")
-        private String convertToString(Object defaultValue, Class<?> rawType) {
+        private Object convertToString(Object defaultValue, Class<?> rawType) {
             if (defaultValue == null) {
                 return null;
             }
             if (Enum.class.isAssignableFrom(rawType)) {
                 return convertEnumToString(defaultValue);
             } else {
-                return defaultValue.toString();
+                return defaultValue;
             }
         }
 
