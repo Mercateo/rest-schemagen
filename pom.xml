@@ -29,9 +29,10 @@
     </license>
   </licenses>
   <scm>
-    <connection>scm:git:https://github.com/Mercateo/rest-schemagen.git</connection>
-    <developerConnection>scm:git:https://github.com/Mercateo/rest-schemagen.git</developerConnection>
+    <connection>scm:git:git@github.com:Mercateo/rest-schemagen.git</connection>
+    <developerConnection>scm:git:git@github.com:Mercateo/rest-schemagen.git</developerConnection>
     <url>https://github.com/Mercateo/rest-schemagen.git</url>
+    <tag>HEAD</tag>
   </scm>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -54,9 +55,14 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-release-plugin</artifactId>
+        <version>2.5.3</version>
+      </plugin>
+      <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.3</version>
+        <version>1.6.8</version>
         <extensions>true</extensions>
         <configuration>
           <serverId>ossrh</serverId>
@@ -66,7 +72,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.5.1</version>
+        <version>3.6.1</version>
         <configuration>
           <compilerVersion>1.8</compilerVersion>
           <source>1.8</source>
@@ -82,7 +88,7 @@
       </plugin>
       <plugin>
         <artifactId>maven-source-plugin</artifactId>
-        <version>2.4</version>
+        <version>3.0.1</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -95,7 +101,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
-        <version>2.10.3</version>
+        <version>2.10.4</version>
         <executions>
           <execution>
             <id>attach-javadocs</id>
@@ -108,7 +114,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
 	<artifactId>maven-jar-plugin</artifactId>
-	<version>2.4</version>
+	<version>3.0.2</version>
 	<executions>
 	  <execution>
 	    <goals>
@@ -120,7 +126,7 @@
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.7.6.201602180812</version>
+        <version>0.7.9</version>
         <executions>
           <execution>
             <id>prepare-agent</id>
@@ -133,7 +139,7 @@
       <plugin>
         <groupId>org.eluder.coveralls</groupId>
         <artifactId>coveralls-maven-plugin</artifactId>
-        <version>4.2.0</version>
+        <version>4.3.0</version>
       </plugin>
     </plugins>
  </build>
