@@ -8,6 +8,7 @@ import com.mercateo.common.rest.schemagen.parameter.CallContext;
 import com.mercateo.common.rest.schemagen.parameter.Parameter;
 import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -127,6 +128,17 @@ public class RestJsonSchemaGeneratorTest {
         assertThat(inputSchema.get()).doesNotContain("pathParam");
     }
 
+    @Test
+    public void createInputSchemaWithPathParam() throws NoSuchMethodException {
+    	final Method getStrings = getTestResourceMethod("pathParam", String.class);
+    	final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
+    			getStrings, new Object[0], CallContext.create()) {
+    	}, fieldCheckerForSchema);
+    	
+		assertThat(inputSchema.isPresent()).isTrue();
+		assertThat(inputSchema.get()).isEqualTo("{\"type\":\"string\"}");
+	}
+    
     @Test
     public void createInputSchemaWithContextParam() throws NoSuchMethodException {
         final Method getStrings = getTestResourceMethod("context", String.class);
@@ -276,6 +288,12 @@ public class RestJsonSchemaGeneratorTest {
             // Nothing to do.
         }
 
+        @GET
+        @Path("/x/{bla}")
+        public String pathParam(@PathParam("bla") String bla) {
+        	return bla;
+        }
+        
         @PUT
         @Path("/ofContext")
         public void context(@Context String bla) {

@@ -96,7 +96,8 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
                 if (paramAn instanceof QueryParam) {
                     ignore = true;
                 } else if (paramAn instanceof PathParam) {
-                    ignore = true;
+                	PathParam pathParam = (PathParam) paramAn;
+                	name = Optional.of(pathParam.value());
                 } else if (paramAn instanceof FormDataParam) {
                     ignore = true;
                 } else if (paramAn instanceof Context) {
