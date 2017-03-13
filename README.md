@@ -2,6 +2,7 @@
 [![Build Status](https://travis-ci.org/Mercateo/rest-schemagen.svg?branch=master)](https://travis-ci.org/Mercateo/rest-schemagen)
 [![Coverage Status](https://coveralls.io/repos/Mercateo/rest-schemagen/badge.svg?branch=master&service=github)](https://coveralls.io/github/Mercateo/rest-schemagen?branch=master)
 [![MavenCentral](https://img.shields.io/maven-central/v/com.mercateo/common.rest.schemagen.svg)](http://search.maven.org/#search%7Cgav%7C1%7Cg%3A%22com.mercateo%22%20AND%20a%3A%22common.rest.schemagen%22)
+[![APL2 License](http://img.shields.io/badge/license-APL2-green.svg)](https://raw.githubusercontent.com/Mercateo/rest-schemagen/master/LICENSE)
 
 
 Jersey add-on for dynamic link and schema building.
