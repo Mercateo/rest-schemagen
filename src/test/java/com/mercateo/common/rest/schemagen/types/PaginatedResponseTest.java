@@ -1,11 +1,15 @@
 package com.mercateo.common.rest.schemagen.types;
 
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.mercateo.common.rest.schemagen.JsonHyperSchema;
 import com.mercateo.common.rest.schemagen.link.relation.RelationContainer;
 import org.junit.Test;
 
 import javax.ws.rs.core.Link;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -62,6 +66,43 @@ public class PaginatedResponseTest {
 
     private Optional<Link> paginationLinkCreator(RelationContainer rel, int offset, int limit) {
         return Optional.of(Link.fromPath("/").param("offset", Integer.toString(offset)).param("limit", Integer.toString(limit)).build());
+    }
+
+    static class Payload {
+        public String value;
+    }
+
+    @Test
+    public void shouldSerialize() throws Exception {
+        final ObjectMapper objectMapper = new ObjectMapper();
+
+        final Payload payload = new Payload();
+        payload.value = "foo";
+        final ObjectWithSchema<Payload> element = ObjectWithSchema.create(payload, JsonHyperSchema.from(Collections
+                .emptyList()));
+        final PaginatedResponse<Payload> listResponse = PaginatedResponse.create(Collections.singletonList(element), 100, 10, 5,
+                JsonHyperSchema.from(Collections.emptyList()));
+
+        final String jsonString = objectMapper.writeValueAsString(listResponse);
+
+        assertThat(jsonString).isEqualTo(
+                "{\"members\":[{\"value\":\"foo\",\"_schema\":{\"links\":[]}}],\"total\":100,\"offset\":10,\"limit\":5,\"_schema\":{\"links\":[]}}");
+    }
+
+    @Test
+    public void shouldDeserialize() throws Exception {
+        final ObjectMapper mapper = new ObjectMapper();
+        final TypeFactory typeFactory = mapper.getTypeFactory();
+
+        final String content = "{\"members\": [{\"value\": \"foo\", \"_schema\":{\"links\": []}}, {\"value\": \"bar\", \"_schema\":{\"links\": []}}], \"offset\": 100, \"limit\": 10, \"total\": 2000, \"_schema\":{\"links\":[]}}";
+
+        final JavaType nameWithSchemaType = typeFactory.constructParametricType(PaginatedResponse.class, Payload.class);
+        final PaginatedResponse<Payload> listResponse = mapper.readValue(content, nameWithSchemaType);
+
+        assertThat(listResponse.getMembers()).extracting(ObjectWithSchema::getObject).extracting(p -> p.value).containsExactly("foo", "bar");
+        assertThat(listResponse.getLimit()).isEqualTo(10);
+        assertThat(listResponse.getOffset()).isEqualTo(100);
+        assertThat(listResponse.getTotal()).isEqualTo(2000);
     }
 
 }

@@ -1,5 +1,9 @@
 package com.mercateo.common.rest.schemagen.types;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import org.glassfish.jersey.server.JSONP;
+
 import java.util.List;
 
 public class PaginatedList<T> {
@@ -11,7 +15,8 @@ public class PaginatedList<T> {
 
     public final int limit;
 
-    public PaginatedList(int total, int offset, int limit, List<T> members) {
+    @JsonCreator
+    public PaginatedList(@JsonProperty("total") int total, @JsonProperty("offset") int offset, @JsonProperty("limit") int limit, @JsonProperty("members") List<T> members) {
         this.total = total;
         this.offset = offset;
         this.limit = limit;

@@ -1,5 +1,6 @@
 package com.mercateo.common.rest.schemagen.types;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
@@ -13,9 +14,10 @@ public class WithId<T> {
     @JsonUnwrapped
     public final T object;
 
+    @JsonCreator
     private WithId(
             @JsonProperty("id") UUID id,
-            @JsonProperty("name") T object
+            @JsonProperty("object") T object
     ) {
         this.id = id;
         this.object = object;

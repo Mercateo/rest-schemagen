@@ -99,4 +99,11 @@ public class JsonHyperSchema {
 	private static <T> Stream<T> filterOptionals(Stream<Optional<T>> streamWithOptionals) {
 		return streamWithOptionals.filter(Objects::nonNull).flatMap(e -> e.map(Stream::of).orElse(Stream.empty()));
 	}
+
+	@Override
+	public String toString() {
+		return "JsonHyperSchema{" +
+				"links=" + links +
+				'}';
+	}
 }

@@ -36,7 +36,7 @@
   </scm>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <jackson.version>2.7.5</jackson.version>
+    <jackson.version>2.7.9</jackson.version>
     <jmh.version>1.12</jmh.version>
   </properties>
   <developers>
