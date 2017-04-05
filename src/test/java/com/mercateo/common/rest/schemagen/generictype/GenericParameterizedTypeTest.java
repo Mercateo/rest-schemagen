@@ -21,7 +21,7 @@ public class GenericParameterizedTypeTest extends ObjectWithSchema<Boolean> {
 
     @SuppressWarnings("boxing")
     public GenericParameterizedTypeTest() {
-        super(true, new JsonHyperSchema(new ArrayList<>()));
+        super(true, new JsonHyperSchema(new ArrayList<>()), null);
     }
 
     @Test

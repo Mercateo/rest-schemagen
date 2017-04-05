@@ -10,6 +10,7 @@ import com.mercateo.common.rest.schemagen.generictype.GenericType;
 import com.mercateo.common.rest.schemagen.parameter.CallContext;
 import com.mercateo.common.rest.schemagen.types.ListResponse;
 import com.mercateo.common.rest.schemagen.types.ObjectWithSchema;
+import com.mercateo.common.rest.schemagen.types.WrappedList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -695,7 +696,6 @@ public class SchemaJsonPropertyGeneratorTest {
     }
 
     public static class ListObject extends ListResponse<SchemaObject> {
-
         protected ListObject(List<ObjectWithSchema<SchemaObject>> members, JsonHyperSchema schema) {
             super(members, schema);
         }
@@ -731,13 +731,13 @@ public class SchemaJsonPropertyGeneratorTest {
 
     public static class MessageResponse extends ObjectWithSchema<String> {
         MessageResponse(String object, JsonHyperSchema schema) {
-            super(object, schema);
+            super(object, schema, null);
         }
     }
 
     public static class WrappedObject extends ObjectWithSchema<SchemaObject> {
         protected WrappedObject(SchemaObject object, JsonHyperSchema schema) {
-            super(object, schema);
+            super(object, schema, null);
         }
     }
 

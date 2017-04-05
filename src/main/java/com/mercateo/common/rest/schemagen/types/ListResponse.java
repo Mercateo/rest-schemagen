@@ -2,12 +2,18 @@ package com.mercateo.common.rest.schemagen.types;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mercateo.common.rest.schemagen.JsonHyperSchema;
 
+@JsonIgnoreProperties("object")
 public class ListResponse<T> extends ObjectWithSchema<WrappedList<ObjectWithSchema<T>>> {
 
-    protected ListResponse(List<ObjectWithSchema<T>> members, JsonHyperSchema schema) {
-        super(new WrappedList<>(members), schema);
+    @JsonCreator
+    protected ListResponse(@JsonProperty("members") List<ObjectWithSchema<T>> members,
+            @JsonProperty("_schema") JsonHyperSchema schema) {
+        super(new WrappedList<>(members), schema, null);
     }
 
     @Override
@@ -20,7 +26,12 @@ public class ListResponse<T> extends ObjectWithSchema<WrappedList<ObjectWithSche
     }
 
     public static <ElementIn, ElementOut> ListResponseBuilder<ElementIn, ElementOut> builder() {
-        //noinspection deprecation
+        // noinspection deprecation
         return new ListResponseBuilder<>();
+    }
+
+    @JsonProperty("members")
+    public List<ObjectWithSchema<T>> getMembers() {
+        return object.members;
     }
 }
