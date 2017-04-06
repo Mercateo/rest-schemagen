@@ -53,7 +53,7 @@ public class ListResponseTest {
     }
 
     @Test
-    public void shouldSerializ() throws Exception {
+    public void shouldSerialize() throws Exception {
         final ObjectMapper objectMapper = new ObjectMapper();
 
         final Payload payload = new Payload();
@@ -85,7 +85,4 @@ public class ListResponseTest {
             .extracting(p -> p.value)
             .containsExactly("foo", "bar");
     }
-
-
-
 }
