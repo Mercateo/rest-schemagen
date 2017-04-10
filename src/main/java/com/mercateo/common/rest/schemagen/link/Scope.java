@@ -1,7 +1,6 @@
 package com.mercateo.common.rest.schemagen.link;
 
 import com.googlecode.gentyref.GenericTypeReflector;
-import com.mercateo.common.rest.schemagen.link.helper.InvocationRecordingResult;
 import com.mercateo.common.rest.schemagen.parameter.CallContext;
 import com.mercateo.common.rest.schemagen.parameter.Parameter;
 
