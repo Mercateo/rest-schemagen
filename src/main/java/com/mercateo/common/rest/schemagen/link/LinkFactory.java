@@ -2,17 +2,17 @@ package com.mercateo.common.rest.schemagen.link;
 
 import com.mercateo.common.rest.schemagen.JerseyResource;
 import com.mercateo.common.rest.schemagen.JsonSchemaGenerator;
-import com.mercateo.common.rest.schemagen.link.helper.InvocationRecorder;
-import com.mercateo.common.rest.schemagen.link.helper.InvocationRecordingResult;
 import com.mercateo.common.rest.schemagen.link.helper.MethodInvocation;
-import com.mercateo.common.rest.schemagen.link.helper.ProxyFactory;
 import com.mercateo.common.rest.schemagen.link.relation.Relation;
 import com.mercateo.common.rest.schemagen.link.relation.RelationContainer;
 import com.mercateo.common.rest.schemagen.parameter.CallContext;
 import com.mercateo.common.rest.schemagen.parameter.Parameter;
+import com.mercateo.reflection.Call;
+import com.mercateo.reflection.CallInterceptor;
+import com.mercateo.reflection.InvocationRecorder;
+import com.mercateo.reflection.proxy.ProxyFactory;
 
 import javax.ws.rs.core.Link;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -30,7 +30,7 @@ public class LinkFactory<T extends JerseyResource> {
     private final T resourceProxy;
 
     LinkFactory(Class<T> resourceClass, JsonSchemaGenerator jsonSchemaGenerator, LinkFactoryContext context, List<Scope> scopes) {
-        this.resourceProxy = ProxyFactory.createProxy(resourceClass);
+        resourceProxy = ProxyFactory.createProxy(resourceClass);
         this.jsonSchemaGenerator = jsonSchemaGenerator;
         this.context = context;
         this.scopes = scopes != null ? scopes : new ArrayList<>();
@@ -184,20 +184,21 @@ public class LinkFactory<T extends JerseyResource> {
     }
 
     private Scope createCallScope(MethodInvocation<T> methodInvocation, CallContext callContext) {
-        final InvocationRecordingResult result = recordMethodCall(methodInvocation);
-        return new CallScope(result.getInvokedClass(), result.getMethod(), result.getParams(), callContext);
+        final Call<T> result = recordMethodCall(methodInvocation);
+        return new CallScope(result.declaringClass(), result.method(), result.args(), callContext);
     }
 
     private Scope createSubresourceScope(MethodInvocation<T> methodInvocation) {
-        final InvocationRecordingResult result = recordMethodCall(methodInvocation);
-        return new SubResourceScope(result.getInvokedClass(), result.getMethod(), result.getParams());
+        final Call<T> result = recordMethodCall(methodInvocation);
+        return new SubResourceScope(result.declaringClass(), result.method(), result.args());
     }
 
-    private InvocationRecordingResult recordMethodCall(MethodInvocation<T> methodInvocation) {
-        final InvocationRecordingResult result;
+    private Call<T> recordMethodCall(MethodInvocation<T> methodInvocation) {
+        final Call<T> result;
         synchronized (resourceProxy) {
             methodInvocation.record(resourceProxy);
-            result = ((InvocationRecorder) resourceProxy).getInvocationRecordingResult();
+            //noinspection unchecked
+            result = ((InvocationRecorder<T>) resourceProxy).getInvocationRecordingResult();
         }
         return result;
     }

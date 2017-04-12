@@ -20,6 +20,43 @@ public class WithIdTest {
     }
 
     @Test
+    public void shouldCreateRandomId() throws Exception {
+        final WithId<Payload> payloadWithId = WithId.create(new Payload());
+
+        assertThat(payloadWithId.id).isNotNull();
+    }
+
+    @Test
+    public void samePayloadWithDifferentIdIsNotEqual() throws Exception {
+        final Payload payload = new Payload();
+        final WithId<Payload> payloadWithId = WithId.create(payload);
+        final WithId<Payload> otherPayloadWithId = WithId.create(payload);
+
+        assertThat(payloadWithId).isNotEqualTo(otherPayloadWithId);
+        assertThat(payloadWithId.hashCode()).isNotEqualTo(otherPayloadWithId.hashCode());
+    }
+
+    @Test
+    public void samePayloadWithSameIdIsEqual() throws Exception {
+        final Payload payload = new Payload();
+        final UUID id = UUID.randomUUID();
+        final WithId<Payload> payloadWithId = WithId.create(id, payload);
+        final WithId<Payload> otherPayloadWithId = WithId.create(id, payload);
+
+        assertThat(payloadWithId).isEqualTo(otherPayloadWithId);
+        assertThat(payloadWithId.hashCode()).isEqualTo(otherPayloadWithId.hashCode());
+    }
+
+    @Test
+    public void toStringShouldContainId() throws Exception {
+        final Payload payload = new Payload();
+        final UUID id = UUID.randomUUID();
+        final WithId<Payload> payloadWithId = WithId.create(id, payload);
+
+        assertThat(payloadWithId.toString()).contains(id.toString());
+    }
+
+    @Test
     public void shouldSerializeCorrectly() throws Exception {
         final ObjectMapper objectMapper = new ObjectMapper();
 

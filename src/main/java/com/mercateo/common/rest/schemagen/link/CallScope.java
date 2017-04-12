@@ -16,4 +16,12 @@ public class CallScope extends Scope {
     public Optional<CallContext> getCallContext() {
         return callContext;
     }
+
+    @Override
+    public String toString() {
+        return "CallScope{" +
+                getInvokedClass().getName() + "." + getInvokedMethod().getName() + ", " +
+                "callContext=" + callContext.orElse(null) +
+                '}';
+    }
 }
