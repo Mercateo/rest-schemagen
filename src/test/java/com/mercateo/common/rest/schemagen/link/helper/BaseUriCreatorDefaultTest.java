@@ -38,7 +38,7 @@ public class BaseUriCreatorDefaultTest {
     }
 
     @Test
-    public void testWithProtocolHeader() {
+    public void testWithCustomProtocolHeader() {
         requestHeaders.putSingle(BaseUriCreatorDefault.TLS_STATUS_HEADER, "Off");
 
         URI baseUri = baseUriFactory.createBaseUri(defaultBaseUri, requestHeaders);
@@ -47,8 +47,17 @@ public class BaseUriCreatorDefaultTest {
     }
 
     @Test
+    public void testWithProtocolHeader() {
+        requestHeaders.putSingle(BaseUriCreatorDefault.FORWARDED_PROTO_HEADER, "Https, http");
+
+        URI baseUri = baseUriFactory.createBaseUri(defaultBaseUri, requestHeaders);
+
+        assertThat(baseUri.toString()).isEqualTo("https://host/base/");
+    }
+
+    @Test
     public void testWithHostHeader() {
-        requestHeaders.putSingle(BaseUriCreatorDefault.HOST_HEADER, "server");
+        requestHeaders.putSingle(BaseUriCreatorDefault.FORWARDED_HOST_HEADER, "server");
 
         URI baseUri = baseUriFactory.createBaseUri(defaultBaseUri, requestHeaders);
 
@@ -57,7 +66,7 @@ public class BaseUriCreatorDefaultTest {
 
     @Test
     public void testWithMultipleHostHeaders() {
-        requestHeaders.putSingle(BaseUriCreatorDefault.HOST_HEADER, "firstServer, secondServer");
+        requestHeaders.putSingle(BaseUriCreatorDefault.FORWARDED_HOST_HEADER, "firstServer, secondServer");
 
         URI baseUri = baseUriFactory.createBaseUri(defaultBaseUri, requestHeaders);
 
@@ -76,7 +85,7 @@ public class BaseUriCreatorDefaultTest {
     @Test
     public void testWithAllHeaders() {
         requestHeaders.putSingle(BaseUriCreatorDefault.TLS_STATUS_HEADER, "On");
-        requestHeaders.putSingle(BaseUriCreatorDefault.HOST_HEADER, "server");
+        requestHeaders.putSingle(BaseUriCreatorDefault.FORWARDED_HOST_HEADER, "server");
         requestHeaders.putSingle(BaseUriCreatorDefault.SERVICE_BASE_HEADER, "/service-api/");
 
         URI baseUri = baseUriFactory.createBaseUri(defaultBaseUri, requestHeaders);
@@ -94,7 +103,7 @@ public class BaseUriCreatorDefaultTest {
 
     @Test
     public void shouldRethrowUriSyntaxException() {
-        requestHeaders.putSingle(BaseUriCreatorDefault.HOST_HEADER, ".");
+        requestHeaders.putSingle(BaseUriCreatorDefault.FORWARDED_HOST_HEADER, ".");
 
         assertThatThrownBy(() -> baseUriFactory.createBaseUri(defaultBaseUri, new HttpRequestHeaders(requestHeaders)))
                 .isInstanceOf(IllegalStateException.class)
