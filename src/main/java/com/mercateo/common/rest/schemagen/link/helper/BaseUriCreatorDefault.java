@@ -15,7 +15,9 @@ public class BaseUriCreatorDefault implements BaseUriCreator {
 
     static final String TLS_STATUS_HEADER = "Front-End-Https";
 
-    static final String HOST_HEADER = "X-Forwarded-Host";
+    static final String FORWARDED_HOST_HEADER = "X-Forwarded-Host";
+
+    static final String FORWARDED_PROTO_HEADER = "x-forwarded-proto";
 
     static final String SERVICE_BASE_HEADER = "Service-Base-Path";
 
@@ -28,17 +30,21 @@ public class BaseUriCreatorDefault implements BaseUriCreator {
 
     @Override
     public URI createBaseUri(final URI requestBaseUri, HttpRequestHeaders requestHeaders) {
-
         try {
             String scheme = requestBaseUri.getScheme();
-            Optional<String> tlsStatusHeader = headerValue(requestHeaders, TLS_STATUS_HEADER);
-            if (tlsStatusHeader.filter("On"::equals).isPresent()) {
+
+            final Optional<String> tlsStatusHeader = headerValue(requestHeaders, TLS_STATUS_HEADER);
+            final Optional<String> forwardedProtoHeader = firstHeaderValue(requestHeaders, FORWARDED_PROTO_HEADER);
+            if (tlsStatusHeader.map(String::toLowerCase).filter("on"::equals).isPresent() ||
+                    forwardedProtoHeader.map(String::toLowerCase).filter("https"::equals).isPresent()) {
                 scheme = HTTPS_SCHEME;
             }
-            Optional<String> hostHeader = headerValue(requestHeaders, HOST_HEADER).map(host -> host.split(", ")[0]);
-            String host = hostHeader.orElse(requestBaseUri.getHost());
+
+            Optional<String> forwardedHostHeader = firstHeaderValue(requestHeaders, FORWARDED_HOST_HEADER);
+            String host = forwardedHostHeader.orElse(requestBaseUri.getHost());
             String path = headerValue(requestHeaders, SERVICE_BASE_HEADER).orElse(requestBaseUri.getPath());
-            boolean useDefaultPort = tlsStatusHeader.isPresent() || hostHeader.isPresent();
+            boolean useDefaultPort = tlsStatusHeader.isPresent() || forwardedProtoHeader.isPresent()
+                    || forwardedHostHeader.isPresent();
             int port = useDefaultPort ? -1 : requestBaseUri.getPort();
 
             return new URI(scheme, requestBaseUri.getUserInfo(), host, port, path, requestBaseUri.getQuery(),
@@ -48,9 +54,17 @@ public class BaseUriCreatorDefault implements BaseUriCreator {
         }
     }
 
+    private Optional<String> firstHeaderValue(HttpRequestHeaders requestHeaders, String parameterName) {
+        return headerValue(requestHeaders, parameterName).map(BaseUriCreatorDefault::firstEntry);
+    }
+
     private static Optional<String> headerValue(final HttpRequestHeaders requestHeaders, final String parameterName) {
         final Optional<String> headerValue = requestHeaders.getValues(parameterName).stream().findFirst();
         headerValue.ifPresent(value -> log.debug("use value '{}' from header {}", value, parameterName));
         return headerValue;
+    }
+
+    private static String firstEntry(String headerValue) {
+        return headerValue.split(", ")[0];
     }
 }
