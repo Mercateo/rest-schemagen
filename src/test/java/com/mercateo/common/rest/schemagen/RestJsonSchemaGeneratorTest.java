@@ -1,33 +1,38 @@
 package com.mercateo.common.rest.schemagen;
 
 
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.mercateo.common.rest.schemagen.annotation.Media;
-import com.mercateo.common.rest.schemagen.link.CallScope;
-import com.mercateo.common.rest.schemagen.parameter.CallContext;
-import com.mercateo.common.rest.schemagen.parameter.Parameter;
-import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import static com.google.common.base.CaseFormat.LOWER_CAMEL;
+import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Optional;
 
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static com.google.common.base.CaseFormat.*;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.runners.MockitoJUnitRunner;
+
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.mercateo.common.rest.schemagen.annotation.Media;
+import com.mercateo.common.rest.schemagen.link.CallScope;
+import com.mercateo.common.rest.schemagen.parameter.CallContext;
+import com.mercateo.common.rest.schemagen.parameter.Parameter;
+import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
+import com.mercateo.reflection.Call;
 
 @SuppressWarnings({"boxing", "unused"})
 @RunWith(MockitoJUnitRunner.class)
@@ -58,6 +63,15 @@ public class RestJsonSchemaGeneratorTest {
                 getStrings, new Object[]{100, 50}, null) {
         }, fieldCheckerForSchema);
         assertThat(inputSchema.isPresent()).isFalse();
+    }
+
+    @Test
+    public void createInputSchemaWithHeaderParams() {
+        final Method withHeader = Call.methodOf(TestResource.class, r -> r.withHeader(null, null));
+        final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
+                withHeader, new Object[] { "", "" }, CallContext.create()) {
+        }, fieldCheckerForSchema);
+        assertThat(inputSchema.isPresent()).isTrue();
     }
 
     @Test
@@ -297,6 +311,13 @@ public class RestJsonSchemaGeneratorTest {
         @GET
         @Path("/media")
         public void media(@Media(type = "<type>", binaryEncoding = "<binaryEncoding>") String media) {
+            // Nothing to do.
+        }
+
+        @POST
+        @Path("/withheader")
+        public void withHeader(String body, @HeaderParam("key") String values) {
+            // Nothing to do.
         }
     }
 

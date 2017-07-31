@@ -12,13 +12,11 @@ import java.util.Optional;
 import java.util.Set;
 
 import javax.ws.rs.FormParam;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
-import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
-import com.mercateo.common.rest.schemagen.generator.ObjectContextBuilder;
-import com.mercateo.common.rest.schemagen.json.mapper.PropertyJsonSchemaMapper;
 import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +24,11 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mercateo.common.rest.schemagen.annotation.Media;
+import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
 import com.mercateo.common.rest.schemagen.generator.ObjectContext;
+import com.mercateo.common.rest.schemagen.generator.ObjectContextBuilder;
 import com.mercateo.common.rest.schemagen.generictype.GenericType;
+import com.mercateo.common.rest.schemagen.json.mapper.PropertyJsonSchemaMapper;
 import com.mercateo.common.rest.schemagen.link.Scope;
 import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 
@@ -96,6 +97,8 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
                 if (paramAn instanceof QueryParam) {
                     ignore = true;
                 } else if (paramAn instanceof PathParam) {
+                    ignore = true;
+                } else if (paramAn instanceof HeaderParam) {
                     ignore = true;
                 } else if (paramAn instanceof FormDataParam) {
                     ignore = true;
