@@ -148,14 +148,18 @@ public class LinkCreator {
     }
 
     private Optional<String> detectMediaType(Method method) {
-        return Optional.ofNullable(method.getAnnotation(Produces.class)).map(produces -> {
+        Produces annotation = method.getAnnotation(Produces.class);
+        if (annotation == null) {
+            annotation = method.getDeclaringClass().getAnnotation(Produces.class);
+        }
+
+        return Optional.ofNullable(annotation).map(produces -> {
             final String[] values = produces.value();
             if (values.length > 0) {
                 return values[0];
             }
             return null;
         });
-
     }
 
     private Map<String, Object> collectPathParameters(Scope scope, Object[] parameters) {

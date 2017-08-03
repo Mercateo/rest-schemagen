@@ -3,6 +3,7 @@ package com.mercateo.common.rest.schemagen.link;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.when;
 
 import java.lang.reflect.Method;
@@ -186,6 +187,75 @@ public class LinkCreatorTest {
                 .getUri().toString());
         assertEquals("GET", link.getParams().get("method"));
         assertEquals("application/json", link.getParams().get("mediaType"));
+    }
+
+    @Test
+    public void testTargetSchemaPresentOnMatchingMediaTypeAtMethodLevel()
+            throws NoSuchMethodException, SecurityException {
+        @Path("test")
+        class TestResource {
+            @GET
+            @Produces("application/json")
+            public String get() {
+                return "test";
+            }
+        }
+
+        Scope scope = new CallScope(TestResource.class, TestResource.class.getMethod("get"),
+                new String[] {}, null);
+
+        Link link = createFor(scope, Relation.of(Rel.SELF));
+
+        assertEquals("http://host/base/test", link.getUri().toString());
+        assertEquals("GET", link.getParams().get("method"));
+        assertEquals("application/json", link.getParams().get("mediaType"));
+        assertEquals(testSchema, link.getParams().get(LinkCreator.TARGET_SCHEMA_PARAM_KEY));
+    }
+
+    @Test
+    public void testTargetSchemaPresentOnMatchingMediaTypeAtTypeLevel()
+            throws NoSuchMethodException, SecurityException {
+        @Path("test")
+        @Produces("application/json")
+        class TestResource {
+            @GET
+            public String get() {
+                return "test";
+            }
+        }
+
+        Scope scope = new CallScope(TestResource.class, TestResource.class.getMethod("get"),
+                new String[] {}, null);
+
+        Link link = createFor(scope, Relation.of(Rel.SELF));
+
+        assertEquals("http://host/base/test", link.getUri().toString());
+        assertEquals("GET", link.getParams().get("method"));
+        assertEquals("application/json", link.getParams().get("mediaType"));
+        assertEquals(testSchema, link.getParams().get(LinkCreator.TARGET_SCHEMA_PARAM_KEY));
+    }
+
+    @Test
+    public void testTargetSchemaAbsentOnNonMatchingMediaType() throws NoSuchMethodException,
+            SecurityException {
+        @Path("test")
+        @Produces("application/octet-stream")
+        class TestResource {
+            @GET
+            public String get() {
+                return "test";
+            }
+        }
+
+        Scope scope = new CallScope(TestResource.class, TestResource.class.getMethod("get"),
+                new String[] {}, null);
+
+        Link link = createFor(scope, Relation.of(Rel.SELF));
+
+        assertEquals("http://host/base/test", link.getUri().toString());
+        assertEquals("GET", link.getParams().get("method"));
+        assertEquals("application/octet-stream", link.getParams().get("mediaType"));
+        assertNull(link.getParams().get(LinkCreator.TARGET_SCHEMA_PARAM_KEY));
     }
 
     private JsonSchemaGenerator createJsonSchemaGenerator() {
