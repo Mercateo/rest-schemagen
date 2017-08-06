@@ -5,7 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import org.junit.Test;
 
 public class RelationEnumTest{
-    enum TestRelation implements RelationEnum<TestRelation>{
+    enum TestRelation implements RelationEnum{
         TEST_RELATION
     }
     
