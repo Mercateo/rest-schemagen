@@ -20,16 +20,16 @@ Where "rs" is your jersey application ResourceConfig. Please choose Jackson as y
 
 In your resources you simply type:
 ```java
-@Path("resource")
+@Path("somethings")
 @Produces(MediaType.APPLICATION_JSON)
 public class ResourceClass {
     @Inject
     private LinkMetaFactory linkMetaFactory; // security and baseURIs already injected
  
-    @Path("/method/{id}")
+    @Path("{id}")
     @GET
     @RolesAllowed("test")
-    public ObjectWithSchema<Something> getSomething(@PathParam("id") String id) {
+    public ObjectWithSchema<Something> getSomething(@PathParam("id") int id) {
  
         Optional<Link> link = linkMetaFactory
             .createFactoryFor(ResourceClass.class)
@@ -40,41 +40,74 @@ public class ResourceClass {
     }
 }
 ```
-or if you have subresources:
-```java
-Optional<Link> link = linkMetaFactory
-    .createFactoryFor(ParentResourceClass.class)
-    .subResource(p -> p.getSubResourceInParentResource()), ResourceClass.class)
-    .subResource(p -> p.getSubResourceInResource()), SubResourceClass.class)
-    .forCall(Rel.SELF, r -> r.getSomething(id));
-```
-Note, that all calls have properly typed return values. So you get code completion, call hierarchy and all other features you are used to have in your IDE.
-
 Responses will look like this:
 ```json
 {
-  "displayName": "display_name",
-  "legalEnityId": "00000000",
-  "legalEntityDisplayName": "mercateo",
-  "catalogId": "CAT_ID",
-  "verNr": 1000,
-  "date": 1321892112432,
+  "id": 1,
+  "something": 1321892112432,
   "_schema":
     {
       "links":
         [{
-            "href": "http://localhost:8081/catalog.management.rest/cvc/1",
+            "href": "http://localhost:8081/somethings/1",
             "rel": "self",
             "targetSchema":
                 {
                     "type":"object",
                     "properties":{
-                        "verNr":{"type":"integer"},
-                        "legalEntityDisplayName":{"type":"string"},
-                        "catalogId":{"type":"string"},
-                        "date":{"type":"integer"},
-                        "displayName":{"type":"string"},
-                        "legalEnityId":{"type":"string"}
+                        "id":{"type":"integer"},
+                        "something":{"type":"integer"}
+                    }
+                },
+            "method": "GET"
+       }]
+    }
+}
+```
+
+or if you have subresources:
+```java
+
+@Path("parent")
+@Produces(MediaType.APPLICATION_JSON)
+public class ParentResourceClass {
+    @Inject
+    private LinkMetaFactory linkMetaFactory; // security and baseURIs already injected
+ 
+    @Path("/subpath")
+    public ResourceClass getSubResourceInParentResource() {
+        return new ResourceClass();
+    }
+}
+```
+
+Then, in ResourceClass, you need to generate the link like this:
+
+```java
+Optional<Link> link = linkMetaFactory
+    .createFactoryFor(ParentResourceClass.class)
+    .subResource(p -> p.getSubResourceInParentResource()), ResourceClass.class)
+    .forCall(Rel.SELF, r -> r.getSomething(id));
+```
+Note, that all calls have properly typed return values. So you get code completion, call hierarchy and all other features you are used to have in your IDE.
+
+Then responses will look like this:
+```json
+{
+  "id": 1,
+  "something": 1321892112432,
+  "_schema":
+    {
+      "links":
+        [{
+            "href": "http://localhost:8081/parent/subpath/1",
+            "rel": "self",
+            "targetSchema":
+                {
+                    "type":"object",
+                    "properties":{
+                        "id":{"type":"integer"},
+                        "something":{"type":"integer"}
                     }
                 },
             "method": "GET"
