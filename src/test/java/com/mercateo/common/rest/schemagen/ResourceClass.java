@@ -41,6 +41,14 @@ public class ResourceClass implements JerseyResource {
 		return ObjectWithSchema.create(new Something(), JsonHyperSchema.from(link));
 	}
 
+	@Path("/method/value")
+	@GET
+	@Produces(MediaType.APPLICATION_JSON)
+	public ObjectWithSchema<Void> getWithQuery(@QueryParam("test") String test) {
+
+		return ObjectWithSchema.create(null, null);
+	}
+
 	@Path("/methods/{id}")
 	@GET
 	@RolesAllowed("test")

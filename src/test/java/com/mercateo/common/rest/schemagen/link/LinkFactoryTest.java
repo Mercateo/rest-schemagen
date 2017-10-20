@@ -14,7 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.ws.rs.core.Link;
 import javax.ws.rs.core.SecurityContext;
@@ -24,7 +24,6 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -123,7 +122,7 @@ public class LinkFactoryTest {
     @Test
     public void testCorrectLinkGenerationPOSTWithParam() {
         linkMetaFactory = LinkMetaFactory.create(new RestJsonSchemaGenerator(), linkFactoryContext);
-        
+
         Link link = linkMetaFactory.createFactoryFor(ResourceClass.class).forCall(() -> Relation.of("self"), r -> r
                 .postSomethingWithId("12", 100)).get();
         assertEquals("basePath/resource/method/12?limit=100", link.getUri().toString());

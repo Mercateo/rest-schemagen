@@ -42,21 +42,14 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
 
     private final PropertyJsonSchemaMapper propertyJsonSchemaMapper;
 
-    private final boolean isDebugEnabled;
-
     public RestJsonSchemaGenerator() {
         schemaPropertyGenerator = new SchemaPropertyGenerator();
         propertyJsonSchemaMapper = new PropertyJsonSchemaMapper();
-        isDebugEnabled = logger.isDebugEnabled();
     }
 
     @Override
     public Optional<String> createOutputSchema(Scope scope,
             FieldCheckerForSchema fieldCheckerForSchema) {
-
-        if (isDebugEnabled) {
-            logger.debug("createOutputSchema {}", scope);
-        }
 
         final GenericType<?> genericType = GenericType.of(scope.getReturnType(), scope
                 .getInvokedMethod().getReturnType());
@@ -80,10 +73,6 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
     public Optional<String> createInputSchema(Scope scope,
             FieldCheckerForSchema fieldCheckerForSchema) {
         Map<String, ObjectNode> objectNodes = new HashMap<>();
-
-        if (isDebugEnabled) {
-            logger.debug("createInputSchema {}", scope);
-        }
 
         final Type[] types = scope.getParameterTypes();
 
