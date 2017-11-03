@@ -25,6 +25,9 @@ class StringJsonPropertyMapper implements JsonPropertyMapper {
 		if (jsonProperty.getFormat() != null) {
 			propertyNode.put("format", jsonProperty.getFormat());
 		}
+		if (jsonProperty.getPattern() != null) {
+			propertyNode.put("pattern", jsonProperty.getPattern());
+		}
         return propertyNode;
     }
 }

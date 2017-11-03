@@ -69,7 +69,7 @@ public class RestJsonSchemaGeneratorTest {
 						new CallScope(TestResource.class, dateTime, new Object[] { null }, CallContext.create()),
 						fieldCheckerForSchema);
 		assertThat(inputSchema.get()).isEqualTo(
-				"{\"type\":\"object\",\"properties\":{\"date\":{\"type\":\"integer\"},\"offsetDateTime\":{\"type\":\"string\",\"format\":\"date-time\"},\"offsetTime\":{\"type\":\"string\",\"format\":\"full-time\"},\"requiredDate\":{\"type\":\"integer\"},\"url\":{\"type\":\"string\"},\"uuid\":{\"type\":\"string\",\"format\":\"uuid\"}},\"required\":[\"offsetDateTime\",\"requiredDate\",\"url\",\"uuid\"]}");
+				"{\"type\":\"object\",\"properties\":{\"date\":{\"type\":\"integer\"},\"offsetDateTime\":{\"type\":\"string\",\"format\":\"date-time\"},\"offsetTime\":{\"type\":\"string\",\"format\":\"full-time\"},\"requiredDate\":{\"type\":\"integer\"},\"url\":{\"type\":\"string\"},\"uuid\":{\"type\":\"string\",\"format\":\"uuid\",\"pattern\":\"^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$\"}},\"required\":[\"offsetDateTime\",\"requiredDate\",\"url\",\"uuid\"]}");
 	}
 
     @Test
