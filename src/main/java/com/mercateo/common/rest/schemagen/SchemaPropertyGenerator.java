@@ -3,14 +3,15 @@ package com.mercateo.common.rest.schemagen;
 import java.lang.reflect.Field;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.net.URL;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,9 +28,12 @@ import com.mercateo.common.rest.schemagen.util.EnumUtil;
 
 public class SchemaPropertyGenerator {
 
-    private static final Map<Class<?>, JsonProperty> builtins = ImmutableMap.of( //
-            Date.class, JsonProperty.builderFor(Integer.class).withName("n/a").withIsRequired(true).build(),
-            URL.class, JsonProperty.builderFor(String.class).withName("n/a").build());
+	private static final Map<Class<?>, JsonProperty> builtins = ImmutableMap.of( //
+			OffsetDateTime.class, JsonProperty.builderFor(String.class).withName("n/a").withFormat("date-time").build(), //
+			// TODO: "full-time" is no standard JSON-schema format
+			OffsetTime.class, JsonProperty.builderFor(String.class).withName("n/a").withFormat("full-time").build(), //
+			// TODO: "uuid" is no standard JSON-schema format
+			UUID.class, JsonProperty.builderFor(String.class).withName("n/a").withFormat("uuid").build());
 
     private final ReferencedJsonPropertyFinder referencedJsonPropertyFinder;
 
@@ -64,7 +68,7 @@ public class SchemaPropertyGenerator {
      */
     public JsonPropertyResult generateSchemaProperty(ObjectContext<?> objectContext,
                                                      SchemaPropertyContext context) {
-        JsonProperty rootJsonProperty = determineProperty("#", objectContext, new PathContext(), context);
+		JsonProperty rootJsonProperty = determineProperty("#", objectContext, new PathContext(), context);
         rootJsonProperty = updateName(rootJsonProperty, objectContext.getRawType().getSimpleName());
         return ImmutableJsonPropertyResult.of(
                 rootJsonProperty,
@@ -149,15 +153,18 @@ public class SchemaPropertyGenerator {
         return field1.getName().compareTo(field2.getName());
     }
 
-    private JsonProperty determineProperty(String name, ObjectContext<?> objectContext,
-                                           PathContext pathContext, SchemaPropertyContext context) {
-        if (builtins.containsKey(objectContext.getRawType())) {
-            JsonProperty jsonPropertyTemplate = builtins.get(objectContext.getRawType());
-            return JsonProperty.builderFrom(jsonPropertyTemplate).withName(name).build();
-        } else {
-            return determineObjectProperty(name, objectContext, pathContext, context);
-        }
-    }
+	private JsonProperty determineProperty(String name, ObjectContext<?> objectContext, PathContext pathContext,
+			SchemaPropertyContext context) {
+		JsonProperty determineObjectProperty = determineObjectProperty(name, objectContext, pathContext, context);
+
+		if (builtins.containsKey(objectContext.getRawType())) {
+			JsonProperty jsonPropertyTemplate = builtins.get(objectContext.getRawType());
+			return JsonProperty.builderFrom(jsonPropertyTemplate).withName(name)
+					.withIsRequired(determineObjectProperty.isRequired()).build();
+		} else {
+			return determineObjectProperty;
+		}
+	}
 
     private JsonProperty determineObjectProperty(String name, ObjectContext<?> objectContext,
                                                  PathContext pathContext, SchemaPropertyContext context) {

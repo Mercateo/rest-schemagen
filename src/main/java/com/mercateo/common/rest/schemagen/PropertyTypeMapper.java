@@ -2,9 +2,10 @@ package com.mercateo.common.rest.schemagen;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URL;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import com.mercateo.common.rest.schemagen.generictype.GenericType;
 
@@ -20,13 +21,14 @@ public final class PropertyTypeMapper {
         TYPE_MAP.put(int.class, PropertyType.INTEGER);
         TYPE_MAP.put(Long.class, PropertyType.INTEGER);
         TYPE_MAP.put(long.class, PropertyType.INTEGER);
+		TYPE_MAP.put(Date.class, PropertyType.INTEGER);
         TYPE_MAP.put(Float.class, PropertyType.NUMBER);
         TYPE_MAP.put(float.class, PropertyType.NUMBER);
         TYPE_MAP.put(Double.class, PropertyType.NUMBER);
         TYPE_MAP.put(double.class, PropertyType.NUMBER);
         TYPE_MAP.put(BigInteger.class, PropertyType.INTEGER);
         TYPE_MAP.put(BigDecimal.class, PropertyType.NUMBER);
-        TYPE_MAP.put(UUID.class, PropertyType.STRING);
+		TYPE_MAP.put(URL.class, PropertyType.STRING);
     }
 
     public static PropertyType of(GenericType<?> type) {

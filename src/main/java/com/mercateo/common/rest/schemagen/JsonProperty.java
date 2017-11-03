@@ -42,6 +42,9 @@ public abstract class JsonProperty {
     @Nullable
     public abstract String getName();
 
+	@Nullable
+	public abstract String getFormat();
+
     public abstract PropertyType getType();
 
     @Nullable
