@@ -18,8 +18,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 import org.glassfish.jersey.media.multipart.FormDataParam;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -35,8 +33,6 @@ import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
     private static final Set<Class<?>> INVALID_OUTPUT_TYPES = new HashSet<>(Arrays.asList(void.class,
             Void.class));
-
-    private static final Logger logger = LoggerFactory.getLogger(RestJsonSchemaGenerator.class);
 
     private final SchemaPropertyGenerator schemaPropertyGenerator;
 

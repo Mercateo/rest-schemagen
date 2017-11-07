@@ -6,9 +6,15 @@ import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.reflect.Method;
+import java.net.URL;
+import java.time.OffsetDateTime;
+import java.time.OffsetTime;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.BeanParam;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
@@ -24,7 +30,7 @@ import javax.ws.rs.core.Context;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.mercateo.common.rest.schemagen.annotation.Media;
@@ -51,17 +57,26 @@ public class RestJsonSchemaGeneratorTest {
     public void createInputSchema() throws NoSuchMethodException {
         final Method getStrings = getTestResourceMethod("getStrings", int.class, int.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
-                getStrings, new Object[0], null) {
-        }, fieldCheckerForSchema);
+				getStrings, new Object[0], null), fieldCheckerForSchema);
         assertThat(inputSchema.isPresent()).isFalse();
     }
+
+	@Test
+	public void createInputSchemaForBuiltins() throws NoSuchMethodException {
+		final Method dateTime = getTestResourceMethod("dateTime", DateTimeParam.class);
+		final Optional<String> inputSchema = schemaGenerator
+				.createInputSchema(
+						new CallScope(TestResource.class, dateTime, new Object[] { null }, CallContext.create()),
+						fieldCheckerForSchema);
+		assertThat(inputSchema.get()).isEqualTo(
+				"{\"type\":\"object\",\"properties\":{\"date\":{\"type\":\"integer\"},\"offsetDateTime\":{\"type\":\"string\",\"format\":\"date-time\"},\"offsetTime\":{\"type\":\"string\",\"format\":\"full-time\"},\"requiredDate\":{\"type\":\"integer\"},\"url\":{\"type\":\"string\"},\"uuid\":{\"type\":\"string\",\"format\":\"uuid\",\"pattern\":\"^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$\"}},\"required\":[\"offsetDateTime\",\"requiredDate\",\"url\",\"uuid\"]}");
+	}
 
     @Test
     public void createInputSchemaWithQueryParams() {
         final Method getStrings = getTestResourceMethod("getStrings", int.class, int.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
-                getStrings, new Object[]{100, 50}, null) {
-        }, fieldCheckerForSchema);
+				getStrings, new Object[] { 100, 50 }, null), fieldCheckerForSchema);
         assertThat(inputSchema.isPresent()).isFalse();
     }
 
@@ -69,8 +84,7 @@ public class RestJsonSchemaGeneratorTest {
     public void createInputSchemaWithHeaderParams() {
         final Method withHeader = Call.methodOf(TestResource.class, r -> r.withHeader(null, null));
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
-                withHeader, new Object[] { "", "" }, CallContext.create()) {
-        }, fieldCheckerForSchema);
+				withHeader, new Object[] { "", "" }, CallContext.create()), fieldCheckerForSchema);
         assertThat(inputSchema.isPresent()).isTrue();
     }
 
@@ -78,8 +92,7 @@ public class RestJsonSchemaGeneratorTest {
     public void createInputSchemaWithSimpleParam() throws NoSuchMethodException {
         final Method getStrings = getTestResourceMethod("setValue", String.class, boolean.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
-                getStrings, new Object[0], CallContext.create()) {
-        }, fieldCheckerForSchema);
+				getStrings, new Object[0], CallContext.create()), fieldCheckerForSchema);
         assertThat(inputSchema.isPresent()).isTrue();
         assertThat(inputSchema.get()).isEqualTo("{\"type\":\"string\"}");
     }
@@ -91,8 +104,7 @@ public class RestJsonSchemaGeneratorTest {
         final Parameter<String> parameter = callContext.builderFor(String.class)
                 .defaultValue("defaultValue").build();
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
-                getStrings, new Object[]{parameter.get()}, callContext) {
-        }, fieldCheckerForSchema);
+				getStrings, new Object[] { parameter.get() }, callContext), fieldCheckerForSchema);
         assertThat(inputSchema.isPresent()).isTrue();
         assertThat(inputSchema.get()).isEqualTo("{\"type\":\"string\",\"default\":\"defaultValue\"}");
     }
@@ -104,8 +116,7 @@ public class RestJsonSchemaGeneratorTest {
         final Parameter<String> parameter = callContext.builderFor(String.class)
                 .allowValues("foo", "bar", "baz").build();
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
-                getStrings, new Object[]{parameter.get()}, callContext) {
-        }, fieldCheckerForSchema);
+				getStrings, new Object[] { parameter.get() }, callContext), fieldCheckerForSchema);
         assertThat(inputSchema.isPresent()).isTrue();
         assertThat(inputSchema.get()).isEqualTo("{\"type\":\"string\",\"enum\":[\"bar\",\"foo\",\"baz\"]}");
     }
@@ -114,8 +125,7 @@ public class RestJsonSchemaGeneratorTest {
     public void createOutputSchemaWithVoidMethod() throws NoSuchMethodException {
         final Method getStrings = getTestResourceMethod("setValue", String.class, boolean.class);
         final Optional<String> outputSchema = schemaGenerator.createOutputSchema(new CallScope(TestResource.class,
-                getStrings, new Object[0], null) {
-        }, fieldCheckerForSchema);
+				getStrings, new Object[0], null), fieldCheckerForSchema);
         assertThat(outputSchema.isPresent()).isFalse();
     }
 
@@ -123,8 +133,7 @@ public class RestJsonSchemaGeneratorTest {
     public void createInputSchemaWithMultipleSimpleFormParams() throws NoSuchMethodException {
         final Method getStrings = getTestResourceMethod("setName", String.class, String.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
-                getStrings, new Object[0], CallContext.create()) {
-        }, fieldCheckerForSchema);
+				getStrings, new Object[0], CallContext.create()), fieldCheckerForSchema);
         assertThat(inputSchema.isPresent()).isTrue();
         assertThat(inputSchema.get()).isEqualTo(
                 "{\"firstName\":{\"type\":\"string\"},\"lastName\":{\"type\":\"string\"}}");
@@ -134,8 +143,7 @@ public class RestJsonSchemaGeneratorTest {
     public void createInputSchemaWithBeanParam() throws NoSuchMethodException {
         final Method getStrings = getTestResourceMethod("paramBean", TestBeanParam.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
-                getStrings, new Object[0], CallContext.create()) {
-        }, fieldCheckerForSchema);
+				getStrings, new Object[0], CallContext.create()), fieldCheckerForSchema);
 
         assertThat(inputSchema.isPresent()).isTrue();
         assertThat(inputSchema.get()).doesNotContain("pathParam");
@@ -145,8 +153,7 @@ public class RestJsonSchemaGeneratorTest {
     public void createInputSchemaWithContextParam() throws NoSuchMethodException {
         final Method getStrings = getTestResourceMethod("context", String.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
-                getStrings, new Object[0], null) {
-        }, fieldCheckerForSchema);
+				getStrings, new Object[0], null), fieldCheckerForSchema);
 
         assertThat(inputSchema.isPresent()).isFalse();
     }
@@ -157,8 +164,7 @@ public class RestJsonSchemaGeneratorTest {
         final Parameter<TestEnum> parameter = Parameter.createContext().builderFor(TestEnum.class)
                 .allowValues(TestEnum.FOO_VALUE).build();
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
-                enumValue, new Object[]{parameter.get()}, parameter.context()) {
-        }, fieldCheckerForSchema);
+				enumValue, new Object[] { parameter.get() }, parameter.context()), fieldCheckerForSchema);
 
         assertThat(inputSchema.isPresent()).isTrue();
         assertThat(inputSchema.get()).containsIgnoringCase(
@@ -172,8 +178,8 @@ public class RestJsonSchemaGeneratorTest {
                 .defaultValue(TestEnum.FOO_VALUE).build();
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
                 enumValue, new Object[]{parameter.get()}, parameter
-                .context()) {
-        }, fieldCheckerForSchema);
+						.context()),
+				fieldCheckerForSchema);
 
         assertThat(inputSchema.isPresent()).isTrue();
         assertThat(inputSchema.get()).containsIgnoringCase(
@@ -188,8 +194,7 @@ public class RestJsonSchemaGeneratorTest {
     public void createInputSchemaWithEnumParam() throws NoSuchMethodException {
         final Method enumValue = getTestResourceMethod("enumValue", TestEnum.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
-                enumValue, new Object[]{null}, CallContext.create()) {
-        }, fieldCheckerForSchema);
+				enumValue, new Object[] { null }, CallContext.create()), fieldCheckerForSchema);
 
         assertThat(inputSchema.isPresent()).isTrue();
         assertThat(inputSchema.get()).containsIgnoringCase(
@@ -202,8 +207,7 @@ public class RestJsonSchemaGeneratorTest {
     public void createInputSchemaWithEnumParamWithJsonValue() throws NoSuchMethodException {
         final Method enumValue = getTestResourceMethod("enumValueJsonValue", TestEnumJsonValue.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
-                enumValue, new Object[]{null}, CallContext.create()) {
-        }, fieldCheckerForSchema);
+				enumValue, new Object[] { null }, CallContext.create()), fieldCheckerForSchema);
 
         assertThat(inputSchema).isPresent();
         assertThat(inputSchema.get()).containsIgnoringCase(
@@ -214,8 +218,7 @@ public class RestJsonSchemaGeneratorTest {
     public void createInputSchemaWithMediaParam() {
         final Method enumValue = getTestResourceMethod("media", String.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
-                enumValue, new Object[]{null}, CallContext.create()) {
-        }, fieldCheckerForSchema);
+				enumValue, new Object[] { null }, CallContext.create()), fieldCheckerForSchema);
 
         assertThat(inputSchema.isPresent()).isTrue();
         assertThat(inputSchema.get()).containsIgnoringCase(
@@ -260,6 +263,24 @@ public class RestJsonSchemaGeneratorTest {
         }
 
     }
+
+	public static class DateTimeParam {
+		@NotNull
+		private OffsetDateTime offsetDateTime;
+		private OffsetTime offsetTime;
+
+		@NotNull
+		private URL url;
+
+		private Date date;
+
+		@NotNull
+		private Date requiredDate;
+
+		@NotNull
+		private UUID uuid;
+
+	}
 
     @Path("/home")
     public class TestResource {
@@ -319,6 +340,12 @@ public class RestJsonSchemaGeneratorTest {
         public void withHeader(String body, @HeaderParam("key") String values) {
             // Nothing to do.
         }
+
+		@POST
+		@Path("datetime")
+		public void dateTime(DateTimeParam dateTimeParam) {
+			// Nothing to do.
+		}
     }
 
     public static String toCamelCaseFirstLowerCase(Enum<? extends Enum<?>> enumInstance) {
