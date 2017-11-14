@@ -176,5 +176,5 @@ public enum OwnRel implements RelationContainer {
 * [example with roles](https://github.com/TNG/rest-demo-jersey)
 * [example with feature toggles](https://github.com/Mercateo/rest-demo-feature)
 
-#Troubleshooting import in IDEs
+# Troubleshooting import in IDEs
 If you have compile errors using an IDE, it is most likely because of immutables. Please refer to the immutables [help page](https://immutables.github.io/apt.html). Keep in mind to choose the right package version of the value-jar.  
