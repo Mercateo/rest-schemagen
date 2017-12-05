@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.PathParam;
@@ -18,6 +19,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.reflections.ReflectionUtils;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -33,6 +35,9 @@ import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
     private static final Set<Class<?>> INVALID_OUTPUT_TYPES = new HashSet<>(Arrays.asList(void.class,
             Void.class));
+
+    public static final HashSet<Class<? extends Annotation>> PAYLOAD_ANNOTATIONS = new HashSet<>(Arrays.asList(
+            QueryParam.class, FormParam.class, FormDataParam.class));
 
     private final SchemaPropertyGenerator schemaPropertyGenerator;
 
@@ -73,16 +78,20 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
         final Type[] types = scope.getParameterTypes();
 
         for (int i = 0; i < types.length; i++) {
-            Annotation[] paramAns = scope.getInvokedMethod().getParameterAnnotations()[i];
-            Optional<Media> media = Optional.empty();
+            final Type parameterType = types[i];
+            Annotation[] parameterAnnotations = scope.getInvokedMethod().getParameterAnnotations()[i];
 
+            Optional<Media> media = Optional.empty();
             boolean ignore = false;
+
             Optional<String> name = Optional.empty();
-            for (Annotation paramAn : paramAns) {
+            for (Annotation paramAn : parameterAnnotations) {
                 if (paramAn instanceof QueryParam) {
                     ignore = true;
                 } else if (paramAn instanceof PathParam) {
                     ignore = true;
+                } else if (paramAn instanceof BeanParam) {
+                    ignore = doesNotContainPayload(parameterType);
                 } else if (paramAn instanceof HeaderParam) {
                     ignore = true;
                 } else if (paramAn instanceof FormDataParam) {
@@ -100,7 +109,7 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
             if (!ignore) {
                 @SuppressWarnings("rawtypes")
                 final ObjectContextBuilder objectContextBuilder = ObjectContext.buildFor(
-                        GenericType.of(types[i]));
+                        GenericType.of(parameterType));
 
                 if (scope.hasAllowedValues(i)) {
                     final List<Object> allowedValues = scope.getAllowedValues(i);
@@ -148,6 +157,14 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
             }
             return Optional.of(objectNode.toString());
         }
+    }
+
+    private boolean doesNotContainPayload(Type type) {
+        //noinspection unchecked
+        return ReflectionUtils
+            .getAllFields((Class<?>) type, field -> PAYLOAD_ANNOTATIONS.stream().anyMatch(
+                    annotationClass -> field.isAnnotationPresent(annotationClass)))
+            .isEmpty();
     }
 
     private Optional<ObjectNode> generateJsonSchema(ObjectContext<?> objectContext,
