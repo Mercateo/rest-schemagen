@@ -154,10 +154,11 @@ public class RestJsonSchemaGeneratorTest {
     public void createInputSchemaWithBeanParamAndPayload() throws NoSuchMethodException {
         final Method getStrings = getTestResourceMethod("paramBeanWithPayload", TestBeanParam.class, String.class);
 
-        assertThatThrownBy(() -> schemaGenerator.createInputSchema(new CallScope(TestResource.class, getStrings,
-                new Object[0], CallContext.create()), fieldCheckerForSchema))
-                    .isInstanceOf(IllegalStateException.class)
-                    .hasMessage("multiple properties named <> found");
+        final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class, getStrings,
+                new Object[0], CallContext.create()), fieldCheckerForSchema);
+
+        assertThat(inputSchema).isPresent();
+        assertThat(inputSchema.get()).isEqualTo("{\"type\":\"string\"}");
     }
 
     @Test
@@ -171,10 +172,29 @@ public class RestJsonSchemaGeneratorTest {
     }
 
     @Test
-    public void createInputSchemaWithPathBeanParam() throws NoSuchMethodException {
+    public void createInputSchemaWithNullPathBeanParam() throws NoSuchMethodException {
         final Method getStrings = getTestResourceMethod("paramBean", TestPathBeanParam.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
                 getStrings, new Object[0], CallContext.create()), fieldCheckerForSchema);
+
+        assertThat(inputSchema).isNotPresent();
+    }
+
+    @Test
+    public void createInputSchemaWithPathBeanParamWithNullValue() throws NoSuchMethodException {
+        final Method getStrings = getTestResourceMethod("paramBean", TestPathBeanParam.class);
+        final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
+                getStrings, new Object[]{new TestPathBeanParam(null)}, CallContext.create()), fieldCheckerForSchema);
+
+        assertThat(inputSchema).isPresent();
+        assertThat(inputSchema).contains("{\"type\":\"object\",\"properties\":{\"pathParam\":{\"type\":\"string\"}}}");
+    }
+
+    @Test
+    public void createInputSchemaWithPathBeanParamWithValue() throws NoSuchMethodException {
+        final Method getStrings = getTestResourceMethod("paramBean", TestPathBeanParam.class);
+        final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
+                getStrings, new Object[]{new TestPathBeanParam("foo")}, CallContext.create()), fieldCheckerForSchema);
 
         assertThat(inputSchema).isNotPresent();
     }
@@ -296,7 +316,11 @@ public class RestJsonSchemaGeneratorTest {
 
     public static class TestPathBeanParam {
         @PathParam("pathParam")
-        private String pathParam;
+        public String pathParam;
+
+        public TestPathBeanParam(String pathParam) {
+            this.pathParam = pathParam;
+        }
     }
 
 	public static class DateTimeParam {

@@ -77,32 +77,35 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
 
         final Type[] types = scope.getParameterTypes();
 
+        Optional<ObjectNode> beanParam = Optional.empty();
+
         for (int i = 0; i < types.length; i++) {
             final Type parameterType = types[i];
             Annotation[] parameterAnnotations = scope.getInvokedMethod().getParameterAnnotations()[i];
 
             Optional<Media> media = Optional.empty();
             boolean ignore = false;
+            boolean isBeanParam = false;
 
             Optional<String> name = Optional.empty();
-            for (Annotation paramAn : parameterAnnotations) {
-                if (paramAn instanceof QueryParam) {
+            for (Annotation parameterAnnotation : parameterAnnotations) {
+                if (parameterAnnotation instanceof QueryParam) {
                     ignore = true;
-                } else if (paramAn instanceof PathParam) {
+                } else if (parameterAnnotation instanceof PathParam) {
                     ignore = true;
-                } else if (paramAn instanceof BeanParam) {
-                    ignore = doesNotContainPayload(parameterType);
-                } else if (paramAn instanceof HeaderParam) {
+                } else if (parameterAnnotation instanceof BeanParam) {
+                    isBeanParam = true;
+                } else if (parameterAnnotation instanceof HeaderParam) {
                     ignore = true;
-                } else if (paramAn instanceof FormDataParam) {
+                } else if (parameterAnnotation instanceof FormDataParam) {
                     ignore = true;
-                } else if (paramAn instanceof Context) {
+                } else if (parameterAnnotation instanceof Context) {
                     ignore = true;
-                } else if (paramAn instanceof FormParam) {
-                    FormParam formParam = (FormParam) paramAn;
+                } else if (parameterAnnotation instanceof FormParam) {
+                    FormParam formParam = (FormParam) parameterAnnotation;
                     name = Optional.of(formParam.value());
-                } else if (paramAn instanceof Media) {
-                    media = Optional.of((Media) paramAn);
+                } else if (parameterAnnotation instanceof Media) {
+                    media = Optional.of((Media) parameterAnnotation);
                 }
             }
 
@@ -126,9 +129,11 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
                 final Optional<ObjectNode> objectNodeOption = generateJsonSchema(
                         objectContextBuilder.build(), createSchemaPropertyContext(scope,
                                 fieldCheckerForSchema));
+
                 if (!objectNodeOption.isPresent()) {
                     continue;
                 }
+
                 ObjectNode objectNode = objectNodeOption.get();
 
                 if (media.isPresent()) {
@@ -137,13 +142,23 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
                 }
 
                 final String propertyName = name.orElse("");
-                if (objectNodes.containsKey(propertyName)) {
+                if (!isBeanParam && objectNodes.containsKey(propertyName)) {
                     throw new IllegalStateException("multiple properties named <" + propertyName
                             + "> found");
                 }
-                objectNodes.put(propertyName, objectNode);
+                if (isBeanParam) {
+                    beanParam = Optional.of(objectNode);
+                } else {
+                    objectNodes.put(propertyName, objectNode);
+                }
             }
         }
+
+        beanParam.ifPresent(bp -> {
+            if (!objectNodes.containsKey("")) {
+                objectNodes.put("", bp);
+            }
+        });
 
         if (objectNodes.isEmpty()) {
             return Optional.empty();
@@ -157,14 +172,6 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
             }
             return Optional.of(objectNode.toString());
         }
-    }
-
-    private boolean doesNotContainPayload(Type type) {
-        //noinspection unchecked
-        return ReflectionUtils
-            .getAllFields((Class<?>) type, field -> PAYLOAD_ANNOTATIONS.stream().anyMatch(
-                    annotationClass -> field.isAnnotationPresent(annotationClass)))
-            .isEmpty();
     }
 
     private Optional<ObjectNode> generateJsonSchema(ObjectContext<?> objectContext,
