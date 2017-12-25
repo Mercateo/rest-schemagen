@@ -215,7 +215,6 @@ public abstract class ObjectContext<T> {
         T currentValue = getCurrentValue();
 
         return currentValue != null && getFieldValue(field, currentValue) == null;
-
     }
 
     private boolean isApplicableFor(Field field, SchemaPropertyContext context) {
@@ -234,8 +233,10 @@ public abstract class ObjectContext<T> {
     private <U> U getFieldValue(Field field, T object) {
         try {
             field.setAccessible(true);
+            final String name = field.getName();
             //noinspection unchecked
-            return (U) field.get(object);
+            final Object o = field.get(object);
+            return (U) o;
         } catch (IllegalAccessException e) {
             throw new IllegalStateException(e);
         }

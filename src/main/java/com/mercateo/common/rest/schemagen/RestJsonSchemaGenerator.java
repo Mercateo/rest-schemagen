@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import javax.ws.rs.BeanParam;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.PathParam;
@@ -18,6 +19,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 import org.glassfish.jersey.media.multipart.FormDataParam;
+import org.reflections.ReflectionUtils;
 
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -33,6 +35,9 @@ import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
     private static final Set<Class<?>> INVALID_OUTPUT_TYPES = new HashSet<>(Arrays.asList(void.class,
             Void.class));
+
+    public static final HashSet<Class<? extends Annotation>> PAYLOAD_ANNOTATIONS = new HashSet<>(Arrays.asList(
+            QueryParam.class, FormParam.class, FormDataParam.class));
 
     private final SchemaPropertyGenerator schemaPropertyGenerator;
 
@@ -72,35 +77,42 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
 
         final Type[] types = scope.getParameterTypes();
 
-        for (int i = 0; i < types.length; i++) {
-            Annotation[] paramAns = scope.getInvokedMethod().getParameterAnnotations()[i];
-            Optional<Media> media = Optional.empty();
+        Optional<ObjectNode> beanParam = Optional.empty();
 
+        for (int i = 0; i < types.length; i++) {
+            final Type parameterType = types[i];
+            Annotation[] parameterAnnotations = scope.getInvokedMethod().getParameterAnnotations()[i];
+
+            Optional<Media> media = Optional.empty();
             boolean ignore = false;
+            boolean isBeanParam = false;
+
             Optional<String> name = Optional.empty();
-            for (Annotation paramAn : paramAns) {
-                if (paramAn instanceof QueryParam) {
+            for (Annotation parameterAnnotation : parameterAnnotations) {
+                if (parameterAnnotation instanceof QueryParam) {
                     ignore = true;
-                } else if (paramAn instanceof PathParam) {
+                } else if (parameterAnnotation instanceof PathParam) {
                     ignore = true;
-                } else if (paramAn instanceof HeaderParam) {
+                } else if (parameterAnnotation instanceof BeanParam) {
+                    isBeanParam = true;
+                } else if (parameterAnnotation instanceof HeaderParam) {
                     ignore = true;
-                } else if (paramAn instanceof FormDataParam) {
+                } else if (parameterAnnotation instanceof FormDataParam) {
                     ignore = true;
-                } else if (paramAn instanceof Context) {
+                } else if (parameterAnnotation instanceof Context) {
                     ignore = true;
-                } else if (paramAn instanceof FormParam) {
-                    FormParam formParam = (FormParam) paramAn;
+                } else if (parameterAnnotation instanceof FormParam) {
+                    FormParam formParam = (FormParam) parameterAnnotation;
                     name = Optional.of(formParam.value());
-                } else if (paramAn instanceof Media) {
-                    media = Optional.of((Media) paramAn);
+                } else if (parameterAnnotation instanceof Media) {
+                    media = Optional.of((Media) parameterAnnotation);
                 }
             }
 
             if (!ignore) {
                 @SuppressWarnings("rawtypes")
                 final ObjectContextBuilder objectContextBuilder = ObjectContext.buildFor(
-                        GenericType.of(types[i]));
+                        GenericType.of(parameterType));
 
                 if (scope.hasAllowedValues(i)) {
                     final List<Object> allowedValues = scope.getAllowedValues(i);
@@ -117,9 +129,11 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
                 final Optional<ObjectNode> objectNodeOption = generateJsonSchema(
                         objectContextBuilder.build(), createSchemaPropertyContext(scope,
                                 fieldCheckerForSchema));
+
                 if (!objectNodeOption.isPresent()) {
                     continue;
                 }
+
                 ObjectNode objectNode = objectNodeOption.get();
 
                 if (media.isPresent()) {
@@ -128,13 +142,23 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
                 }
 
                 final String propertyName = name.orElse("");
-                if (objectNodes.containsKey(propertyName)) {
+                if (!isBeanParam && objectNodes.containsKey(propertyName)) {
                     throw new IllegalStateException("multiple properties named <" + propertyName
                             + "> found");
                 }
-                objectNodes.put(propertyName, objectNode);
+                if (isBeanParam) {
+                    beanParam = Optional.of(objectNode);
+                } else {
+                    objectNodes.put(propertyName, objectNode);
+                }
             }
         }
+
+        beanParam.ifPresent(bp -> {
+            if (!objectNodes.containsKey("")) {
+                objectNodes.put("", bp);
+            }
+        });
 
         if (objectNodes.isEmpty()) {
             return Optional.empty();
