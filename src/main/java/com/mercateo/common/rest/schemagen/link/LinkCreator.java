@@ -182,7 +182,12 @@ public class LinkCreator {
                 .getInvokedMethod(), scope.getInvokedClass());
         visitAnnotations((parameter, parameterIndex, annotation) -> {
             if (annotation instanceof QueryParam && parameter != null) {
-                uriBuilder.queryParam(((QueryParam) annotation).value(), parameter.toString());
+                final String parameterName = ((QueryParam) annotation).value();
+                if (parameter instanceof Iterable) {
+                    uriBuilder.queryParam(parameterName, Iterables.toArray((Iterable) parameter, Object.class));
+                } else {
+                    uriBuilder.queryParam(parameterName, parameter.toString());
+                }
             } else if (annotation instanceof BeanParam && parameter != null) {
                 if (realParamTypes[parameterIndex] instanceof Class<?>) {
                     BeanParamExtractor beanParamExtractor = new BeanParamExtractor();

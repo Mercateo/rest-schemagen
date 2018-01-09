@@ -20,6 +20,7 @@ import javax.ws.rs.core.Link;
 import javax.ws.rs.core.SecurityContext;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -194,6 +195,22 @@ public class LinkFactoryTest {
                 "basePath/parentResource/subresource/sub/submethod/14");
         assertThat(link.getParams()).hasSize(2);
         assertThat(link.getParams()).containsEntry("rel", "self").containsEntry("method", "GET");
+    }
+
+    @Test
+    public void shouldHandleListOfQueryParameter() {
+        linkMetaFactory = LinkMetaFactory.create(new RestJsonSchemaGenerator(), linkFactoryContext);
+
+        final LinkFactory<ResourceClass> linkFactory = linkMetaFactory.createFactoryFor(ResourceClass.class);
+        final Optional<Link> linkOption = linkFactory.forCall(Relation.of("multi-param"), r -> r
+                .multipleQueryParameters(Arrays.asList("foo", "bar", "baz")));
+
+        assertThat(linkOption).isPresent();
+
+        final Link link = linkOption.get();
+
+        assertThat(link.getUri().getPath()).isEqualTo("basePath/resource");
+        assertThat(link.getUri().getQuery()).isEqualTo("test=foo&test=bar&test=baz");
     }
 
     private void allowRole(String roleName) {
