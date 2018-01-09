@@ -1,5 +1,6 @@
 package com.mercateo.common.rest.schemagen;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.annotation.security.RolesAllowed;
@@ -85,6 +86,10 @@ public class ResourceClass implements JerseyResource {
 
 	public void noHttpMethod() {
 	}
+
+    @GET
+    public void multipleQueryParameters(@QueryParam("test") List<String> parameters) {
+    }
 
 	@Path("parentResource")
 	public static class ParentResourceClass implements JerseyResource {
