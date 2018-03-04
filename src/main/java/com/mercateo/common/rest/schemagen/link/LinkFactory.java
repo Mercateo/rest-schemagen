@@ -8,9 +8,8 @@ import com.mercateo.common.rest.schemagen.link.relation.RelationContainer;
 import com.mercateo.common.rest.schemagen.parameter.CallContext;
 import com.mercateo.common.rest.schemagen.parameter.Parameter;
 import com.mercateo.reflection.Call;
-import com.mercateo.reflection.CallInterceptor;
 import com.mercateo.reflection.InvocationRecorder;
-import com.mercateo.reflection.proxy.ProxyFactory;
+import com.mercateo.reflection.proxy.ProxyCache;
 
 import javax.ws.rs.core.Link;
 import java.util.ArrayList;
@@ -18,6 +17,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class LinkFactory<T extends JerseyResource> {
+
+    private static final ProxyCache PROXY_CACHE = new ProxyCache();
 
     private final List<Scope> scopes;
 
@@ -30,7 +31,7 @@ public class LinkFactory<T extends JerseyResource> {
     private final T resourceProxy;
 
     LinkFactory(Class<T> resourceClass, JsonSchemaGenerator jsonSchemaGenerator, LinkFactoryContext context, List<Scope> scopes) {
-        resourceProxy = ProxyFactory.createProxy(resourceClass);
+        resourceProxy = PROXY_CACHE.createProxy(resourceClass);
         this.jsonSchemaGenerator = jsonSchemaGenerator;
         this.context = context;
         this.scopes = scopes != null ? scopes : new ArrayList<>();
