@@ -38,6 +38,7 @@ import javax.validation.Constraint;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import javax.ws.rs.PathParam;
 import java.lang.annotation.Annotation;
@@ -112,6 +113,9 @@ public abstract class ObjectContext<T> {
         return ValueConstraints.empty();
     }
 
+    @Nullable
+    public abstract String getPattern();
+
     public abstract PropertyType getPropertyType();
 
     @Value.Default
@@ -165,6 +169,9 @@ public abstract class ObjectContext<T> {
 
         determineConstraints(Size.class, field, SizeConstraints::new)
                 .ifPresent(builder::withSizeConstraints);
+
+        determineConstraints(Pattern.class, field, Pattern::regexp)
+                .ifPresent(builder::withPattern);
 
         builder.withValueConstraints(new ValueConstraints(
                 determineConstraints(Max.class, field, Max::value),

@@ -24,6 +24,10 @@
       "minLength": 5,
       "type": "string"
     },
+    "patternString": {
+      "type": "string",
+      "pattern": "^(the )?pattern$"
+    },
     "hasOwnGenerator": {"type": "test"},
     "integer": {"type": "integer"},
     "nestedRecursiveElement": {

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 
 import com.mercateo.common.rest.schemagen.plugin.PropertySchema;
@@ -31,6 +32,9 @@ public class TestRto {
 
     @Size(min = 5, max = 8)
     public String constrainedString;
+
+    @Pattern(regexp = "^(the )?pattern$")
+    public String patternString;
 
     public int integer;
 
