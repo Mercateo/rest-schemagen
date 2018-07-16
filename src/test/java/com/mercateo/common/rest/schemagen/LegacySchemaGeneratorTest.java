@@ -113,6 +113,14 @@ public class LegacySchemaGeneratorTest {
     }
 
     @Test
+    public void shouldMapPattern() {
+        createSchemaFor(TestRto.class);
+        JsonProperty bigDecimal = getByName("patternString");
+        assertThat(bigDecimal.getType()).isEqualTo(PropertyType.STRING);
+        assertThat(bigDecimal.getPattern()).isEqualTo("^(the )?pattern$");
+    }
+
+    @Test
     public void shouldMapBooleans() {
         createSchemaFor(TestRto.class);
         assertThat(getByName("bool").getType()).isEqualTo(PropertyType.BOOLEAN);
@@ -178,12 +186,15 @@ public class LegacySchemaGeneratorTest {
         createSchemaFor(GenericType.of(getClass().getDeclaredMethod("unused")
                 .getGenericReturnType()));
         assertThat(rootJsonProperty.getType()).isEqualTo(PropertyType.OBJECT);
-        assertThat(rootJsonProperty.getProperties()).hasSize(12);
+        assertThat(rootJsonProperty.getProperties()).hasSize(13);
         assertThat(rootJsonProperty.getPropertyByName("string").getType()).isEqualTo(PropertyType.STRING);
         assertThat(rootJsonProperty.getPropertyByName("requiredString").getType()).isEqualTo(
                 PropertyType.STRING);
         assertThat(rootJsonProperty.getPropertyByName("constrainedString").getType()).isEqualTo(
                 PropertyType.STRING);
+        assertThat(rootJsonProperty.getPropertyByName("patternString").getType()).isEqualTo(
+                PropertyType.STRING);
+        assertThat(rootJsonProperty.getPropertyByName("patternString").getPattern()).isEqualTo("^(the )?pattern$");
         assertThat(rootJsonProperty.getPropertyByName("integer").getType()).isEqualTo(PropertyType.INTEGER);
         assertThat(rootJsonProperty.getPropertyByName("bigDecimal").getType()).isEqualTo(PropertyType.NUMBER);
         assertThat(rootJsonProperty.getPropertyByName("bool").getType()).isEqualTo(PropertyType.BOOLEAN);

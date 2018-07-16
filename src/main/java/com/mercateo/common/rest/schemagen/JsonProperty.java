@@ -115,6 +115,7 @@ public abstract class JsonProperty {
             withIsRequired(objectContext.isRequired());
             withSizeConstraints(objectContext.getSizeConstraints());
             withValueConstraints(objectContext.getValueConstraints());
+            withPattern(objectContext.getPattern());
             withIndividualSchemaGenerator(objectContext.getSchemaGenerator());
             return this;
         }
