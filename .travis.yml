@@ -12,7 +12,7 @@ deploy:
     script: .travis/deploy.sh
     skip_cleanup: true
     on:
-      repo: Mercateo/sqs-utils
+      repo: Mercateo/rest-schemagen
       branch: master
       jdk: oraclejdk8
   -
@@ -20,6 +20,6 @@ deploy:
     script: .travis/deploy.sh
     skip_cleanup: true
     on:
-      repo: Mercateo/sqs-utils
+      repo: Mercateo/rest-schemagen
       tags: true
       jdk: oraclejdk8
