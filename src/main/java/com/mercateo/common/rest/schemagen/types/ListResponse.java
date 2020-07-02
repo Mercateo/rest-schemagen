@@ -15,12 +15,12 @@
  */
 package com.mercateo.common.rest.schemagen.types;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mercateo.common.rest.schemagen.JsonHyperSchema;
+
+import java.util.List;
 
 @JsonIgnoreProperties("object")
 public class ListResponse<T> extends ObjectWithSchema<WrappedList<ObjectWithSchema<T>>> {
@@ -33,7 +33,7 @@ public class ListResponse<T> extends ObjectWithSchema<WrappedList<ObjectWithSche
 
     @Override
     public String toString() {
-        return "ListResponseRto [ payload=" + object.members + ", _schema=" + schema + "]";
+        return "ListResponseRto [ payload=" + getObject().members + ", _schema=" + getSchema() + "]";
     }
 
     public static <T> ListResponse<T> create(List<ObjectWithSchema<T>> members, JsonHyperSchema schema) {
@@ -47,6 +47,6 @@ public class ListResponse<T> extends ObjectWithSchema<WrappedList<ObjectWithSche
 
     @JsonProperty("members")
     public List<ObjectWithSchema<T>> getMembers() {
-        return object.members;
+        return getObject().members;
     }
 }

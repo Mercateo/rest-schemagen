@@ -1,14 +1,14 @@
 package com.mercateo.common.rest.schemagen.types;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import org.junit.Test;
 
 import java.util.Collections;
-import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.Test;
 
 public class WrappedListTest {
 
@@ -39,7 +39,7 @@ public class WrappedListTest {
 
         final TypeReference typeReference = new TypeReference<WrappedList<ObjectWithSchema<ListResponseTest.Payload>>>() {
         };
-        final WrappedList<ObjectWithSchema<ListResponseTest.Payload>> listResponse = mapper.readValue(content, typeReference);
+        final WrappedList<ObjectWithSchema<ListResponseTest.Payload>> listResponse = (WrappedList<ObjectWithSchema<ListResponseTest.Payload>>) mapper.readValue(content, typeReference);
 
         assertThat(listResponse.members)
                 .extracting(ObjectWithSchema::getObject)

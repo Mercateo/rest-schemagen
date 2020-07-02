@@ -16,27 +16,35 @@
 package com.mercateo.common.rest.schemagen.types;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
+import lombok.Getter;
+import lombok.Setter;
+
 public class WithId<T> {
-    public final UUID id;
+
+    @Getter
+    @Setter
+    private UUID id;
 
     @JsonUnwrapped
-    public final T object;
+    @Getter
+    @Setter
+    private T object;
 
     @JsonCreator
-    private WithId(
-            @JsonProperty("id") UUID id,
-            @JsonProperty("object") T object
-    ) {
+    private WithId() {
+    }
+
+    private WithId(UUID id,T object) {
         this.id = id;
         this.object = object;
     }
+
 
     public static <T> WithId<T> create(T payload) {
         return create(UUID.randomUUID(), payload);

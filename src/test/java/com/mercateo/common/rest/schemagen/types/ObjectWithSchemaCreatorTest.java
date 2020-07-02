@@ -1,10 +1,11 @@
 package com.mercateo.common.rest.schemagen.types;
 
-import com.mercateo.common.rest.schemagen.JsonHyperSchema;
-import org.junit.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+
+import com.mercateo.common.rest.schemagen.JsonHyperSchema;
+
+import org.junit.Test;
 
 public class ObjectWithSchemaCreatorTest {
     @Test
@@ -14,7 +15,7 @@ public class ObjectWithSchemaCreatorTest {
 
         ObjectWithSchema<Object> objectWithSchema = new ObjectWithSchemaCreator().create(object, schema);
 
-        assertThat(objectWithSchema.object).isEqualTo(object);
-        assertThat(objectWithSchema.schema).isEqualTo(schema);
+        assertThat(objectWithSchema.getObject()).isEqualTo(object);
+        assertThat(objectWithSchema.getSchema()).isEqualTo(schema);
     }
 }
