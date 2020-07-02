@@ -4,8 +4,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
 
+import lombok.Data;
+import lombok.Value;
+
 import org.junit.Test;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
@@ -13,8 +17,17 @@ import com.mercateo.common.rest.schemagen.JsonHyperSchema;
 
 public class ObjectWithSchemaTest {
 
+    @Data
     static class Payload {
         public String value;
+
+        @JsonUnwrapped
+        public NestedPayload nestedPayload;
+    }
+
+    @Value
+    static class NestedPayload {
+        String name;
     }
 
     @Test
@@ -23,12 +36,13 @@ public class ObjectWithSchemaTest {
 
         final Payload payload = new Payload();
         payload.value = "bar";
+        payload.setNestedPayload(new NestedPayload("John"));
         final ObjectWithSchema<Payload> objectWithSchema = ObjectWithSchema.create(payload, JsonHyperSchema.from(
                 Optional.empty()));
 
         final String jsonString = objectMapper.writeValueAsString(objectWithSchema);
 
-        assertThat(jsonString).isEqualTo("{\"value\":\"bar\",\"_schema\":{\"links\":[]}}");
+        assertThat(jsonString).isEqualTo("{\"value\":\"bar\",\"name\":\"John\",\"_schema\":{\"links\":[]}}");
     }
 
     @Test
@@ -36,12 +50,13 @@ public class ObjectWithSchemaTest {
         final ObjectMapper mapper = new ObjectMapper();
         final TypeFactory typeFactory = mapper.getTypeFactory();
 
-        final String content = "{\"value\": \"foo\", \"_schema\": {\"links\": []}}";
+        final String content = "{\"value\":\"foo\",\"name\":\"John\",\"_schema\":{\"links\":[]}}";
 
         final JavaType nameWithSchemaType = typeFactory.constructParametricType(ObjectWithSchema.class, Payload.class);
         final ObjectWithSchema<Payload> objectWithSchema = mapper.readValue(content, nameWithSchemaType);
 
         assertThat(objectWithSchema.getObject().value).isEqualTo("foo");
+        assertThat(objectWithSchema.getObject().getNestedPayload()).isEqualTo(new NestedPayload("John"));
         assertThat(objectWithSchema.getSchema().getLinks()).isEmpty();
         assertThat(objectWithSchema.getMessages()).isEmpty();
     }

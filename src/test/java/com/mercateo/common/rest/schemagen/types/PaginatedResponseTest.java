@@ -1,20 +1,22 @@
 package com.mercateo.common.rest.schemagen.types;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.mercateo.common.rest.schemagen.JsonHyperSchema;
 import com.mercateo.common.rest.schemagen.link.relation.RelationContainer;
-import org.junit.Test;
 
-import javax.ws.rs.core.Link;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import javax.ws.rs.core.Link;
+
+import org.junit.Test;
 
 public class PaginatedResponseTest {
 
@@ -29,17 +31,17 @@ public class PaginatedResponseTest {
                 .withContainerLinks(containerLink)
                 .build();
 
-        final List<String> strings = listResponse.object.members.stream()
-                .map(o -> o.object)
+        final List<String> strings = listResponse.getObject().members.stream()
+                .map(o -> o.getObject())
                 .collect(Collectors.toList());
         assertThat(strings).containsExactly("2", "3");
 
-        final List<String> links = listResponse.object.members.stream().map(
-                o -> o.schema.getLinks().iterator().next().getUri().toString()).collect(
+        final List<String> links = listResponse.getObject().members.stream().map(
+                o -> o.getSchema().getLinks().iterator().next().getUri().toString()).collect(
                 Collectors.toList());
         assertThat(links).containsExactly("/2", "/3");
 
-        assertThat(listResponse.schema.getLinks().iterator().next().getUri().toString()).isEqualTo(
+        assertThat(listResponse.getSchema().getLinks().iterator().next().getUri().toString()).isEqualTo(
                 "/");
     }
 
@@ -54,9 +56,9 @@ public class PaginatedResponseTest {
                 .withContainerLinks(containerLink)
                 .build();
 
-        assertThat(listResponse.object.total).isEqualTo(paginatedList.total);
-        assertThat(listResponse.object.offset).isEqualTo(paginatedList.offset);
-        assertThat(listResponse.object.limit).isEqualTo(paginatedList.limit);
+        assertThat(listResponse.getObject().total).isEqualTo(paginatedList.total);
+        assertThat(listResponse.getObject().offset).isEqualTo(paginatedList.offset);
+        assertThat(listResponse.getObject().limit).isEqualTo(paginatedList.limit);
     }
 
     private ObjectWithSchema<String> elementMapper(Integer number) {

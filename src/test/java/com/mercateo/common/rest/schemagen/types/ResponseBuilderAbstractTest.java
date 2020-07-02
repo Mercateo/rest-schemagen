@@ -1,17 +1,19 @@
 package com.mercateo.common.rest.schemagen.types;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.mercateo.common.rest.schemagen.JsonHyperSchema;
+
+import java.util.Arrays;
+import java.util.Optional;
+
+import javax.ws.rs.core.Link;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import javax.ws.rs.core.Link;
-import java.util.Arrays;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ResponseBuilderAbstractTest {
@@ -34,8 +36,8 @@ public class ResponseBuilderAbstractTest {
     public void elementMapperShouldMapValueAndAddLink() {
         ObjectWithSchema<ObjectWithSchema<Long>> result = responseBuilder.build();
 
-        assertThat(result.object.object).isEqualTo(value);
-        assertThat(result.object.schema.getLinks()).containsExactly(link3);
+        assertThat(result.getObject().getObject()).isEqualTo(value);
+        assertThat(result.getObject().getSchema().getLinks()).containsExactly(link3);
     }
 
     @Test
@@ -45,7 +47,7 @@ public class ResponseBuilderAbstractTest {
         );
         ObjectWithSchema<ObjectWithSchema<Long>> result = responseBuilder.build();
 
-        assertThat(result.schema.getLinks()).containsExactly(link1, link2);
+        assertThat(result.getSchema().getLinks()).containsExactly(link1, link2);
     }
 
     @Test
@@ -55,7 +57,7 @@ public class ResponseBuilderAbstractTest {
         );
         ObjectWithSchema<ObjectWithSchema<Long>> result = responseBuilder.build();
 
-        assertThat(result.schema.getLinks()).containsExactly(link1, link2);
+        assertThat(result.getSchema().getLinks()).containsExactly(link1, link2);
     }
 
     @Test
@@ -63,7 +65,7 @@ public class ResponseBuilderAbstractTest {
         responseBuilder.withContainerLinks(link1, link2);
         ObjectWithSchema<ObjectWithSchema<Long>> result = responseBuilder.build();
 
-        assertThat(result.schema.getLinks()).containsExactly(link1, link2);
+        assertThat(result.getSchema().getLinks()).containsExactly(link1, link2);
     }
 
     static class ResponseBuilder extends ResponseBuilderAbstract<ResponseBuilder, Integer, Long, ObjectWithSchema<ObjectWithSchema<Long>>> {

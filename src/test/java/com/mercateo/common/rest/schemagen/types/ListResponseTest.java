@@ -2,6 +2,10 @@ package com.mercateo.common.rest.schemagen.types;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.mercateo.common.rest.schemagen.JsonHyperSchema;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -10,12 +14,6 @@ import java.util.stream.Collectors;
 import javax.ws.rs.core.Link;
 
 import org.junit.Test;
-
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.mercateo.common.rest.schemagen.JsonHyperSchema;
 
 public class ListResponseTest {
 
@@ -30,17 +28,17 @@ public class ListResponseTest {
             .withContainerLinks(containerLink)
             .build();
 
-        final List<String> strings = listResponse.object.members.stream().map(o -> o.object).collect(Collectors
+        final List<String> strings = listResponse.getObject().members.stream().map(o -> o.getObject()).collect(Collectors
             .toList());
         assertThat(strings).containsExactly("1", "2", "3");
 
-        final List<String> links = listResponse.object.members
+        final List<String> links = listResponse.getObject().members
             .stream()
-            .map(o -> o.schema.getLinks().iterator().next().getUri().toString())
+            .map(o -> o.getSchema().getLinks().iterator().next().getUri().toString())
             .collect(Collectors.toList());
         assertThat(links).containsExactly("/1", "/2", "/3");
 
-        assertThat(listResponse.schema.getLinks().iterator().next().getUri().toString()).isEqualTo("/");
+        assertThat(listResponse.getSchema().getLinks().iterator().next().getUri().toString()).isEqualTo("/");
     }
 
     private ObjectWithSchema<String> elementMapper(Integer number) {

@@ -1,21 +1,21 @@
 package com.mercateo.common.rest.schemagen.types;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+
 import com.mercateo.common.rest.schemagen.JsonHyperSchemaCreator;
-import org.junit.Before;
+
+import java.util.Collections;
+import java.util.Optional;
+
+import javax.ws.rs.core.Link;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.runners.MockitoJUnitRunner;
-
-import javax.inject.Inject;
-import javax.ws.rs.core.Link;
-import java.util.Collections;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HyperSchemaCreatorTest {
@@ -36,14 +36,14 @@ public class HyperSchemaCreatorTest {
     public void shouldWrapPayload() {
         ObjectWithSchema<Object> objectWithSchema = hyperSchemaCreator.create(object, Optional.of(mock(Link.class)));
 
-        assertThat(objectWithSchema.object).isEqualTo(object);
+        assertThat(objectWithSchema.getObject()).isEqualTo(object);
     }
 
     @Test
     public void shouldIgnoreNotExistentLinks() throws Exception {
         ObjectWithSchema<Object> objectWithSchema = hyperSchemaCreator.create(object, Optional.empty());
 
-        assertThat(objectWithSchema.schema.getLinks()).isEmpty();
+        assertThat(objectWithSchema.getSchema().getLinks()).isEmpty();
     }
 
     @Test
@@ -54,7 +54,7 @@ public class HyperSchemaCreatorTest {
         ObjectWithSchema<Object> objectWithSchema = hyperSchemaCreator
                 .create(object, Optional.of(link1), Optional.of(link2));
 
-        assertThat(objectWithSchema.schema.getLinks()).containsExactly(link1, link2);
+        assertThat(objectWithSchema.getSchema().getLinks()).containsExactly(link1, link2);
     }
 
     @Test
@@ -65,6 +65,6 @@ public class HyperSchemaCreatorTest {
         ObjectWithSchema<Object> objectWithSchema = hyperSchemaCreator
                 .create(object, Collections.singletonList(link1), Collections.singletonList(link2));
 
-        assertThat(objectWithSchema.schema.getLinks()).containsExactly(link1, link2);
+        assertThat(objectWithSchema.getSchema().getLinks()).containsExactly(link1, link2);
     }
 }

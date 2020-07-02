@@ -1,16 +1,14 @@
 package com.mercateo.common.rest.schemagen.types;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
-import com.mercateo.common.rest.schemagen.JsonHyperSchema;
-import org.junit.Test;
 
-import java.util.Collections;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.*;
+import org.junit.Test;
 
 public class WithIdTest {
 
@@ -20,10 +18,10 @@ public class WithIdTest {
     }
 
     @Test
-    public void shouldCreateRandomId() throws Exception {
+    public void shouldCreateRandomId() {
         final WithId<Payload> payloadWithId = WithId.create(new Payload());
 
-        assertThat(payloadWithId.id).isNotNull();
+        assertThat(payloadWithId.getId()).isNotNull();
     }
 
     @Test
@@ -84,9 +82,9 @@ public class WithIdTest {
         final JavaType nameWithSchemaType = typeFactory.constructParametricType(WithId.class, Payload.class);
         final WithId<Payload> payloadWithId = mapper.readValue(content, nameWithSchemaType);
 
-        assertThat(payloadWithId.object.text).isEqualTo("foo");
-        assertThat(payloadWithId.object.number).isEqualTo(123);
-        assertThat(payloadWithId.id).isEqualTo(id);
+        assertThat(payloadWithId.getObject().text).isEqualTo("foo");
+        assertThat(payloadWithId.getObject().number).isEqualTo(123);
+        assertThat(payloadWithId.getId()).isEqualTo(id);
     }
 
 }

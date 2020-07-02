@@ -17,9 +17,6 @@ package com.mercateo.common.rest.schemagen.types;
 
 import static java.util.Objects.requireNonNull;
 
-import java.util.Collections;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -28,23 +25,33 @@ import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.mercateo.common.rest.schemagen.IgnoreInRestSchema;
 import com.mercateo.common.rest.schemagen.JsonHyperSchema;
 
+import java.util.Collections;
+import java.util.List;
+
+import lombok.Setter;
+
 public class ObjectWithSchema<T> {
 
     @JsonUnwrapped
-    public final T object;
+    @Setter
+    private T object;
 
     @JsonProperty("_schema")
     @IgnoreInRestSchema
-    public final JsonHyperSchema schema;
+    @Setter
+    private JsonHyperSchema schema;
 
     @JsonProperty("_messages")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @IgnoreInRestSchema
-    public final List<Message> messages;
+    @Setter
+    private List<Message> messages;
 
     @JsonCreator
-    protected ObjectWithSchema(@JsonProperty("object") T object, @JsonProperty("_schema") JsonHyperSchema schema,
-            @JsonProperty("_messages") List<Message> messages) {
+    ObjectWithSchema() {
+    }
+
+    protected ObjectWithSchema(T object, JsonHyperSchema schema, List<Message> messages) {
         // this has to be null, if T is Void, so please, do not "fix" this!
         this.object = object;
         this.schema = requireNonNull(schema);
@@ -62,7 +69,7 @@ public class ObjectWithSchema<T> {
 
     @JsonIgnore
     public List<Message> getMessages() {
-        return messages;
+        return messages == null ? Collections.emptyList() : messages;
     }
 
     @JsonIgnore

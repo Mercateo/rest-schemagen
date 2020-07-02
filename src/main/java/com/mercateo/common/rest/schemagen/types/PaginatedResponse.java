@@ -15,12 +15,12 @@
  */
 package com.mercateo.common.rest.schemagen.types;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mercateo.common.rest.schemagen.JsonHyperSchema;
+
+import java.util.List;
 
 @JsonIgnoreProperties("object")
 public class PaginatedResponse<T> extends ObjectWithSchema<PaginatedList<ObjectWithSchema<T>>> {
@@ -36,8 +36,7 @@ public class PaginatedResponse<T> extends ObjectWithSchema<PaginatedList<ObjectW
 
     @Override
     public String toString() {
-        return "PaginatedResponse [ payload=" + object.members + ", offset=" + object.offset + ", _schema=" + schema
-                + "]";
+        return "PaginatedResponse [ payload=" + getObject().members + ", offset=" + getObject().offset + ", _schema=" + getSchema() + "]";
     }
 
     public static <U> PaginatedResponse<U> create(List<ObjectWithSchema<U>> members, int total, int offset, int limit,
@@ -57,21 +56,21 @@ public class PaginatedResponse<T> extends ObjectWithSchema<PaginatedList<ObjectW
 
     @JsonProperty("members")
     public List<ObjectWithSchema<T>> getMembers() {
-        return object.members;
+        return getObject().members;
     }
 
     @JsonProperty("offset")
     public Integer getOffset() {
-        return object.offset;
+        return getObject().offset;
     }
 
     @JsonProperty("limit")
     public Integer getLimit() {
-        return object.limit;
+        return getObject().limit;
     }
 
     @JsonProperty("total")
     public Integer getTotal() {
-        return object.total;
+        return getObject().total;
     }
 }
