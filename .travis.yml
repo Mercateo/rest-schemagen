@@ -1,25 +1,21 @@
+os: linux
+dist: xenial
 language: java
 jdk:
   - openjdk8
+cache:
+  directories:
+    - $HOME/.m2
 before_install:
   - if [ ! -z "$GPG_SECRET_KEYS" ]; then echo $GPG_SECRET_KEYS | base64 --decode | $GPG_EXECUTABLE --import; fi
   - if [ ! -z "$GPG_OWNERTRUST" ]; then echo $GPG_OWNERTRUST | base64 --decode | $GPG_EXECUTABLE --import-ownertrust; fi
-install: "mvn install -DskipTests=true"
-script: "mvn -e clean test jacoco:report coveralls:report"
+script: "mvn -e -B verify"
+after_success: "mvn clean verify jacoco:report coveralls:report"
 deploy:
-  -
-    provider: script
+  - provider: script
     script: .travis/deploy.sh
-    skip_cleanup: true
     on:
       repo: Mercateo/rest-schemagen
       branch: master
-      jdk: openjdk8
-  -
-    provider: script
-    script: .travis/deploy.sh
-    skip_cleanup: true
-    on:
-      repo: Mercateo/rest-schemagen
       tags: true
-      jdk: openjdk8
+
