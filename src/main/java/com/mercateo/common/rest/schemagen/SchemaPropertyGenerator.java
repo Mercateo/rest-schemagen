@@ -27,11 +27,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.google.common.collect.ImmutableMap;
+import com.mercateo.common.rest.schemagen.JsonProperty.Builder;
 import com.mercateo.common.rest.schemagen.generator.ImmutableJsonPropertyResult;
 import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
 import com.mercateo.common.rest.schemagen.generator.ObjectContext;
@@ -43,14 +45,17 @@ import com.mercateo.common.rest.schemagen.util.EnumUtil;
 
 public class SchemaPropertyGenerator {
 
-	private static final Map<Class<?>, JsonProperty> builtins = ImmutableMap.of( //
-			OffsetDateTime.class, JsonProperty.builderFor(String.class).withName("n/a").withFormat("date-time").build(), //
-			// TODO: "full-time" is no standard JSON-schema format
-			OffsetTime.class, JsonProperty.builderFor(String.class).withName("n/a").withFormat("full-time").build(), //
-			// TODO: "uuid" is no standard JSON-schema format, the pattern is
-			// for a v4 UUID. Is that enough?
-			UUID.class, JsonProperty.builderFor(String.class).withName("n/a").withFormat("uuid")
-					.withPattern("^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$").build());
+    private static final Map<Class<?>, Function<Object, String>> builtinsValueSerializers = ImmutableMap.of(
+            UUID.class, Object::toString);
+
+    private static final Map<Class<?>, JsonProperty> builtins = ImmutableMap.of( //
+            OffsetDateTime.class, JsonProperty.builderFor(String.class).withName("n/a").withFormat("date-time").build(),
+            // TODO: "full-time" is no standard JSON-schema format
+            OffsetTime.class, JsonProperty.builderFor(String.class).withName("n/a").withFormat("full-time").build(), //
+            // TODO: "uuid" is no standard JSON-schema format, the pattern is
+            // for a v4 UUID. Is that enough?
+            UUID.class, JsonProperty.builderFor(String.class).withName("n/a").withFormat("uuid")
+                    .withPattern("^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$").build());
 
     private final ReferencedJsonPropertyFinder referencedJsonPropertyFinder;
 
@@ -174,14 +179,34 @@ public class SchemaPropertyGenerator {
 			SchemaPropertyContext context) {
 		JsonProperty determineObjectProperty = determineObjectProperty(name, objectContext, pathContext, context);
 
-		if (builtins.containsKey(objectContext.getRawType())) {
-			JsonProperty jsonPropertyTemplate = builtins.get(objectContext.getRawType());
-			return JsonProperty.builderFrom(jsonPropertyTemplate).withName(name)
-					.withIsRequired(determineObjectProperty.isRequired()).build();
-		} else {
-			return determineObjectProperty;
-		}
-	}
+        if (builtins.containsKey(objectContext.getRawType())) {
+            return getBuiltinsJsonProperty(name, objectContext, determineObjectProperty);
+        } else {
+            return determineObjectProperty;
+        }
+    }
+
+    private JsonProperty getBuiltinsJsonProperty(String name, ObjectContext<?> objectContext,
+                                                 JsonProperty determineObjectProperty) {
+        JsonProperty jsonPropertyTemplate = builtins.get(objectContext.getRawType());
+
+        final Builder builder = JsonProperty.builderFrom(jsonPropertyTemplate).withName(name)
+                .withIsRequired(determineObjectProperty.isRequired())
+                .withPath(determineObjectProperty.getPath());
+        if (builtinsValueSerializers.containsKey(objectContext.getRawType())) {
+            final Function<Object, String> serialize = builtinsValueSerializers
+                    .get(objectContext.getRawType());
+            if (determineObjectProperty.getAllowedValues() != null) {
+                builder.withAllowedValues(determineObjectProperty.getAllowedValues().stream().map(serialize)
+                        .collect(Collectors.toList()));
+            }
+            if (determineObjectProperty.getDefaultValue() != null) {
+                final Object defaultValue = determineObjectProperty.getDefaultValue();
+                builder.withDefaultValue(serialize.apply(defaultValue));
+            }
+        }
+        return builder.build();
+    }
 
     private JsonProperty determineObjectProperty(String name, ObjectContext<?> objectContext,
                                                  PathContext pathContext, SchemaPropertyContext context) {

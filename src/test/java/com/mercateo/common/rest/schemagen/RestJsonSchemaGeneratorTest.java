@@ -50,12 +50,12 @@ public class RestJsonSchemaGeneratorTest {
     private FieldCheckerForSchema fieldCheckerForSchema = (o, c) -> true;
 
     @Before
-    public void setUp() throws NoSuchMethodException {
+    public void setUp() {
         schemaGenerator = new RestJsonSchemaGenerator();
     }
 
     @Test
-    public void createInputSchema() throws NoSuchMethodException {
+    public void createInputSchema() {
         final Method getStrings = getTestResourceMethod("getStrings", int.class, int.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
 				getStrings, new Object[0], null), fieldCheckerForSchema);
@@ -63,7 +63,7 @@ public class RestJsonSchemaGeneratorTest {
     }
 
 	@Test
-	public void createInputSchemaForBuiltins() throws NoSuchMethodException {
+	public void createInputSchemaForBuiltins() {
 		final Method dateTime = getTestResourceMethod("dateTime", DateTimeParam.class);
 		final Optional<String> inputSchema = schemaGenerator
 				.createInputSchema(
@@ -90,7 +90,7 @@ public class RestJsonSchemaGeneratorTest {
     }
 
     @Test
-    public void createInputSchemaWithSimpleParam() throws NoSuchMethodException {
+    public void createInputSchemaWithSimpleParam() {
         final Method getStrings = getTestResourceMethod("setValue", String.class, boolean.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
 				getStrings, new Object[0], CallContext.create()), fieldCheckerForSchema);
@@ -99,7 +99,7 @@ public class RestJsonSchemaGeneratorTest {
     }
 
     @Test
-    public void createInputSchemaWithSimpleParamAndDefaultValue() throws NoSuchMethodException {
+    public void createInputSchemaWithSimpleParamAndDefaultValue() {
         final Method getStrings = getTestResourceMethod("setValue", String.class, boolean.class);
         final CallContext callContext = CallContext.create();
         final Parameter<String> parameter = callContext.builderFor(String.class)
@@ -111,7 +111,7 @@ public class RestJsonSchemaGeneratorTest {
     }
 
     @Test
-    public void createInputSchemaWithSimpleParamAndAllowedValues() throws NoSuchMethodException {
+    public void createInputSchemaWithSimpleParamAndAllowedValues() {
         final Method getStrings = getTestResourceMethod("setValue", String.class, boolean.class);
         final CallContext callContext = CallContext.create();
         final Parameter<String> parameter = callContext.builderFor(String.class)
@@ -123,7 +123,7 @@ public class RestJsonSchemaGeneratorTest {
     }
 
     @Test
-    public void createOutputSchemaWithVoidMethod() throws NoSuchMethodException {
+    public void createOutputSchemaWithVoidMethod() {
         final Method getStrings = getTestResourceMethod("setValue", String.class, boolean.class);
         final Optional<String> outputSchema = schemaGenerator.createOutputSchema(new CallScope(TestResource.class,
 				getStrings, new Object[0], null), fieldCheckerForSchema);
@@ -131,7 +131,7 @@ public class RestJsonSchemaGeneratorTest {
     }
 
     @Test
-    public void createInputSchemaWithMultipleSimpleFormParams() throws NoSuchMethodException {
+    public void createInputSchemaWithMultipleSimpleFormParams() {
         final Method getStrings = getTestResourceMethod("setName", String.class, String.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
 				getStrings, new Object[0], CallContext.create()), fieldCheckerForSchema);
@@ -141,7 +141,7 @@ public class RestJsonSchemaGeneratorTest {
     }
 
     @Test
-    public void createInputSchemaWithBeanParam() throws NoSuchMethodException {
+    public void createInputSchemaWithBeanParam() {
         final Method getStrings = getTestResourceMethod("paramBean", TestBeanParam.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
 				getStrings, new Object[0], CallContext.create()), fieldCheckerForSchema);
@@ -151,7 +151,7 @@ public class RestJsonSchemaGeneratorTest {
     }
 
     @Test
-    public void createInputSchemaWithBeanParamAndPayload() throws NoSuchMethodException {
+    public void createInputSchemaWithBeanParamAndPayload() {
         final Method getStrings = getTestResourceMethod("paramBeanWithPayload", TestBeanParam.class, String.class);
 
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class, getStrings,
@@ -162,7 +162,7 @@ public class RestJsonSchemaGeneratorTest {
     }
 
     @Test
-    public void createInputSchemaWithPathBeanParamAndPayload() throws NoSuchMethodException {
+    public void createInputSchemaWithPathBeanParamAndPayload() {
         final Method getStrings = getTestResourceMethod("paramBeanWithPayload", TestPathBeanParam.class, String.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
                 getStrings, new Object[0], CallContext.create()), fieldCheckerForSchema);
@@ -172,7 +172,7 @@ public class RestJsonSchemaGeneratorTest {
     }
 
     @Test
-    public void createInputSchemaWithNullPathBeanParam() throws NoSuchMethodException {
+    public void createInputSchemaWithNullPathBeanParam() {
         final Method getStrings = getTestResourceMethod("paramBean", TestPathBeanParam.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
                 getStrings, new Object[0], CallContext.create()), fieldCheckerForSchema);
@@ -181,7 +181,7 @@ public class RestJsonSchemaGeneratorTest {
     }
 
     @Test
-    public void createInputSchemaWithPathBeanParamWithNullValue() throws NoSuchMethodException {
+    public void createInputSchemaWithPathBeanParamWithNullValue() {
         final Method getStrings = getTestResourceMethod("paramBean", TestPathBeanParam.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
                 getStrings, new Object[]{new TestPathBeanParam(null)}, CallContext.create()), fieldCheckerForSchema);
@@ -191,7 +191,7 @@ public class RestJsonSchemaGeneratorTest {
     }
 
     @Test
-    public void createInputSchemaWithPathBeanParamWithValue() throws NoSuchMethodException {
+    public void createInputSchemaWithPathBeanParamWithValue() {
         final Method getStrings = getTestResourceMethod("paramBean", TestPathBeanParam.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
                 getStrings, new Object[]{new TestPathBeanParam("foo")}, CallContext.create()), fieldCheckerForSchema);
@@ -200,7 +200,7 @@ public class RestJsonSchemaGeneratorTest {
     }
 
     @Test
-    public void createInputSchemaWithContextParam() throws NoSuchMethodException {
+    public void createInputSchemaWithContextParam() {
         final Method getStrings = getTestResourceMethod("context", String.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
 				getStrings, new Object[0], null), fieldCheckerForSchema);
@@ -209,27 +209,41 @@ public class RestJsonSchemaGeneratorTest {
     }
 
     @Test
-    public void createInputSchemaWithEnumParamAndAllowedValue() throws NoSuchMethodException {
-        final Method enumValue = getTestResourceMethod("enumValue", TestEnum.class);
-        final Parameter<TestEnum> parameter = Parameter.createContext().builderFor(TestEnum.class)
-                .allowValues(TestEnum.FOO_VALUE).build();
+    public void createInputSchemaWithIntegerAndAllowedValue() {
+        final Method integerMethod = getTestResourceMethod("integer", Integer.class);
+        final Parameter<Integer> parameter = Parameter.createContext().builderFor(Integer.class)
+                .allowValues(10, 20).build();
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
-				enumValue, new Object[] { parameter.get() }, parameter.context()), fieldCheckerForSchema);
+                integerMethod, new Object[] { parameter.get() }, parameter.context()), fieldCheckerForSchema);
 
         assertThat(inputSchema.isPresent()).isTrue();
-        assertThat(inputSchema.get()).containsIgnoringCase(
-                "{\"type\":\"string\",\"enum\":[\"FOO_VALUE\"]}");
+        assertThat(inputSchema.get()).containsIgnoringCase("{\"type\":\"integer\",\"enum\":[20,10]}");
     }
 
     @Test
-    public void createInputSchemaWithEnumParamAndDefaultValue() throws NoSuchMethodException {
+    public void createInputSchemaWithUUIDAndAllowedValue() {
+        final Method uuidMethod = getTestResourceMethod("uuid", UUID.class);
+        final Parameter<UUID> parameter = Parameter.createContext().builderFor(UUID.class)
+                .allowValues(UUID.fromString("156a3b9c-f9d0-447e-a412-ef6d339bf01b"),
+                        UUID.fromString("2364568a-f9d0-447e-a412-ef6d339bf01a")).build();
+        final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
+                uuidMethod, new Object[] { parameter.get() }, parameter.context()), fieldCheckerForSchema);
+
+        assertThat(inputSchema.isPresent()).isTrue();
+        assertThat(inputSchema.get()).containsIgnoringCase(
+                "{\"type\":\"string\",\"enum\":[\"156a3b9c-f9d0-447e-a412-ef6d339bf01b\",\"2364568a-f9d0-447e-a412-ef6d339bf01a\"]"
+                        + ",\"format\":\"uuid\",\"pattern\":\"^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$\"}");
+    }
+
+    @Test
+    public void createInputSchemaWithEnumParamAndDefaultValue() {
         final Method enumValue = getTestResourceMethod("enumValue", TestEnum.class);
         final Parameter<TestEnum> parameter = Parameter.createContext().builderFor(TestEnum.class)
                 .defaultValue(TestEnum.FOO_VALUE).build();
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
-                enumValue, new Object[]{parameter.get()}, parameter
-						.context()),
-				fieldCheckerForSchema);
+                        enumValue, new Object[] { parameter.get() }, parameter
+                        .context()),
+                fieldCheckerForSchema);
 
         assertThat(inputSchema.isPresent()).isTrue();
         assertThat(inputSchema.get()).containsIgnoringCase(
@@ -241,7 +255,7 @@ public class RestJsonSchemaGeneratorTest {
     }
 
     @Test
-    public void createInputSchemaWithEnumParam() throws NoSuchMethodException {
+    public void createInputSchemaWithEnumParam() {
         final Method enumValue = getTestResourceMethod("enumValue", TestEnum.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
 				enumValue, new Object[] { null }, CallContext.create()), fieldCheckerForSchema);
@@ -254,7 +268,7 @@ public class RestJsonSchemaGeneratorTest {
     }
 
     @Test
-    public void createInputSchemaWithEnumParamWithJsonValue() throws NoSuchMethodException {
+    public void createInputSchemaWithEnumParamWithJsonValue() {
         final Method enumValue = getTestResourceMethod("enumValueJsonValue", TestEnumJsonValue.class);
         final Optional<String> inputSchema = schemaGenerator.createInputSchema(new CallScope(TestResource.class,
 				enumValue, new Object[] { null }, CallContext.create()), fieldCheckerForSchema);
@@ -418,11 +432,23 @@ public class RestJsonSchemaGeneratorTest {
             // Nothing to do.
         }
 
-		@POST
-		@Path("datetime")
-		public void dateTime(DateTimeParam dateTimeParam) {
-			// Nothing to do.
-		}
+        @POST
+        @Path("datetime")
+        public void dateTime(DateTimeParam dateTimeParam) {
+            // Nothing to do.
+        }
+
+        @POST
+        @Path("uuid")
+        public void uuid(UUID uuid) {
+            // Nothing to do.
+        }
+
+        @POST
+        @Path("integer")
+        public void integer(Integer integer) {
+            // Nothing to do.
+        }
     }
 
     public static String toCamelCaseFirstLowerCase(Enum<? extends Enum<?>> enumInstance) {

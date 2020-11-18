@@ -85,6 +85,7 @@ public class SchemaJsonPropertyGeneratorTest {
     public void testObjectAllowedValues() {
         SchemaObject allowedValues = new SchemaObject();
         allowedValues.name = "foo";
+        allowedValues.count = 5;
 
         final JsonProperty jsonProperty = generateSchemaProperty(ObjectContext.buildFor(SchemaObject.class)
                 .addAllowedValues(allowedValues));
@@ -93,7 +94,7 @@ public class SchemaJsonPropertyGeneratorTest {
         assertThat(properties).hasSize(2);
 
         assertThat(properties.get(0).getName()).isEqualTo("count");
-        assertThat(properties.get(0).getAllowedValues()).isEmpty();
+        assertThat(properties.get(0).getAllowedValues()).containsExactly(5);
         assertThat(properties.get(0).getDefaultValue()).isNull();
 
         assertThat(properties.get(1).getName()).isEqualTo("name");
@@ -133,6 +134,7 @@ public class SchemaJsonPropertyGeneratorTest {
 
         SchemaObject defaultValue = new SchemaObject();
         defaultValue.name = "baz";
+        defaultValue.count = 5;
 
         final JsonProperty jsonProperty = generateSchemaProperty(ObjectContext.buildFor(SchemaObject.class)
                 .addAllowedValues(allowedValues).withDefaultValue(defaultValue));
@@ -142,7 +144,7 @@ public class SchemaJsonPropertyGeneratorTest {
 
         assertThat(properties.get(0).getName()).isEqualTo("count");
         assertThat(properties.get(0).getAllowedValues()).isEmpty();
-        assertThat(properties.get(0).getDefaultValue()).isNull();
+        assertThat(properties.get(0).getDefaultValue()).isEqualTo(5);
 
         assertThat(properties.get(1).getName()).isEqualTo("name");
         assertThat(properties.get(1).getAllowedValues()).containsOnly("foo|bar|baz");
@@ -579,6 +581,41 @@ public class SchemaJsonPropertyGeneratorTest {
         final JsonProperty idJsonProperty = jsonProperty.getPropertyByName("id");
 
         assertThat(idJsonProperty.getType()).isEqualTo(PropertyType.STRING);
+        assertThat(idJsonProperty.getPattern())
+                .isEqualTo("^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$");
+    }
+
+    @Test
+    public void testUUIDSchemaGenerationAllowedValues() {
+
+        UUIDSchemaObject allowedValues = new UUIDSchemaObject();
+        allowedValues.id = UUID.randomUUID();
+
+        final JsonProperty jsonProperty = generateSchemaProperty(ObjectContext.buildFor(UUIDSchemaObject.class)
+                .addAllowedValues(allowedValues));
+
+        final JsonProperty idJsonProperty = jsonProperty.getPropertyByName("id");
+
+        assertThat(idJsonProperty.getType()).isEqualTo(PropertyType.STRING);
+        assertThat(idJsonProperty.getName()).isEqualTo("id");
+        assertThat(idJsonProperty.getAllowedValues()).containsExactly(allowedValues.id.toString());
+        assertThat(idJsonProperty.getDefaultValue()).isNull();
+    }
+
+    @Test
+    public void testUUIDSchemaGenerationDefaultValue() {
+
+        UUIDSchemaObject defaultValue = new UUIDSchemaObject();
+        defaultValue.id = UUID.randomUUID();
+
+        final JsonProperty jsonProperty = generateSchemaProperty(ObjectContext.buildFor(UUIDSchemaObject.class)
+                .withDefaultValue(defaultValue));
+
+        final JsonProperty idJsonProperty = jsonProperty.getPropertyByName("id");
+
+        assertThat(idJsonProperty.getType()).isEqualTo(PropertyType.STRING);
+        assertThat(idJsonProperty.getName()).isEqualTo("id");
+        assertThat(idJsonProperty.getDefaultValue()).isEqualTo(defaultValue.id.toString());
     }
 
     @Test
