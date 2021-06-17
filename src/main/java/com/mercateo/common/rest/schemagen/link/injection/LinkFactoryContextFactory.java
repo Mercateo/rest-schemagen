@@ -15,19 +15,20 @@
  */
 package com.mercateo.common.rest.schemagen.link.injection;
 
+import com.mercateo.common.rest.schemagen.link.LinkFactoryContext;
+import com.mercateo.common.rest.schemagen.link.LinkFactoryContextDefault;
+import com.mercateo.common.rest.schemagen.link.helper.BaseUriCreator;
+import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
+import com.mercateo.common.rest.schemagen.plugin.MethodCheckerForLink;
+import com.mercateo.common.rest.schemagen.plugin.TargetSchemaEnablerForLink;
+
+import java.net.URI;
+
 import javax.inject.Inject;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriInfo;
 
-import com.mercateo.common.rest.schemagen.link.LinkFactoryContextDefault;
 import org.glassfish.hk2.api.Factory;
-
-import com.mercateo.common.rest.schemagen.link.LinkFactoryContext;
-import com.mercateo.common.rest.schemagen.link.helper.BaseUriCreator;
-import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
-import com.mercateo.common.rest.schemagen.plugin.MethodCheckerForLink;
-
-import java.net.URI;
 
 public class LinkFactoryContextFactory implements Factory<LinkFactoryContext> {
 
@@ -41,20 +42,25 @@ public class LinkFactoryContextFactory implements Factory<LinkFactoryContext> {
 
     private final FieldCheckerForSchema fieldCheckerForSchema;
 
+    private final TargetSchemaEnablerForLink targetSchemaEnablerForLink;
+
     @Inject
     public LinkFactoryContextFactory(UriInfo uriInfo, HttpHeaders httpHeaders, BaseUriCreator baseUriCreator,
-            MethodCheckerForLink methodCheckerForLink, FieldCheckerForSchema fieldCheckerForSchema) {
+            MethodCheckerForLink methodCheckerForLink, FieldCheckerForSchema fieldCheckerForSchema,
+            TargetSchemaEnablerForLink targetSchemaEnablerForLink) {
         this.uriInfo = uriInfo;
         this.httpHeaders = httpHeaders;
         this.baseUriCreator = baseUriCreator;
         this.methodCheckerForLink = methodCheckerForLink;
         this.fieldCheckerForSchema = fieldCheckerForSchema;
+        this.targetSchemaEnablerForLink = targetSchemaEnablerForLink;
     }
 
     @Override
     public LinkFactoryContext provide() {
         final URI baseUri = baseUriCreator.createBaseUri(uriInfo.getBaseUri(), httpHeaders.getRequestHeaders());
-        return new LinkFactoryContextDefault(baseUri, methodCheckerForLink, fieldCheckerForSchema);
+        return new LinkFactoryContextDefault(baseUri, methodCheckerForLink, fieldCheckerForSchema,
+                targetSchemaEnablerForLink);
     }
 
     @Override

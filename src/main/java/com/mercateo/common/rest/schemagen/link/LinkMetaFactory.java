@@ -17,15 +17,16 @@ package com.mercateo.common.rest.schemagen.link;
 
 import static java.util.Objects.requireNonNull;
 
-import java.net.URI;
-import java.util.ArrayList;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.mercateo.common.rest.schemagen.JerseyResource;
 import com.mercateo.common.rest.schemagen.JsonSchemaGenerator;
 import com.mercateo.common.rest.schemagen.RestJsonSchemaGenerator;
 import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 import com.mercateo.common.rest.schemagen.plugin.MethodCheckerForLink;
+import com.mercateo.common.rest.schemagen.plugin.TargetSchemaEnablerForLink;
+
+import java.net.URI;
+import java.util.ArrayList;
 
 public class LinkMetaFactory {
 
@@ -73,26 +74,31 @@ public class LinkMetaFactory {
 	 * @param methodCheckerForLink
 	 * @param fieldCheckerForSchema
 	 *
+	 * @param targetSchemaEnablerForLink
 	 * @deprecated please use {@link #create(JsonSchemaGenerator)} instead
 	 * @return
 	 */
 	@Deprecated
 	public static LinkMetaFactory create(JsonSchemaGenerator jsonSchemaGenerator, URI baseUri,
-			MethodCheckerForLink methodCheckerForLink, FieldCheckerForSchema fieldCheckerForSchema) {
+			MethodCheckerForLink methodCheckerForLink, FieldCheckerForSchema fieldCheckerForSchema,
+			TargetSchemaEnablerForLink targetSchemaEnablerForLink) {
 
 		requireNonNull(baseUri);
 		requireNonNull(methodCheckerForLink);
 		requireNonNull(fieldCheckerForSchema);
-		return new LinkMetaFactory(jsonSchemaGenerator, new LinkFactoryContextDefault(baseUri, methodCheckerForLink, fieldCheckerForSchema));
+		return new LinkMetaFactory(jsonSchemaGenerator, new LinkFactoryContextDefault(baseUri, methodCheckerForLink, fieldCheckerForSchema,
+				targetSchemaEnablerForLink));
 	}
 
 	/**
 	 * @deprecated should not be used any more, because the use of a global link factory context is deprecated
+	 * @param targetSchemaEnablerForLink
 	 */
 	@Deprecated
 	@VisibleForTesting
 	public static LinkMetaFactory createInsecureFactoryForTest() {
-		return new LinkMetaFactory(new RestJsonSchemaGenerator(), new LinkFactoryContextDefault(URI.create(""), r -> true, (r, c) -> true));
+		return new LinkMetaFactory(new RestJsonSchemaGenerator(), new LinkFactoryContextDefault(URI.create(""), r -> true, (r, c) -> true,
+				scope -> true));
 	}
 
 	public <T extends JerseyResource> LinkFactory<T> createFactoryFor(Class<T> resourceClass) {

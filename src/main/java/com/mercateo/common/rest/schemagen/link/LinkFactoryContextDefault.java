@@ -17,10 +17,11 @@ package com.mercateo.common.rest.schemagen.link;
 
 import static java.util.Objects.requireNonNull;
 
-import java.net.URI;
-
 import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 import com.mercateo.common.rest.schemagen.plugin.MethodCheckerForLink;
+import com.mercateo.common.rest.schemagen.plugin.TargetSchemaEnablerForLink;
+
+import java.net.URI;
 
 public class LinkFactoryContextDefault implements LinkFactoryContext {
 
@@ -30,17 +31,21 @@ public class LinkFactoryContextDefault implements LinkFactoryContext {
 
     private final FieldCheckerForSchema fieldCheckerForSchema;
 
+    private final TargetSchemaEnablerForLink targetSchemaEnablerForLink;
+
     public LinkFactoryContextDefault() {
         baseUri = null;
         methodCheckerForLink = null;
         fieldCheckerForSchema = null;
+        targetSchemaEnablerForLink = null;
     }
 
     public LinkFactoryContextDefault(URI baseUri, MethodCheckerForLink methodCheckerForLink,
-                                     FieldCheckerForSchema fieldCheckerForSchema) {
+            FieldCheckerForSchema fieldCheckerForSchema, TargetSchemaEnablerForLink targetSchemaEnablerForLink) {
         this.baseUri = baseUri;
         this.methodCheckerForLink = requireNonNull(methodCheckerForLink);
         this.fieldCheckerForSchema = requireNonNull(fieldCheckerForSchema);
+        this.targetSchemaEnablerForLink = targetSchemaEnablerForLink;
     }
 
     @Override
@@ -56,5 +61,10 @@ public class LinkFactoryContextDefault implements LinkFactoryContext {
     @Override
     public MethodCheckerForLink getMethodCheckerForLink() {
         return methodCheckerForLink;
+    }
+
+    @Override
+    public TargetSchemaEnablerForLink getTargetSchemaEnablerForLink() {
+        return targetSchemaEnablerForLink;
     }
 }

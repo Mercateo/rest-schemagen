@@ -1,5 +1,13 @@
 package com.mercateo.common.rest.schemagen.link;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.when;
+
 import com.mercateo.common.rest.schemagen.ResourceClass;
 import com.mercateo.common.rest.schemagen.ResourceClass.ChildResourceClass;
 import com.mercateo.common.rest.schemagen.ResourceClass.ParentResourceClass;
@@ -9,27 +17,22 @@ import com.mercateo.common.rest.schemagen.link.relation.Rel;
 import com.mercateo.common.rest.schemagen.link.relation.Relation;
 import com.mercateo.common.rest.schemagen.parameter.CallContext;
 import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
+import com.mercateo.common.rest.schemagen.plugin.TargetSchemaEnablerForLink;
 import com.mercateo.common.rest.schemagen.plugin.common.RolesAllowedChecker;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.ws.rs.core.Link;
-import javax.ws.rs.core.SecurityContext;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.when;
+import javax.ws.rs.core.Link;
+import javax.ws.rs.core.SecurityContext;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @SuppressWarnings("boxing")
 @RunWith(MockitoJUnitRunner.class)
@@ -41,13 +44,19 @@ public class LinkFactoryTest {
     @Mock
     private FieldCheckerForSchema fieldCheckerForSchema;
 
+    @Mock
+    private TargetSchemaEnablerForLink targetSchemaEnablerForLink;
+
     private LinkFactoryContext linkFactoryContext;
 
     private LinkMetaFactory linkMetaFactory;
 
     @Before
     public void setUp() throws URISyntaxException {
-        linkFactoryContext = new LinkFactoryContextDefault(new URI("basePath/"), new RolesAllowedChecker(securityContext), fieldCheckerForSchema);
+        when(targetSchemaEnablerForLink.test(any())).thenReturn(true);
+        linkFactoryContext = new LinkFactoryContextDefault(new URI("basePath/"),
+                new RolesAllowedChecker(securityContext), fieldCheckerForSchema,
+                targetSchemaEnablerForLink);
 
         linkMetaFactory = LinkMetaFactory.create(new RestJsonSchemaGenerator());
     }
@@ -71,6 +80,17 @@ public class LinkFactoryTest {
                 .getSomething("12")).get();
         assertEquals("{\"type\":\"object\",\"properties\":{\"id\":{\"type\":\"string\"}}}", link
                 .getParams().get("targetSchema"));
+    }
+
+    @Test
+    public void targetSchemaDisabled() throws NoSuchFieldException {
+        when(targetSchemaEnablerForLink.test(any())).thenReturn(false);
+        linkMetaFactory = LinkMetaFactory.create(new RestJsonSchemaGenerator(), linkFactoryContext);
+
+        allowRole("test");
+        Link link = linkMetaFactory.createFactoryFor(ResourceClass.class).forCall(Rel.SELF, r -> r
+                .getSomething("12")).get();
+        assertNull(link.getParams().get("targetSchema"));
     }
 
     @Test

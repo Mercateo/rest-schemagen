@@ -138,10 +138,13 @@ if (!addressJsonBuilder.isEmpty()) {
 The context and the parameter, which is build by context.builderFor() are still connected.
 
 # Plugins
-There are three possibilities to customize the way the schema generation works. All of them are located in the plugin package.
+There are four possibilities to customize the way the schema generation works. All of them are located in the plugin package.
 
 ### Determine if a link should be made from a method
 You should bring you own implementation of the MethodCheckerForLink interface and bind it with your own factory. A common use-case would be if you want to check security roles. The implementation can be found in the plugin package.
+
+### Determine if targetSchema should be present in the schema
+You should bring you own implementation of the TargetSchemaEnablerForLink interface and bind it with your own factory. The default implementation always adds the target schema to the link.
 
 ### Determine if a field should be included in the schema
 You should bring you own implementation of the FieldCheckerForSchema interface and bind it with your own factory. A common use-case is included in the package. There, you do the filtering with jackson's JsonView annotation. In the future, we plan to do the filtering based on the roles of a user. This feature depends on https://java.net/jira/browse/JERSEY-2998.
