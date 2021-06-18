@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.mercateo.common.rest.schemagen.GenericResource;
@@ -26,7 +27,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Link;
 
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 public class LinkCreatorTest {
@@ -58,7 +58,7 @@ public class LinkCreatorTest {
         final CallScope callScope = new CallScope(ResourceClass.class, ResourceClass.class
                 .getMethod("getSomething", String.class), new Object[] { "12" }, null);
 
-        final JsonSchemaGenerator jsonSchemaGenerator = createJsonSchemaGenerator();
+        final JsonSchemaGenerator jsonSchemaGenerator = createJsonSchemaGenerator(true);
 
         final LinkFactoryContext linkFactoryContext = new LinkFactoryContextDefault(null, o -> true,
                 (o, c) -> true, scope -> true);
@@ -200,7 +200,7 @@ public class LinkCreatorTest {
     }
 
     @Test
-    public void testTargetSchemaPresentOnMatchingMediaTypeAtMethodLevel__targetSchemaEnabled()
+    public void testTargetSchemaPresentOnMatchingMediaTypeAtMethodLevelTargetSchemaEnabled()
             throws NoSuchMethodException, SecurityException {
         @Path("test")
         class TestResource {
@@ -314,12 +314,17 @@ public class LinkCreatorTest {
         assertNull(link.getParams().get(LinkCreator.TARGET_SCHEMA_PARAM_KEY));
     }
 
-    private JsonSchemaGenerator createJsonSchemaGenerator() {
+    private JsonSchemaGenerator createJsonSchemaGenerator(boolean targetSchemaEnabledForLink) {
         JsonSchemaGenerator jsonSchemaGenerator = Mockito.mock(JsonSchemaGenerator.class);
-        when(jsonSchemaGenerator.createInputSchema(Matchers.any(), Matchers.any())).thenReturn(
+        when(jsonSchemaGenerator.createInputSchema(any(), any())).thenReturn(
                 Optional.of(testSchema));
-        when(jsonSchemaGenerator.createOutputSchema(Matchers.any(), Matchers.any())).thenReturn(
-                Optional.of(testSchema));
+        if (targetSchemaEnabledForLink) {
+            when(jsonSchemaGenerator.createOutputSchema(any(), any(), any())).thenReturn(
+                    Optional.of(testSchema));
+        } else {
+            when(jsonSchemaGenerator.createOutputSchema(any(), any(), any())).thenReturn(
+                    Optional.empty());
+        }
         return jsonSchemaGenerator;
     }
 
@@ -329,7 +334,7 @@ public class LinkCreatorTest {
     }
 
     private Link createFor(Scope method, Relation relation, boolean targetSchemaEnabledForLink) {
-        final JsonSchemaGenerator jsonSchemaGenerator = createJsonSchemaGenerator();
+        final JsonSchemaGenerator jsonSchemaGenerator = createJsonSchemaGenerator(targetSchemaEnabledForLink);
 
         final LinkFactoryContext linkFactoryContext = new LinkFactoryContextDefault(URI.create(
                 "http://host/base/"), o -> true, (o, c) -> true, scope -> targetSchemaEnabledForLink);

@@ -236,13 +236,12 @@ public class LinkCreator {
         Optional<String> optionalInputSchema = jsonSchemaGenerator.createInputSchema(method,
                 linkFactoryContext.getFieldCheckerForSchema());
         optionalInputSchema.ifPresent(s -> builder.param(SCHEMA_PARAM_KEY, s));
-        if (linkFactoryContext.getTargetSchemaEnablerForLink().test(method)) {
-            Optional<String> mt = detectMediaType(method.getInvokedMethod());
-            if (mt.isPresent() && MediaType.APPLICATION_JSON.equals(mt.get())) {
-                Optional<String> optionalOutputSchema = jsonSchemaGenerator.createOutputSchema(method,
-                        linkFactoryContext.getFieldCheckerForSchema());
-                optionalOutputSchema.ifPresent(s -> builder.param(TARGET_SCHEMA_PARAM_KEY, s));
-            }
+        Optional<String> mt = detectMediaType(method.getInvokedMethod());
+        if (mt.isPresent() && MediaType.APPLICATION_JSON.equals(mt.get())) {
+            Optional<String> optionalOutputSchema = jsonSchemaGenerator.createOutputSchema(method,
+                    linkFactoryContext.getFieldCheckerForSchema(),
+                    linkFactoryContext.getTargetSchemaEnablerForLink());
+            optionalOutputSchema.ifPresent(s -> builder.param(TARGET_SCHEMA_PARAM_KEY, s));
         }
     }
 

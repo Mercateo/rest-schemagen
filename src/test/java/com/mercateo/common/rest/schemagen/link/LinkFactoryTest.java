@@ -83,7 +83,7 @@ public class LinkFactoryTest {
     }
 
     @Test
-    public void targetSchemaDisabled() throws NoSuchFieldException {
+    public void targetSchemaDisabled() {
         when(targetSchemaEnablerForLink.test(any())).thenReturn(false);
         linkMetaFactory = LinkMetaFactory.create(new RestJsonSchemaGenerator(), linkFactoryContext);
 

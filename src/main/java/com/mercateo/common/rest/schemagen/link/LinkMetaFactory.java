@@ -92,7 +92,6 @@ public class LinkMetaFactory {
 
 	/**
 	 * @deprecated should not be used any more, because the use of a global link factory context is deprecated
-	 * @param targetSchemaEnablerForLink
 	 */
 	@Deprecated
 	@VisibleForTesting
