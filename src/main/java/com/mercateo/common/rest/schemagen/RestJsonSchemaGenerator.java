@@ -15,6 +15,18 @@
  */
 package com.mercateo.common.rest.schemagen;
 
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.mercateo.common.rest.schemagen.annotation.Media;
+import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
+import com.mercateo.common.rest.schemagen.generator.ObjectContext;
+import com.mercateo.common.rest.schemagen.generator.ObjectContextBuilder;
+import com.mercateo.common.rest.schemagen.generictype.GenericType;
+import com.mercateo.common.rest.schemagen.json.mapper.PropertyJsonSchemaMapper;
+import com.mercateo.common.rest.schemagen.link.Scope;
+import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
+import com.mercateo.common.rest.schemagen.plugin.TargetSchemaEnablerForLink;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Arrays;
@@ -34,18 +46,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 
 import org.glassfish.jersey.media.multipart.FormDataParam;
-import org.reflections.ReflectionUtils;
-
-import com.fasterxml.jackson.databind.node.JsonNodeFactory;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.mercateo.common.rest.schemagen.annotation.Media;
-import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
-import com.mercateo.common.rest.schemagen.generator.ObjectContext;
-import com.mercateo.common.rest.schemagen.generator.ObjectContextBuilder;
-import com.mercateo.common.rest.schemagen.generictype.GenericType;
-import com.mercateo.common.rest.schemagen.json.mapper.PropertyJsonSchemaMapper;
-import com.mercateo.common.rest.schemagen.link.Scope;
-import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 
 public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
     private static final Set<Class<?>> INVALID_OUTPUT_TYPES = new HashSet<>(Arrays.asList(void.class,
@@ -64,8 +64,11 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
     }
 
     @Override
-    public Optional<String> createOutputSchema(Scope scope,
-            FieldCheckerForSchema fieldCheckerForSchema) {
+    public Optional<String> createOutputSchema(Scope scope, FieldCheckerForSchema fieldCheckerForSchema,
+            TargetSchemaEnablerForLink targetSchemaEnablerForLink) {
+        if (!targetSchemaEnablerForLink.test(scope)) {
+            return Optional.empty();
+        }
 
         final GenericType<?> genericType = GenericType.of(scope.getReturnType(), scope
                 .getInvokedMethod().getReturnType());
@@ -73,7 +76,7 @@ public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
         if (!INVALID_OUTPUT_TYPES.contains(genericType.getRawType())) {
             return generateJsonSchema(ObjectContext.buildFor(genericType).build(),
                     createSchemaPropertyContext(scope, fieldCheckerForSchema)).map(
-                            Object::toString);
+                    Object::toString);
         } else {
             return Optional.empty();
         }

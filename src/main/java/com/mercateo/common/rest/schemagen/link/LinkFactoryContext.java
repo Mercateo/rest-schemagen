@@ -17,6 +17,7 @@ package com.mercateo.common.rest.schemagen.link;
 
 import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 import com.mercateo.common.rest.schemagen.plugin.MethodCheckerForLink;
+import com.mercateo.common.rest.schemagen.plugin.TargetSchemaEnablerForLink;
 
 import java.net.URI;
 
@@ -26,4 +27,6 @@ public interface LinkFactoryContext {
     FieldCheckerForSchema getFieldCheckerForSchema();
 
     MethodCheckerForLink getMethodCheckerForLink();
+
+    TargetSchemaEnablerForLink getTargetSchemaEnablerForLink();
 }

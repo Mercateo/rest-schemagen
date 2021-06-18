@@ -1,10 +1,16 @@
 package com.mercateo.common.rest.schemagen;
 
-
 import static com.google.common.base.CaseFormat.LOWER_CAMEL;
 import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.mercateo.common.rest.schemagen.annotation.Media;
+import com.mercateo.common.rest.schemagen.link.CallScope;
+import com.mercateo.common.rest.schemagen.parameter.CallContext;
+import com.mercateo.common.rest.schemagen.parameter.Parameter;
+import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
+import com.mercateo.reflection.Call;
 
 import java.lang.reflect.Method;
 import java.net.URL;
@@ -32,14 +38,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.mercateo.common.rest.schemagen.annotation.Media;
-import com.mercateo.common.rest.schemagen.link.CallScope;
-import com.mercateo.common.rest.schemagen.parameter.CallContext;
-import com.mercateo.common.rest.schemagen.parameter.Parameter;
-import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
-import com.mercateo.reflection.Call;
 
 @SuppressWarnings({"boxing", "unused"})
 @RunWith(MockitoJUnitRunner.class)
@@ -126,7 +124,24 @@ public class RestJsonSchemaGeneratorTest {
     public void createOutputSchemaWithVoidMethod() {
         final Method getStrings = getTestResourceMethod("setValue", String.class, boolean.class);
         final Optional<String> outputSchema = schemaGenerator.createOutputSchema(new CallScope(TestResource.class,
-				getStrings, new Object[0], null), fieldCheckerForSchema);
+				getStrings, new Object[0], null), fieldCheckerForSchema, scope -> true);
+        assertThat(outputSchema.isPresent()).isFalse();
+    }
+
+    @Test
+    public void createOutputSchema() {
+        final Method getStrings = getTestResourceMethod("getStrings");
+        final Optional<String> outputSchema = schemaGenerator.createOutputSchema(new CallScope(TestResource.class,
+                getStrings, new Object[0], CallContext.create()), fieldCheckerForSchema, scope -> true);
+        assertThat(outputSchema.isPresent()).isTrue();
+        assertThat(outputSchema).hasValue("{\"type\":\"array\",\"items\":{\"type\":\"string\"}}");
+    }
+
+    @Test
+    public void createOutputSchemaDisabled() {
+        final Method getStrings = getTestResourceMethod("getStrings");
+        final Optional<String> outputSchema = schemaGenerator.createOutputSchema(new CallScope(TestResource.class,
+                getStrings, new Object[0], CallContext.create()), fieldCheckerForSchema, scope -> false);
         assertThat(outputSchema.isPresent()).isFalse();
     }
 
@@ -357,6 +372,11 @@ public class RestJsonSchemaGeneratorTest {
 
     @Path("/home")
     public class TestResource {
+        @GET
+        @Path("/output")
+        public String[] getStrings() {
+            return null;
+        }
 
         @GET
         @Path("/at")
