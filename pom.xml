@@ -41,7 +41,7 @@
 	</scm>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<jackson.version>2.11.1</jackson.version>
+		<jackson.version>2.13.3</jackson.version>
 		<jmh.version>1.20</jmh.version>
 		<lombok.version>1.18.12</lombok.version>
 	</properties>
@@ -170,7 +170,7 @@
 		<dependency>
 			<artifactId>reflections</artifactId>
 			<groupId>org.reflections</groupId>
-			<version>0.9.11</version>
+			<version>0.10.2</version>
 		</dependency>
 		<dependency>
 			<artifactId>validation-api</artifactId>
@@ -230,6 +230,11 @@
 			<version>1.2.0</version>
 		</dependency>
 		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>31.1-jre</version>
+		</dependency>
+		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.25</version>
@@ -259,7 +264,7 @@
 		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
-			<version>20171018</version>
+			<version>20220320</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -287,7 +292,7 @@
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
-			<version>1.2.3</version>
+			<version>1.2.11</version>
 			<scope>test</scope>
 		</dependency>
         <dependency>
