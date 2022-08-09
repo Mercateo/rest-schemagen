@@ -70,7 +70,7 @@ public class ListResponseTest {
     @Test
     public void shouldDeserialize() throws Exception {
         final ObjectMapper mapper = new ObjectMapper();
-        mapper.disableDefaultTyping();
+        mapper.deactivateDefaultTyping();
 
         final String content = "{\"members\": [{\"value\": \"foo\", \"_schema\":{\"links\":[]}}, {\"value\": \"bar\", \"_schema\":{\"links\":[]}}], \"_schema\":{\"links\":[]}}";
 
