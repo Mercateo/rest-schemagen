@@ -7,7 +7,7 @@
 	</parent>
 	<artifactId>common.rest.schemagen</artifactId>
 	<groupId>com.mercateo</groupId>
-	<version>0.20.0</version>
+	<version>0.20.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>rest-schemagen</name>
 	<description>Jersey add-on for dynamic link and schema building</description>
@@ -37,7 +37,7 @@
 		<connection>scm:git:git@github.com:Mercateo/rest-schemagen.git</connection>
 		<developerConnection>scm:git:git@github.com:Mercateo/rest-schemagen.git</developerConnection>
 		<url>https://github.com/Mercateo/rest-schemagen.git</url>
-		<tag>0.20.0</tag>
+		<tag>HEAD</tag>
 	</scm>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
