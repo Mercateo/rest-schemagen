@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -82,7 +82,7 @@ public class MessageTest {
     @Test
     public void shouldDeserialize() throws Exception {
         final ObjectMapper mapper = new ObjectMapper();
-        mapper.disableDefaultTyping();
+        mapper.deactivateDefaultTyping();
 
         final String content = "{\"type\":\"INFO\",\"code\":\"<code>\",\"data\":{\"value\":\"<data>\"}}";
 

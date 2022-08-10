@@ -14,7 +14,7 @@ import com.mercateo.common.rest.schemagen.types.WrappedList;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import javax.ws.rs.PathParam;
 import java.lang.reflect.Type;
