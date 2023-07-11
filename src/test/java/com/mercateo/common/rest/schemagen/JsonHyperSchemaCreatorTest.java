@@ -1,15 +1,14 @@
 package com.mercateo.common.rest.schemagen;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
-import org.junit.Test;
-
-import javax.ws.rs.core.Link;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
+import org.junit.jupiter.api.Test;
+
+import jakarta.ws.rs.core.Link;
 
 public class JsonHyperSchemaCreatorTest {
     @Test

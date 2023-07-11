@@ -17,8 +17,8 @@ package com.mercateo.common.rest.schemagen;
 
 import com.mercateo.common.rest.schemagen.link.relation.Rel;
 import com.mercateo.common.rest.schemagen.link.relation.RelationContainer;
+import jakarta.ws.rs.core.Link;
 
-import javax.ws.rs.core.Link;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

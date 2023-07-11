@@ -27,9 +27,7 @@ import com.mercateo.common.rest.schemagen.plugin.TargetSchemaEnablerForLink;
 import com.mercateo.common.rest.schemagen.plugin.common.FieldCheckerForSchemaFactory;
 import com.mercateo.common.rest.schemagen.plugin.common.MethodCheckerForLinkFactory;
 import com.mercateo.common.rest.schemagen.plugin.common.TargetSchemaEnablerForLinkFactory;
-
-import javax.inject.Singleton;
-
+import jakarta.inject.Singleton;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.glassfish.jersey.process.internal.RequestScoped;
 import org.glassfish.jersey.server.ResourceConfig;

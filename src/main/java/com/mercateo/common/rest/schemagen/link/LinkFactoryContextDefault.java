@@ -15,13 +15,13 @@
  */
 package com.mercateo.common.rest.schemagen.link;
 
-import static java.util.Objects.requireNonNull;
-
 import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 import com.mercateo.common.rest.schemagen.plugin.MethodCheckerForLink;
 import com.mercateo.common.rest.schemagen.plugin.TargetSchemaEnablerForLink;
 
 import java.net.URI;
+
+import static java.util.Objects.requireNonNull;
 
 public class LinkFactoryContextDefault implements LinkFactoryContext {
 

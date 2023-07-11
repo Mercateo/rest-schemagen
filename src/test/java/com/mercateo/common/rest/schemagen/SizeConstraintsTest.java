@@ -1,14 +1,15 @@
 package com.mercateo.common.rest.schemagen;
 
-import org.junit.Test;
-
-import javax.validation.constraints.Size;
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.Optional;
+
+import org.junit.jupiter.api.Test;
+
+import jakarta.validation.constraints.Size;
 
 public class SizeConstraintsTest {
 

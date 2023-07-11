@@ -15,12 +15,12 @@
  */
 package com.mercateo.common.rest.schemagen.types;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 @JsonSerialize
 public class Message {

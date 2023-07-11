@@ -15,9 +15,9 @@
  */
 package com.mercateo.common.rest.schemagen.plugin;
 
-import java.util.function.Predicate;
-
 import com.mercateo.common.rest.schemagen.link.Scope;
+
+import java.util.function.Predicate;
 
 /**
  * Checks if a link should be created for that method.

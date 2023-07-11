@@ -15,12 +15,12 @@
  */
 package com.mercateo.common.rest.schemagen.generictype;
 
-import static java.util.Objects.requireNonNull;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+
+import static java.util.Objects.requireNonNull;
 
 public abstract class GenericType<T> {
 

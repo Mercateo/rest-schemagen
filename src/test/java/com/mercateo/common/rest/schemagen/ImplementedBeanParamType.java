@@ -8,9 +8,9 @@ package com.mercateo.common.rest.schemagen;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
 
 public class ImplementedBeanParamType {
 

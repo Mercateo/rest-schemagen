@@ -15,13 +15,11 @@
  */
 package com.mercateo.common.rest.schemagen.link.injection;
 
-import javax.inject.Inject;
-
-import org.glassfish.hk2.api.Factory;
-
 import com.mercateo.common.rest.schemagen.JsonSchemaGenerator;
 import com.mercateo.common.rest.schemagen.link.LinkFactoryContext;
 import com.mercateo.common.rest.schemagen.link.LinkMetaFactory;
+import jakarta.inject.Inject;
+import org.glassfish.hk2.api.Factory;
 
 public class LinkMetaFactoryFactory implements Factory<LinkMetaFactory> {
 

@@ -1,20 +1,18 @@
 package com.mercateo.common.rest.schemagen.link.injection;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import javax.inject.Inject;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Application;
-
-import org.glassfish.jersey.server.ResourceConfig;
-import org.glassfish.jersey.test.JerseyTest;
-import org.junit.Test;
-
 import com.mercateo.common.rest.schemagen.JerseyResource;
 import com.mercateo.common.rest.schemagen.link.LinkFactory;
 import com.mercateo.common.rest.schemagen.link.LinkMetaFactory;
 import com.mercateo.common.rest.schemagen.link.relation.Rel;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.core.Application;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.test.JerseyTest;
+import org.junit.jupiter.api.Test;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class LinkFactoryResourceConfigTest extends JerseyTest {
 

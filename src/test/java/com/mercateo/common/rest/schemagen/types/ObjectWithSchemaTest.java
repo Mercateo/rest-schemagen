@@ -1,19 +1,17 @@
 package com.mercateo.common.rest.schemagen.types;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.util.Optional;
-
-import lombok.Data;
-import lombok.Value;
-
-import org.junit.Test;
-
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.mercateo.common.rest.schemagen.JsonHyperSchema;
+import lombok.Data;
+import lombok.Value;
+import org.junit.jupiter.api.Test;
+
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ObjectWithSchemaTest {
 

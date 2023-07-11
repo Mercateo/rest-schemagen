@@ -15,14 +15,14 @@
  */
 package com.mercateo.common.rest.schemagen;
 
+import com.mercateo.common.rest.schemagen.generictype.GenericType;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.mercateo.common.rest.schemagen.generictype.GenericType;
 
 public final class PropertyTypeMapper {
 

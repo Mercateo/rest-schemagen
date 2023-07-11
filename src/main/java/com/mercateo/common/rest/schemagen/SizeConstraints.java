@@ -15,9 +15,9 @@
  */
 package com.mercateo.common.rest.schemagen;
 
-import java.util.Optional;
+import jakarta.validation.constraints.Size;
 
-import javax.validation.constraints.Size;
+import java.util.Optional;
 
 public class SizeConstraints {
 

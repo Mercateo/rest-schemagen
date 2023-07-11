@@ -1,19 +1,17 @@
 package com.mercateo.common.rest.schemagen.types;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mercateo.common.rest.schemagen.JsonHyperSchema;
+import jakarta.ws.rs.core.Link;
+import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.core.Link;
-
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class ListResponseTest {
 

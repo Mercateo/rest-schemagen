@@ -15,14 +15,6 @@
  */
 package com.mercateo.common.rest.schemagen.link.helper;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.ws.rs.core.Link;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -32,9 +24,16 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.mercateo.common.rest.schemagen.link.LinkCreator;
+import jakarta.ws.rs.core.Link;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * this class is needed, since {@link javax.ws.rs.core.Link} could not be
+ * this class is needed, since {@link jakarta.ws.rs.core.Link} could not be
  * serialized properly at the moment
  * 
  * @author joerg.adler

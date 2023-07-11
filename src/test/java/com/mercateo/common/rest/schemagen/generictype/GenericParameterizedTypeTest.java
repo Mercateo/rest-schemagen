@@ -8,7 +8,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.googlecode.gentyref.GenericTypeReflector;
 import com.mercateo.common.rest.schemagen.JsonHyperSchema;

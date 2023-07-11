@@ -15,12 +15,12 @@
  */
 package com.mercateo.common.rest.schemagen.generictype;
 
-import static java.util.Objects.requireNonNull;
+import com.googlecode.gentyref.GenericTypeReflector;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
-import com.googlecode.gentyref.GenericTypeReflector;
+import static java.util.Objects.requireNonNull;
 
 public class GenericParameterizedType<T> extends GenericType<T> {
 

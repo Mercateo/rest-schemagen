@@ -17,9 +17,9 @@ package com.mercateo.common.rest.schemagen.types;
 
 import com.mercateo.common.rest.schemagen.JsonHyperSchema;
 import com.mercateo.common.rest.schemagen.JsonHyperSchemaCreator;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.core.Link;
 
-import javax.inject.Inject;
-import javax.ws.rs.core.Link;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

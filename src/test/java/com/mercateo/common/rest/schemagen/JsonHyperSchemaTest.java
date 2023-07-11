@@ -1,15 +1,16 @@
 package com.mercateo.common.rest.schemagen;
 
-import com.mercateo.common.rest.schemagen.link.relation.Rel;
-import org.junit.Before;
-import org.junit.Test;
-
-import javax.ws.rs.core.Link;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import com.mercateo.common.rest.schemagen.link.relation.Rel;
+
+import jakarta.ws.rs.core.Link;
 
 public class JsonHyperSchemaTest {
 
@@ -19,7 +20,7 @@ public class JsonHyperSchemaTest {
 
     private JsonHyperSchema hyperSchema;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         hyperSchema = JsonHyperSchema.from(null, link1, null, link2, null);
     }

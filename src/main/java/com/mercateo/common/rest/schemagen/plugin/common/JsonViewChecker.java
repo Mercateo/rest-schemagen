@@ -15,16 +15,16 @@
  */
 package com.mercateo.common.rest.schemagen.plugin.common;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import com.fasterxml.jackson.annotation.JsonView;
+import com.mercateo.common.rest.schemagen.parameter.CallContext;
+import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonView;
-import com.mercateo.common.rest.schemagen.parameter.CallContext;
-import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class JsonViewChecker implements FieldCheckerForSchema {
 

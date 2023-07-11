@@ -15,13 +15,13 @@
  */
 package com.mercateo.common.rest.schemagen.json.mapper;
 
-import java.util.function.Function;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.mercateo.common.rest.schemagen.JsonProperty;
+
+import java.util.function.Function;
 
 class StringJsonPropertyMapper implements JsonPropertyMapper {
 

@@ -15,8 +15,6 @@
  */
 package com.mercateo.common.rest.schemagen.types;
 
-import static java.util.Objects.requireNonNull;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -24,11 +22,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.mercateo.common.rest.schemagen.IgnoreInRestSchema;
 import com.mercateo.common.rest.schemagen.JsonHyperSchema;
+import lombok.Setter;
 
 import java.util.Collections;
 import java.util.List;
 
-import lombok.Setter;
+import static java.util.Objects.requireNonNull;
 
 public class ObjectWithSchema<T> {
 

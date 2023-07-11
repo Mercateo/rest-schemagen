@@ -20,6 +20,14 @@
  */
 package com.mercateo.common.rest.schemagen.link;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
+import org.reflections.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.util.Collection;
@@ -27,16 +35,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-
-import org.reflections.ReflectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Multimap;
 
 public class BeanParamExtractor {
     private final static Logger logger = LoggerFactory.getLogger(BeanParamExtractor.class);

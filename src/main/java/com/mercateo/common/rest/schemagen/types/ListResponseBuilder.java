@@ -15,12 +15,12 @@
  */
 package com.mercateo.common.rest.schemagen.types;
 
-import static java.util.Objects.requireNonNull;
+import com.mercateo.common.rest.schemagen.JsonHyperSchema;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.mercateo.common.rest.schemagen.JsonHyperSchema;
+import static java.util.Objects.requireNonNull;
 
 public class ListResponseBuilder<ElementIn, ElementOut> extends
         ResponseBuilderAbstract<ListResponseBuilder<ElementIn, ElementOut>, ElementIn, ElementOut, ListResponse<ElementOut>> {

@@ -15,11 +15,11 @@
  */
 package com.mercateo.common.rest.schemagen;
 
+import com.mercateo.common.rest.schemagen.types.PaginatedList;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import com.mercateo.common.rest.schemagen.types.PaginatedList;
 
 public class ListSlicer {
 

@@ -1,17 +1,14 @@
 package com.mercateo.common.rest.schemagen.link.helper;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.in;
+import com.fasterxml.jackson.databind.node.TextNode;
+import com.mercateo.common.rest.schemagen.link.LinkCreator;
+import jakarta.ws.rs.core.Link;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 
-import javax.ws.rs.core.Link;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import com.fasterxml.jackson.databind.node.TextNode;
-import com.mercateo.common.rest.schemagen.link.LinkCreator;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class JsonLinkTest {
 
@@ -27,7 +24,7 @@ public class JsonLinkTest {
 
 	private String uriStringTemplate;
 
-	@Before
+	@BeforeEach
 	public void setUp() throws IOException {
 		uriString = "https://localhost:1234/base?parm1=val1&parm2=val2#test";
 		jsonLink = new JsonLink(Link //

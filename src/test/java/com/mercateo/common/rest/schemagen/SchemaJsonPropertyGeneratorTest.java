@@ -1,5 +1,19 @@
 package com.mercateo.common.rest.schemagen;
 
+import static com.google.common.base.CaseFormat.LOWER_CAMEL;
+import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.lang.reflect.Type;
+import java.math.BigDecimal;
+import java.util.*;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.ImmutableList;
@@ -10,28 +24,15 @@ import com.mercateo.common.rest.schemagen.generictype.GenericType;
 import com.mercateo.common.rest.schemagen.parameter.CallContext;
 import com.mercateo.common.rest.schemagen.types.ListResponse;
 import com.mercateo.common.rest.schemagen.types.ObjectWithSchema;
-import com.mercateo.common.rest.schemagen.types.WrappedList;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.ws.rs.PathParam;
-import java.lang.reflect.Type;
-import java.math.BigDecimal;
-import java.util.*;
+import jakarta.ws.rs.PathParam;
 
-import static com.google.common.base.CaseFormat.LOWER_CAMEL;
-import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class SchemaJsonPropertyGeneratorTest {
 
     private SchemaPropertyGenerator schemaGenerator;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         schemaGenerator = new SchemaPropertyGenerator();
     }

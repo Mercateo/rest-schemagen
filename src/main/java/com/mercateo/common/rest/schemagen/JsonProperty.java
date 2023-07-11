@@ -15,21 +15,19 @@
  */
 package com.mercateo.common.rest.schemagen;
 
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import javax.annotation.Nullable;
-
-import org.immutables.value.Value;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.mercateo.common.rest.schemagen.generator.ObjectContext;
 import com.mercateo.common.rest.schemagen.internal.DataClassStyle;
 import com.mercateo.common.rest.schemagen.plugin.IndividualSchemaGenerator;
 import com.mercateo.common.rest.schemagen.util.EnumUtil;
+import jakarta.annotation.Nullable;
+import org.immutables.value.Value;
+
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Value.Immutable
 @DataClassStyle

@@ -1,13 +1,14 @@
 package com.mercateo.common.rest.schemagen.link;
 
+import jakarta.ws.rs.core.Link;
+import org.junit.jupiter.api.Test;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Optional;
 
-import javax.ws.rs.core.Link;
-
-import org.junit.Assert;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class ExternalLinkFactory0Test {
 	private ExternalLinkFactory uut = new ExternalLinkFactory();
@@ -18,10 +19,10 @@ public class ExternalLinkFactory0Test {
 		Optional<String> schemaForLink = Optional.of("schema");
 		String relName = "relation";
 		Link link = uut.createFor(uri, schemaForLink, relName);
-		Assert.assertEquals(uri, link.getUri());
-		Assert.assertEquals("_blank", link.getParams().get("target"));
-		Assert.assertEquals("schema", link.getParams().get("schema"));
-		Assert.assertEquals("relation", link.getRel());
+		assertEquals(uri, link.getUri());
+		assertEquals("_blank", link.getParams().get("target"));
+		assertEquals("schema", link.getParams().get("schema"));
+		assertEquals("relation", link.getRel());
 	}
 
 	@Test
@@ -30,9 +31,9 @@ public class ExternalLinkFactory0Test {
 		Optional<String> schemaForLink = Optional.empty();
 		String relName = "relation";
 		Link link = uut.createFor(uri, schemaForLink, relName);
-		Assert.assertEquals(uri, link.getUri());
-		Assert.assertEquals("_blank", link.getParams().get("target"));
-		Assert.assertNull(link.getParams().get("schema"));
-		Assert.assertEquals("relation", link.getRel());
+		assertEquals(uri, link.getUri());
+		assertEquals("_blank", link.getParams().get("target"));
+		assertNull(link.getParams().get("schema"));
+		assertEquals("relation", link.getRel());
 	}
 }

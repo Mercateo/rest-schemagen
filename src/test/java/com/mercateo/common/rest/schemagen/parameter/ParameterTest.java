@@ -1,18 +1,18 @@
 package com.mercateo.common.rest.schemagen.parameter;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collections;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class ParameterTest {
 
     private Parameter.Builder<TestClass> builder;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         builder = Parameter.builderFor(TestClass.class);
     }

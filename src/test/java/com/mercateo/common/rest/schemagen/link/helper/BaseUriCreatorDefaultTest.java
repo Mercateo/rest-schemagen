@@ -1,20 +1,19 @@
 package com.mercateo.common.rest.schemagen.link.helper;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import jakarta.ws.rs.core.MultivaluedHashMap;
+import jakarta.ws.rs.core.MultivaluedMap;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import javax.ws.rs.core.MultivaluedHashMap;
-import javax.ws.rs.core.MultivaluedMap;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
-
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class BaseUriCreatorDefaultTest {
 
     private MultivaluedMap<String, String> requestHeaders;
@@ -23,7 +22,7 @@ public class BaseUriCreatorDefaultTest {
 
     private BaseUriCreator baseUriFactory;
 
-    @Before
+    @BeforeEach
     public void setUp() throws URISyntaxException {
         defaultBaseUri = new URI("http://host:8090/base/");
         requestHeaders = new MultivaluedHashMap<>();

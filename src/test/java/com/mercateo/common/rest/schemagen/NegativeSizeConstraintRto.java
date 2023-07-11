@@ -1,6 +1,6 @@
 package com.mercateo.common.rest.schemagen;
 
-import javax.validation.constraints.Size;
+import jakarta.validation.constraints.Size;
 
 @SuppressWarnings("unused")
 public class NegativeSizeConstraintRto {

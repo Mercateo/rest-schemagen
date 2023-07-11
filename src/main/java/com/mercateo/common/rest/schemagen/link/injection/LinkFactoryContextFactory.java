@@ -21,14 +21,12 @@ import com.mercateo.common.rest.schemagen.link.helper.BaseUriCreator;
 import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 import com.mercateo.common.rest.schemagen.plugin.MethodCheckerForLink;
 import com.mercateo.common.rest.schemagen.plugin.TargetSchemaEnablerForLink;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.UriInfo;
+import org.glassfish.hk2.api.Factory;
 
 import java.net.URI;
-
-import javax.inject.Inject;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.UriInfo;
-
-import org.glassfish.hk2.api.Factory;
 
 public class LinkFactoryContextFactory implements Factory<LinkFactoryContext> {
 

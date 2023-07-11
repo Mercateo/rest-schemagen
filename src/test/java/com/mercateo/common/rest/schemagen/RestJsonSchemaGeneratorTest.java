@@ -4,14 +4,6 @@ import static com.google.common.base.CaseFormat.LOWER_CAMEL;
 import static com.google.common.base.CaseFormat.UPPER_UNDERSCORE;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.mercateo.common.rest.schemagen.annotation.Media;
-import com.mercateo.common.rest.schemagen.link.CallScope;
-import com.mercateo.common.rest.schemagen.parameter.CallContext;
-import com.mercateo.common.rest.schemagen.parameter.Parameter;
-import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
-import com.mercateo.reflection.Call;
-
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.time.OffsetDateTime;
@@ -21,33 +13,41 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import javax.validation.constraints.NotNull;
-import javax.ws.rs.BeanParam;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.GET;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
+import com.fasterxml.jackson.annotation.JsonValue;
+import com.mercateo.common.rest.schemagen.annotation.Media;
+import com.mercateo.common.rest.schemagen.link.CallScope;
+import com.mercateo.common.rest.schemagen.parameter.CallContext;
+import com.mercateo.common.rest.schemagen.parameter.Parameter;
+import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
+import com.mercateo.reflection.Call;
+
+import jakarta.validation.constraints.NotNull;
+import jakarta.ws.rs.BeanParam;
+import jakarta.ws.rs.DefaultValue;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
 
 @SuppressWarnings({"boxing", "unused"})
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class RestJsonSchemaGeneratorTest {
 
     private RestJsonSchemaGenerator schemaGenerator;
 
     private FieldCheckerForSchema fieldCheckerForSchema = (o, c) -> true;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         schemaGenerator = new RestJsonSchemaGenerator();
     }

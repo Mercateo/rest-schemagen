@@ -16,7 +16,6 @@
 package com.mercateo.common.rest.schemagen.generator;
 
 import com.mercateo.common.rest.schemagen.JsonProperty;
-import com.mercateo.common.rest.schemagen.internal.DataClassStyle;
 import com.mercateo.common.rest.schemagen.internal.TupleStyle;
 import org.immutables.value.Value;
 

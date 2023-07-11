@@ -1,11 +1,10 @@
 package com.mercateo.common.rest.schemagen.types;
 
+import com.mercateo.common.rest.schemagen.JsonHyperSchema;
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
-
-import com.mercateo.common.rest.schemagen.JsonHyperSchema;
-
-import org.junit.Test;
 
 public class ObjectWithSchemaCreatorTest {
     @Test

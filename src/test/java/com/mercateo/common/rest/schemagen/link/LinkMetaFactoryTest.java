@@ -1,21 +1,20 @@
 package com.mercateo.common.rest.schemagen.link;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-
 import com.mercateo.common.rest.schemagen.JsonSchemaGenerator;
 import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 import com.mercateo.common.rest.schemagen.plugin.MethodCheckerForLink;
 import com.mercateo.common.rest.schemagen.plugin.TargetSchemaEnablerForLink;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.URI;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class LinkMetaFactoryTest {
 
     @Mock

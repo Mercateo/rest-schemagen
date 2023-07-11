@@ -25,8 +25,8 @@ import com.mercateo.common.rest.schemagen.parameter.Parameter;
 import com.mercateo.reflection.Call;
 import com.mercateo.reflection.InvocationRecorder;
 import com.mercateo.reflection.proxy.ProxyCache;
+import jakarta.ws.rs.core.Link;
 
-import javax.ws.rs.core.Link;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;

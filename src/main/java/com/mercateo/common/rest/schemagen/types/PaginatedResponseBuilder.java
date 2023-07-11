@@ -15,18 +15,17 @@
  */
 package com.mercateo.common.rest.schemagen.types;
 
-import static java.util.Objects.requireNonNull;
+import com.mercateo.common.rest.schemagen.JsonHyperSchema;
+import com.mercateo.common.rest.schemagen.ListSlicer;
+import com.mercateo.common.rest.schemagen.PaginationLinkBuilder;
+import com.mercateo.common.rest.schemagen.PaginationLinkBuilder.PaginationLinkCreator;
+import jakarta.ws.rs.core.Link;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.mercateo.common.rest.schemagen.JsonHyperSchema;
-import com.mercateo.common.rest.schemagen.ListSlicer;
-import com.mercateo.common.rest.schemagen.PaginationLinkBuilder;
-import com.mercateo.common.rest.schemagen.PaginationLinkBuilder.PaginationLinkCreator;
-
-import javax.ws.rs.core.Link;
+import static java.util.Objects.requireNonNull;
 
 public class PaginatedResponseBuilder<ElementIn, ElementOut> extends
         ResponseBuilderAbstract<PaginatedResponseBuilder<ElementIn, ElementOut>, ElementIn, ElementOut, PaginatedResponse<ElementOut>> {

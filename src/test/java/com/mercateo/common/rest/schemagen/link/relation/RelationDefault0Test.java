@@ -1,9 +1,9 @@
 package com.mercateo.common.rest.schemagen.link.relation;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class RelationDefault0Test {
 
@@ -13,7 +13,7 @@ public class RelationDefault0Test {
 
     private String relationName;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         type = new RelationTypeDefault("<typeName>", false, "<type>");
         relationName = "<name>";

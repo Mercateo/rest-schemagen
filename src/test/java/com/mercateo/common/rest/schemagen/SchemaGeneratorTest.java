@@ -5,19 +5,19 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 
-import javax.ws.rs.core.Link;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.mercateo.common.rest.schemagen.link.LinkFactory;
 import com.mercateo.common.rest.schemagen.link.SchemaGenerator;
 import com.mercateo.common.rest.schemagen.link.helper.MethodInvocation;
 import com.mercateo.common.rest.schemagen.link.relation.Rel;
 
-@RunWith(MockitoJUnitRunner.class)
+import jakarta.ws.rs.core.Link;
+
+@ExtendWith(MockitoExtension.class)
 public class SchemaGeneratorTest {
     public static class Resource implements JerseyResource {
         @SuppressWarnings("unused")

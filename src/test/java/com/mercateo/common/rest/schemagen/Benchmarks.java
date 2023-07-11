@@ -1,16 +1,18 @@
 package com.mercateo.common.rest.schemagen;
 
-import com.mercateo.common.rest.schemagen.link.LinkFactory;
-import com.mercateo.common.rest.schemagen.link.LinkMetaFactory;
-import com.mercateo.common.rest.schemagen.link.relation.Rel;
+import java.util.Optional;
+
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import javax.ws.rs.core.Link;
-import java.util.Optional;
+import com.mercateo.common.rest.schemagen.link.LinkFactory;
+import com.mercateo.common.rest.schemagen.link.LinkMetaFactory;
+import com.mercateo.common.rest.schemagen.link.relation.Rel;
+
+import jakarta.ws.rs.core.Link;
 
 public class Benchmarks {
 

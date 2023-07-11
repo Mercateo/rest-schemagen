@@ -4,21 +4,21 @@ import com.mercateo.common.rest.schemagen.link.LinkFactoryContext;
 import com.mercateo.common.rest.schemagen.link.helper.BaseUriCreator;
 import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 import com.mercateo.common.rest.schemagen.plugin.MethodCheckerForLink;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import jakarta.ws.rs.core.HttpHeaders;
+import jakarta.ws.rs.core.MultivaluedMap;
+import jakarta.ws.rs.core.UriInfo;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class LinkFactoryContextFactoryTest {
 
     @Mock

@@ -17,7 +17,6 @@ package com.mercateo.common.rest.schemagen.types;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.glassfish.jersey.server.JSONP;
 
 import java.util.List;
 

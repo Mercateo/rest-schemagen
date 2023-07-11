@@ -16,7 +16,6 @@
 package com.mercateo.common.rest.schemagen.plugin.common;
 
 import com.mercateo.common.rest.schemagen.plugin.TargetSchemaEnablerForLink;
-
 import org.glassfish.hk2.api.Factory;
 
 public class TargetSchemaEnablerForLinkFactory implements Factory<TargetSchemaEnablerForLink> {

@@ -1,12 +1,5 @@
 package com.mercateo.common.rest.schemagen.link;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-
 import com.mercateo.common.rest.schemagen.GenericResource;
 import com.mercateo.common.rest.schemagen.ImplementedBeanParamType;
 import com.mercateo.common.rest.schemagen.JsonSchemaGenerator;
@@ -14,20 +7,25 @@ import com.mercateo.common.rest.schemagen.ResourceClass;
 import com.mercateo.common.rest.schemagen.Something;
 import com.mercateo.common.rest.schemagen.link.relation.Rel;
 import com.mercateo.common.rest.schemagen.link.relation.Relation;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.core.Link;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Optional;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.Link;
-
-import org.junit.Test;
-import org.mockito.Mockito;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 public class LinkCreatorTest {
 

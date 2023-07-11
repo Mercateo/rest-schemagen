@@ -1,9 +1,7 @@
 package com.mercateo.common.rest.schemagen.plugin;
 
 import com.mercateo.common.rest.schemagen.parameter.CallContext;
-import org.junit.Test;
-
-import java.lang.reflect.Field;
+import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;

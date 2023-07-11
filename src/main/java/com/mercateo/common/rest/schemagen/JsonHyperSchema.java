@@ -15,7 +15,15 @@
  */
 package com.mercateo.common.rest.schemagen;
 
-import static java.util.Objects.requireNonNull;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.annotations.VisibleForTesting;
+import com.mercateo.common.rest.schemagen.link.LinkCreator;
+import com.mercateo.common.rest.schemagen.link.helper.JsonLink;
+import com.mercateo.common.rest.schemagen.link.relation.RelationContainer;
+import jakarta.ws.rs.ProcessingException;
+import jakarta.ws.rs.core.Link;
+import jakarta.xml.bind.annotation.adapters.XmlAdapter;
+import jakarta.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -27,16 +35,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.ws.rs.ProcessingException;
-import javax.ws.rs.core.Link;
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.common.annotations.VisibleForTesting;
-import com.mercateo.common.rest.schemagen.link.LinkCreator;
-import com.mercateo.common.rest.schemagen.link.helper.JsonLink;
-import com.mercateo.common.rest.schemagen.link.relation.RelationContainer;
+import static java.util.Objects.requireNonNull;
 
 public class JsonHyperSchema {
 

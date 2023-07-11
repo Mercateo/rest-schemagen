@@ -1,13 +1,5 @@
 package com.mercateo.common.rest.schemagen.link;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-
 import com.mercateo.common.rest.schemagen.ResourceClass;
 import com.mercateo.common.rest.schemagen.ResourceClass.ChildResourceClass;
 import com.mercateo.common.rest.schemagen.ResourceClass.ParentResourceClass;
@@ -19,23 +11,30 @@ import com.mercateo.common.rest.schemagen.parameter.CallContext;
 import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 import com.mercateo.common.rest.schemagen.plugin.TargetSchemaEnablerForLink;
 import com.mercateo.common.rest.schemagen.plugin.common.RolesAllowedChecker;
+import jakarta.ws.rs.core.Link;
+import jakarta.ws.rs.core.SecurityContext;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Optional;
 
-import javax.ws.rs.core.Link;
-import javax.ws.rs.core.SecurityContext;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
 @SuppressWarnings("boxing")
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class LinkFactoryTest {
 
     @Mock
@@ -51,9 +50,9 @@ public class LinkFactoryTest {
 
     private LinkMetaFactory linkMetaFactory;
 
-    @Before
+    @BeforeEach
     public void setUp() throws URISyntaxException {
-        when(targetSchemaEnablerForLink.test(any())).thenReturn(true);
+        lenient().when(targetSchemaEnablerForLink.test(any())).thenReturn(true);
         linkFactoryContext = new LinkFactoryContextDefault(new URI("basePath/"),
                 new RolesAllowedChecker(securityContext), fieldCheckerForSchema,
                 targetSchemaEnablerForLink);

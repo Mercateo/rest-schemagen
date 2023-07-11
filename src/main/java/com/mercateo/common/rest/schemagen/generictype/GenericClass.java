@@ -15,9 +15,9 @@
  */
 package com.mercateo.common.rest.schemagen.generictype;
 
-import java.lang.reflect.Type;
-
 import com.googlecode.gentyref.GenericTypeReflector;
+
+import java.lang.reflect.Type;
 
 public class GenericClass<T> extends GenericType<T> {
 

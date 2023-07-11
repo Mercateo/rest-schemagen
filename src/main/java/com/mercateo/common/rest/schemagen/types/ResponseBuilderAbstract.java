@@ -15,9 +15,8 @@
  */
 package com.mercateo.common.rest.schemagen.types;
 
-import static java.util.Objects.requireNonNull;
+import jakarta.ws.rs.core.Link;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -27,7 +26,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.ws.rs.core.Link;
+import static java.util.Objects.requireNonNull;
 
 public abstract class ResponseBuilderAbstract<Self extends ResponseBuilderAbstract<Self, ElementIn, ElementOut, Container>, ElementIn, ElementOut, Container> {
 

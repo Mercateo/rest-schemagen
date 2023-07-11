@@ -1,20 +1,19 @@
 package com.mercateo.common.rest.schemagen.types;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Map;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.entry;
 
-import java.util.Map;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class MessageTest {
 
     @Mock
@@ -22,7 +21,7 @@ public class MessageTest {
 
     private MessageCode code;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         code = new MessageCode() {
             @Override

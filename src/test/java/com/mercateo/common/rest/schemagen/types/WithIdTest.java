@@ -1,14 +1,13 @@
 package com.mercateo.common.rest.schemagen.types;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class WithIdTest {
 

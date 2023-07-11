@@ -1,5 +1,12 @@
 package com.mercateo.common.rest.schemagen;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.lang.reflect.Type;
+import java.net.URL;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -10,13 +17,6 @@ import com.mercateo.common.rest.schemagen.generator.ObjectContextBuilder;
 import com.mercateo.common.rest.schemagen.generictype.GenericType;
 import com.mercateo.common.rest.schemagen.json.mapper.PropertyJsonSchemaMapper;
 import com.mercateo.common.rest.schemagen.parameter.CallContext;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.lang.reflect.Type;
-import java.net.URL;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class PropertyJsonSchemaMapperTest {
 
@@ -24,7 +24,7 @@ public class PropertyJsonSchemaMapperTest {
 
     private PropertyJsonSchemaMapper propertyJsonSchemaMapper;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         schemaGenerator = new SchemaPropertyGenerator();
         propertyJsonSchemaMapper = new PropertyJsonSchemaMapper();

@@ -1,9 +1,9 @@
 package com.mercateo.common.rest.schemagen.link.relation;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import org.junit.Before;
-import org.junit.Test;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class RelationTypeDefault0Test {
 
@@ -12,7 +12,7 @@ public class RelationTypeDefault0Test {
     public static final boolean SHOULD_BE_SERIALIZED = true;
     private RelationTypeDefault relationType;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         relationType = new RelationTypeDefault(NAME, SHOULD_BE_SERIALIZED, SERIALIZED_NAME);
     }

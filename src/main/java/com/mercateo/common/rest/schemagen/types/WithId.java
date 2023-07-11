@@ -17,13 +17,12 @@ package com.mercateo.common.rest.schemagen.types;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
-
-import lombok.Getter;
-import lombok.Setter;
 
 public class WithId<T> {
 

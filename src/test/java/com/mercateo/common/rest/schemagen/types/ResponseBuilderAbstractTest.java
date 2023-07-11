@@ -1,21 +1,19 @@
 package com.mercateo.common.rest.schemagen.types;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.mercateo.common.rest.schemagen.JsonHyperSchema;
+import jakarta.ws.rs.core.Link;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
 import java.util.Optional;
 
-import javax.ws.rs.core.Link;
+import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class ResponseBuilderAbstractTest {
 
     private final int value = 1234;
@@ -23,7 +21,7 @@ public class ResponseBuilderAbstractTest {
     @Mock
     private Link link1, link2, link3;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         responseBuilder = new ResponseBuilder();
         responseBuilder.withValue(value);

@@ -1,15 +1,15 @@
 package com.mercateo.common.rest.schemagen.plugin.common;
 
-import java.util.Optional;
-
-import org.junit.Assert;
-import org.junit.Test;
-import org.mockito.Mockito;
-
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.Sets;
 import com.mercateo.common.rest.schemagen.parameter.CallContext;
+import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class JsonViewCheckerTest {
 
@@ -32,7 +32,7 @@ public class JsonViewCheckerTest {
 		CallContext callContext=Mockito.mock(CallContext.class);
 		Mockito.when(callContext.getAdditionalObjectsFor(Class.class)).thenReturn(Optional.empty());
 		JsonViewChecker uut=new JsonViewChecker();
-		Assert.assertTrue(uut.test(TestBean.class.getDeclaredField("viewField"), callContext));
+		assertTrue(uut.test(TestBean.class.getDeclaredField("viewField"), callContext));
 	}
 	
 	
@@ -41,7 +41,7 @@ public class JsonViewCheckerTest {
 		CallContext callContext=Mockito.mock(CallContext.class);
 		Mockito.when(callContext.getAdditionalObjectsFor(Class.class)).thenReturn(Optional.of(Sets.newHashSet(Class.class, this.getClass())));
 		JsonViewChecker uut=new JsonViewChecker();
-		Assert.assertTrue(uut.test(TestBean.class.getDeclaredField("viewField"), callContext));
+		assertTrue(uut.test(TestBean.class.getDeclaredField("viewField"), callContext));
 	}
 	
 	@Test
@@ -49,6 +49,6 @@ public class JsonViewCheckerTest {
 		CallContext callContext=Mockito.mock(CallContext.class);
 		Mockito.when(callContext.getAdditionalObjectsFor(Class.class)).thenReturn(Optional.of(Sets.newHashSet(this.getClass())));
 		JsonViewChecker uut=new JsonViewChecker();
-		Assert.assertFalse(uut.test(TestBean.class.getDeclaredField("viewField"), callContext));
+		assertFalse(uut.test(TestBean.class.getDeclaredField("viewField"), callContext));
 	}
 }

@@ -5,13 +5,11 @@
  */
 package com.mercateo.common.rest.schemagen.link;
 
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -21,12 +19,9 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 public class BeanParamExtractorTest {
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-
     private BeanParamExtractor beanParamExtractor;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         beanParamExtractor = new BeanParamExtractor();
     }

@@ -15,9 +15,8 @@
  */
 package com.mercateo.common.rest.schemagen.plugin.common;
 
-import org.glassfish.hk2.api.Factory;
-
 import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
+import org.glassfish.hk2.api.Factory;
 
 public class FieldCheckerForSchemaFactory implements Factory<FieldCheckerForSchema> {
 

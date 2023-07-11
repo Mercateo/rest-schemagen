@@ -15,10 +15,10 @@
  */
 package com.mercateo.common.rest.schemagen.generictype;
 
+import com.googlecode.gentyref.GenericTypeReflector;
+
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Type;
-
-import com.googlecode.gentyref.GenericTypeReflector;
 
 public class GenericArray<T> extends GenericType<T> {
     private final GenericArrayType arrayType;

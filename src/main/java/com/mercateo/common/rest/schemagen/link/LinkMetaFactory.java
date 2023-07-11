@@ -15,8 +15,6 @@
  */
 package com.mercateo.common.rest.schemagen.link;
 
-import static java.util.Objects.requireNonNull;
-
 import com.google.common.annotations.VisibleForTesting;
 import com.mercateo.common.rest.schemagen.JerseyResource;
 import com.mercateo.common.rest.schemagen.JsonSchemaGenerator;
@@ -27,6 +25,8 @@ import com.mercateo.common.rest.schemagen.plugin.TargetSchemaEnablerForLink;
 
 import java.net.URI;
 import java.util.ArrayList;
+
+import static java.util.Objects.requireNonNull;
 
 public class LinkMetaFactory {
 

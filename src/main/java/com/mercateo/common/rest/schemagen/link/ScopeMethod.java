@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 /**
  * @deprecated please use {@link Scope} instead
  */
+@Deprecated
 public abstract class ScopeMethod extends Scope {
     public ScopeMethod(Class<?> clazz, Method method, Object[] params) {
         super(clazz, method, params);

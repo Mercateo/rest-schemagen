@@ -15,12 +15,10 @@
  */
 package com.mercateo.common.rest.schemagen.plugin.common;
 
-import javax.inject.Inject;
-import javax.ws.rs.core.SecurityContext;
-
-import org.glassfish.hk2.api.Factory;
-
 import com.mercateo.common.rest.schemagen.plugin.MethodCheckerForLink;
+import jakarta.inject.Inject;
+import jakarta.ws.rs.core.SecurityContext;
+import org.glassfish.hk2.api.Factory;
 
 public class MethodCheckerForLinkFactory implements Factory<MethodCheckerForLink> {
 

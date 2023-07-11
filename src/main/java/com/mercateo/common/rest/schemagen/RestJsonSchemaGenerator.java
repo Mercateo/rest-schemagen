@@ -26,6 +26,13 @@ import com.mercateo.common.rest.schemagen.json.mapper.PropertyJsonSchemaMapper;
 import com.mercateo.common.rest.schemagen.link.Scope;
 import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 import com.mercateo.common.rest.schemagen.plugin.TargetSchemaEnablerForLink;
+import jakarta.ws.rs.BeanParam;
+import jakarta.ws.rs.FormParam;
+import jakarta.ws.rs.HeaderParam;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Context;
+import org.glassfish.jersey.media.multipart.FormDataParam;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -37,15 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-
-import javax.ws.rs.BeanParam;
-import javax.ws.rs.FormParam;
-import javax.ws.rs.HeaderParam;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-
-import org.glassfish.jersey.media.multipart.FormDataParam;
 
 public class RestJsonSchemaGenerator implements JsonSchemaGenerator {
     private static final Set<Class<?>> INVALID_OUTPUT_TYPES = new HashSet<>(Arrays.asList(void.class,
