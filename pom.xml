@@ -7,7 +7,7 @@
 	</parent>
 	<artifactId>common.rest.schemagen</artifactId>
 	<groupId>com.mercateo</groupId>
-	<version>0.21.0-SNAPSHOT</version>
+	<version>0.30.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	<name>rest-schemagen</name>
 	<description>Jersey add-on for dynamic link and schema building</description>
@@ -54,19 +54,6 @@
 		<jersey.version>3.1.2</jersey.version>
 		<glassfish.version>3.0.4</glassfish.version>
 	</properties>
-	<developers>
-		<developer>
-			<id>joerg_adler</id>
-			<name>Joerg Adler</name>
-			<email>joerg.adler@mercateo.com</email>
-			<url>http://www.mercateo.com</url>
-			<organization>Mercateo AG</organization>
-			<organizationUrl>http://www.mercateo.com</organizationUrl>
-			<roles>
-				<role>developer</role>
-			</roles>
-		</developer>
-	</developers>
 	<build>
 		<plugins>
 			<plugin>

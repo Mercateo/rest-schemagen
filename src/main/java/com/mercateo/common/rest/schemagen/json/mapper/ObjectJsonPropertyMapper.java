@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,12 +15,12 @@
  */
 package com.mercateo.common.rest.schemagen.json.mapper;
 
+import java.util.List;
+
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.mercateo.common.rest.schemagen.JsonProperty;
-
-import java.util.List;
 
 class ObjectJsonPropertyMapper implements JsonPropertyMapper {
 

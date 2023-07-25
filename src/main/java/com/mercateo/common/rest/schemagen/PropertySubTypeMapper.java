@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,11 +15,11 @@
  */
 package com.mercateo.common.rest.schemagen;
 
-import com.mercateo.common.rest.schemagen.generictype.GenericType;
-
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
+
+import com.mercateo.common.rest.schemagen.generictype.GenericType;
 
 public final class PropertySubTypeMapper {
 

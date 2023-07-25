@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +15,9 @@
  */
 package com.mercateo.common.rest.schemagen;
 
-import jakarta.ws.rs.core.Link;
-
 import java.util.Collection;
+
+import jakarta.ws.rs.core.Link;
 
 public class JsonHyperSchemaCreator {
 

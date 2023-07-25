@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +15,10 @@
  */
 package com.mercateo.common.rest.schemagen.link;
 
-import com.mercateo.common.rest.schemagen.parameter.CallContext;
-
 import java.lang.reflect.Method;
 import java.util.Optional;
+
+import com.mercateo.common.rest.schemagen.parameter.CallContext;
 
 public class CallScope extends Scope {
     private final Optional<CallContext> callContext;

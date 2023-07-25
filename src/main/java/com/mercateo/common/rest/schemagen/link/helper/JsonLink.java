@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,12 @@
  */
 package com.mercateo.common.rest.schemagen.link.helper;
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -24,13 +30,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.mercateo.common.rest.schemagen.link.LinkCreator;
-import jakarta.ws.rs.core.Link;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.HashMap;
-import java.util.Map;
+import jakarta.ws.rs.core.Link;
 
 /**
  * this class is needed, since {@link jakarta.ws.rs.core.Link} could not be

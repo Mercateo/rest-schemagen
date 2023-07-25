@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,12 +15,12 @@
  */
 package com.mercateo.common.rest.schemagen.types;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mercateo.common.rest.schemagen.JsonHyperSchema;
-
-import java.util.List;
 
 @JsonIgnoreProperties("object")
 public class ListResponse<T> extends ObjectWithSchema<WrappedList<ObjectWithSchema<T>>> {

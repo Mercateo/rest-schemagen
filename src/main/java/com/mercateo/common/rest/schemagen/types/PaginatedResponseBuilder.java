@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,17 +15,18 @@
  */
 package com.mercateo.common.rest.schemagen.types;
 
-import com.mercateo.common.rest.schemagen.JsonHyperSchema;
-import com.mercateo.common.rest.schemagen.ListSlicer;
-import com.mercateo.common.rest.schemagen.PaginationLinkBuilder;
-import com.mercateo.common.rest.schemagen.PaginationLinkBuilder.PaginationLinkCreator;
-import jakarta.ws.rs.core.Link;
+import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.Objects.requireNonNull;
+import com.mercateo.common.rest.schemagen.JsonHyperSchema;
+import com.mercateo.common.rest.schemagen.ListSlicer;
+import com.mercateo.common.rest.schemagen.PaginationLinkBuilder;
+import com.mercateo.common.rest.schemagen.PaginationLinkBuilder.PaginationLinkCreator;
+
+import jakarta.ws.rs.core.Link;
 
 public class PaginatedResponseBuilder<ElementIn, ElementOut> extends
         ResponseBuilderAbstract<PaginatedResponseBuilder<ElementIn, ElementOut>, ElementIn, ElementOut, PaginatedResponse<ElementOut>> {

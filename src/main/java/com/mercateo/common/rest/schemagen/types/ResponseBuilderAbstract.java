@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,7 @@
  */
 package com.mercateo.common.rest.schemagen.types;
 
-import jakarta.ws.rs.core.Link;
+import static java.util.Objects.requireNonNull;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -26,7 +26,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.Objects.requireNonNull;
+import jakarta.ws.rs.core.Link;
 
 public abstract class ResponseBuilderAbstract<Self extends ResponseBuilderAbstract<Self, ElementIn, ElementOut, Container>, ElementIn, ElementOut, Container> {
 

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +15,10 @@
  */
 package com.mercateo.common.rest.schemagen.plugin;
 
-import com.mercateo.common.rest.schemagen.parameter.CallContext;
-
 import java.lang.reflect.Field;
 import java.util.function.BiPredicate;
+
+import com.mercateo.common.rest.schemagen.parameter.CallContext;
 
 /**
  * this class checks, if a field of a bean should be contained in the schema

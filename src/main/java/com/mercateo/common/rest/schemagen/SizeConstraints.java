@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +15,9 @@
  */
 package com.mercateo.common.rest.schemagen;
 
-import jakarta.validation.constraints.Size;
-
 import java.util.Optional;
+
+import jakarta.validation.constraints.Size;
 
 public class SizeConstraints {
 

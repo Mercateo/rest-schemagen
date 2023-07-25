@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,9 @@
  */
 package com.mercateo.common.rest.schemagen.json.mapper;
 
+import java.util.Map;
+import java.util.Set;
+
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.collect.ImmutableMap;
@@ -22,9 +25,6 @@ import com.mercateo.common.rest.schemagen.JsonProperty;
 import com.mercateo.common.rest.schemagen.PropertyType;
 import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
 import com.mercateo.common.rest.schemagen.plugin.IndividualSchemaGenerator;
-
-import java.util.Map;
-import java.util.Set;
 
 class PropertyJsonSchemaMapperForRoot {
     private static final JsonNodeFactory nodeFactory = new JsonNodeFactory(true);

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,18 +15,20 @@
  */
 package com.mercateo.common.rest.schemagen.link.injection;
 
+import java.net.URI;
+
+import org.glassfish.hk2.api.Factory;
+
 import com.mercateo.common.rest.schemagen.link.LinkFactoryContext;
 import com.mercateo.common.rest.schemagen.link.LinkFactoryContextDefault;
 import com.mercateo.common.rest.schemagen.link.helper.BaseUriCreator;
 import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 import com.mercateo.common.rest.schemagen.plugin.MethodCheckerForLink;
 import com.mercateo.common.rest.schemagen.plugin.TargetSchemaEnablerForLink;
+
 import jakarta.inject.Inject;
 import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.UriInfo;
-import org.glassfish.hk2.api.Factory;
-
-import java.net.URI;
 
 public class LinkFactoryContextFactory implements Factory<LinkFactoryContext> {
 

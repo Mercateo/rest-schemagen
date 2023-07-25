@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,14 +15,15 @@
  */
 package com.mercateo.common.rest.schemagen.link;
 
-import com.mercateo.common.rest.schemagen.JerseyResource;
-import com.mercateo.common.rest.schemagen.link.helper.MethodInvocation;
-import com.mercateo.common.rest.schemagen.link.relation.RelationContainer;
-import jakarta.ws.rs.core.Link;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import com.mercateo.common.rest.schemagen.JerseyResource;
+import com.mercateo.common.rest.schemagen.link.helper.MethodInvocation;
+import com.mercateo.common.rest.schemagen.link.relation.RelationContainer;
+
+import jakarta.ws.rs.core.Link;
 
 public class SchemaGenerator<T extends JerseyResource> {
     private LinkFactory<T> linkFactory;

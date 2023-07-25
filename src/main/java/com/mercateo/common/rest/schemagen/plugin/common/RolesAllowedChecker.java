@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,16 +15,18 @@
  */
 package com.mercateo.common.rest.schemagen.plugin.common;
 
+import static java.util.Objects.requireNonNull;
+
+import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
+import org.glassfish.jersey.server.model.AnnotatedMethod;
+
 import com.mercateo.common.rest.schemagen.link.Scope;
 import com.mercateo.common.rest.schemagen.plugin.MethodCheckerForLink;
+
 import jakarta.annotation.security.DenyAll;
 import jakarta.annotation.security.PermitAll;
 import jakarta.annotation.security.RolesAllowed;
 import jakarta.ws.rs.core.SecurityContext;
-import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
-import org.glassfish.jersey.server.model.AnnotatedMethod;
-
-import static java.util.Objects.requireNonNull;
 
 /**
  * copied from {@link RolesAllowedDynamicFeature}

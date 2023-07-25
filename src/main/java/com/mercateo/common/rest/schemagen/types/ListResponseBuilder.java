@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,12 +15,12 @@
  */
 package com.mercateo.common.rest.schemagen.types;
 
-import com.mercateo.common.rest.schemagen.JsonHyperSchema;
+import static java.util.Objects.requireNonNull;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.Objects.requireNonNull;
+import com.mercateo.common.rest.schemagen.JsonHyperSchema;
 
 public class ListResponseBuilder<ElementIn, ElementOut> extends
         ResponseBuilderAbstract<ListResponseBuilder<ElementIn, ElementOut>, ElementIn, ElementOut, ListResponse<ElementOut>> {

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,14 +15,14 @@
  */
 package com.mercateo.common.rest.schemagen.parameter;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-
-import static com.google.common.base.Preconditions.checkState;
 
 public class Parameter<T> {
 

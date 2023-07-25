@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,9 +15,7 @@
  */
 package com.mercateo.common.rest.schemagen.link;
 
-import com.googlecode.gentyref.GenericTypeReflector;
-import com.mercateo.common.rest.schemagen.parameter.CallContext;
-import com.mercateo.common.rest.schemagen.parameter.Parameter;
+import static java.util.Objects.requireNonNull;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -27,7 +25,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static java.util.Objects.requireNonNull;
+import com.googlecode.gentyref.GenericTypeReflector;
+import com.mercateo.common.rest.schemagen.parameter.CallContext;
+import com.mercateo.common.rest.schemagen.parameter.Parameter;
 
 public abstract class Scope {
     private final Class<?> invokedClass;

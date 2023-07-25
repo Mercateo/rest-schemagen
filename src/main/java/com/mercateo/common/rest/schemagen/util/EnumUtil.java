@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,12 +15,12 @@
  */
 package com.mercateo.common.rest.schemagen.util;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.stream.Stream;
+
+import com.fasterxml.jackson.annotation.JsonValue;
 
 public final class EnumUtil {
     private EnumUtil() {

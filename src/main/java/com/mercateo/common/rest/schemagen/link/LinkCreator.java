@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,23 +15,9 @@
  */
 package com.mercateo.common.rest.schemagen.link;
 
-import com.google.common.collect.Iterables;
-import com.googlecode.gentyref.GenericTypeReflector;
-import com.mercateo.common.rest.schemagen.JsonSchemaGenerator;
-import com.mercateo.common.rest.schemagen.link.relation.Relation;
-import jakarta.ws.rs.BeanParam;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.PUT;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.QueryParam;
-import jakarta.ws.rs.core.Link;
-import jakarta.ws.rs.core.Link.Builder;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.UriBuilder;
+import static java.util.Objects.requireNonNull;
+
+import static com.mercateo.common.rest.schemagen.link.helper.ParameterAnnotationVisitor.visitAnnotations;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
@@ -45,8 +31,24 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import static com.mercateo.common.rest.schemagen.link.helper.ParameterAnnotationVisitor.visitAnnotations;
-import static java.util.Objects.requireNonNull;
+import com.google.common.collect.Iterables;
+import com.googlecode.gentyref.GenericTypeReflector;
+import com.mercateo.common.rest.schemagen.JsonSchemaGenerator;
+import com.mercateo.common.rest.schemagen.link.relation.Relation;
+
+import jakarta.ws.rs.BeanParam;
+import jakarta.ws.rs.DELETE;
+import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
+import jakarta.ws.rs.PUT;
+import jakarta.ws.rs.Path;
+import jakarta.ws.rs.PathParam;
+import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
+import jakarta.ws.rs.core.Link;
+import jakarta.ws.rs.core.Link.Builder;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.UriBuilder;
 
 public class LinkCreator {
     public static final String TARGET_SCHEMA_PARAM_KEY = "targetSchema";
