@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +20,7 @@ import java.lang.reflect.Method;
 /**
  * @deprecated please use {@link Scope} instead
  */
+@Deprecated
 public abstract class ScopeMethod extends Scope {
     public ScopeMethod(Class<?> clazz, Method method, Object[] params) {
         super(clazz, method, params);

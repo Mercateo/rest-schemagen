@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,12 +15,12 @@
  */
 package com.mercateo.common.rest.schemagen.generator;
 
-import com.mercateo.common.rest.schemagen.JsonProperty;
-import com.mercateo.common.rest.schemagen.internal.DataClassStyle;
-import com.mercateo.common.rest.schemagen.internal.TupleStyle;
+import java.util.Set;
+
 import org.immutables.value.Value;
 
-import java.util.Set;
+import com.mercateo.common.rest.schemagen.JsonProperty;
+import com.mercateo.common.rest.schemagen.internal.TupleStyle;
 
 @Value.Immutable
 @TupleStyle

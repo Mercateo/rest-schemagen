@@ -1,6 +1,22 @@
+/*
+ * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.mercateo.common.rest.schemagen;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,22 +25,22 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import javax.ws.rs.NotFoundException;
-
-import com.mercateo.common.rest.schemagen.generator.ImmutableJsonPropertyResult;
-import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
-import com.mercateo.common.rest.schemagen.generator.ObjectContextBuilder;
-import com.mercateo.common.rest.schemagen.json.mapper.PropertyJsonSchemaMapper;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import com.google.common.io.CharStreams;
+import com.mercateo.common.rest.schemagen.generator.ImmutableJsonPropertyResult;
+import com.mercateo.common.rest.schemagen.generator.JsonPropertyResult;
 import com.mercateo.common.rest.schemagen.generator.ObjectContext;
+import com.mercateo.common.rest.schemagen.generator.ObjectContextBuilder;
 import com.mercateo.common.rest.schemagen.generictype.GenericType;
+import com.mercateo.common.rest.schemagen.json.mapper.PropertyJsonSchemaMapper;
 import com.mercateo.common.rest.schemagen.parameter.CallContext;
 import com.mercateo.common.rest.schemagen.types.ObjectWithSchema;
+
+import jakarta.ws.rs.NotFoundException;
 
 public class LegacySchemaGeneratorTest {
 
@@ -39,7 +55,7 @@ public class LegacySchemaGeneratorTest {
     private SchemaPropertyContext schemaPropertyContext = new SchemaPropertyContext(callContext, (o,
             c) -> true);
 
-    @Before
+    @BeforeEach
     public void setUp() throws Exception {
         schemaGenerator = new SchemaPropertyGenerator();
     }
@@ -86,10 +102,10 @@ public class LegacySchemaGeneratorTest {
         assertThat(getByName("requiredString").isRequired()).isTrue();
     }
 
-    @Test(expected = NotFoundException.class)
+    @Test
     public void shouldNotIncludeIgnoredElement() {
         createSchemaFor(TestRto.class);
-        getByName("ignoredString");
+        assertThrows(NotFoundException.class, () ->  getByName("ignoredString"));
     }
 
     @Test
@@ -233,20 +249,20 @@ public class LegacySchemaGeneratorTest {
         assertThat(otherProp).contains("this|is|an|enum");
     }
 
-    @Test(expected = NoSuchElementException.class)
+    @Test
     public void getPropertyByNameShouldThrow() {
         createSchemaFor(TestRto.class);
-        rootJsonProperty.getPropertyByName("nonExistentProperty");
+        assertThrows(NoSuchElementException.class, () ->  rootJsonProperty.getPropertyByName("nonExistentProperty"));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldThrowOnNegativeSizeConstraint() {
-        createSchemaFor(NegativeSizeConstraintRto.class);
+        assertThrows(IllegalArgumentException.class, () -> createSchemaFor(NegativeSizeConstraintRto.class));
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void shouldThrowOnInconsistentConstraints() {
-        createSchemaFor(InvalidTestRto.class);
+        assertThrows(IllegalArgumentException.class, () -> createSchemaFor(InvalidTestRto.class));
     }
 
     @SuppressWarnings("unused")

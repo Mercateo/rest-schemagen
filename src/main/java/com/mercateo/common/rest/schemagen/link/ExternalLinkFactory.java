@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,11 +19,11 @@ import java.net.URI;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.ws.rs.core.Link;
-import javax.ws.rs.core.Link.Builder;
-
 import com.mercateo.common.rest.schemagen.link.relation.RelType;
 import com.mercateo.common.rest.schemagen.link.relation.Relation;
+
+import jakarta.ws.rs.core.Link;
+import jakarta.ws.rs.core.Link.Builder;
 
 /**
  * This LinkFactory is for linking to external URIs. The starting point here is

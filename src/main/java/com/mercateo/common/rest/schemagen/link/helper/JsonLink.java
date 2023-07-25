@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,8 +21,6 @@ import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.core.Link;
-
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -33,8 +31,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.mercateo.common.rest.schemagen.link.LinkCreator;
 
+import jakarta.ws.rs.core.Link;
+
 /**
- * this class is needed, since {@link javax.ws.rs.core.Link} could not be
+ * this class is needed, since {@link jakarta.ws.rs.core.Link} could not be
  * serialized properly at the moment
  * 
  * @author joerg.adler

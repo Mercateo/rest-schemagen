@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,6 +15,10 @@
  */
 package com.mercateo.common.rest.schemagen.link.injection;
 
+import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.glassfish.jersey.process.internal.RequestScoped;
+import org.glassfish.jersey.server.ResourceConfig;
+
 import com.mercateo.common.rest.schemagen.JsonSchemaGenerator;
 import com.mercateo.common.rest.schemagen.RestJsonSchemaGeneratorFactory;
 import com.mercateo.common.rest.schemagen.link.LinkFactoryContext;
@@ -28,11 +32,7 @@ import com.mercateo.common.rest.schemagen.plugin.common.FieldCheckerForSchemaFac
 import com.mercateo.common.rest.schemagen.plugin.common.MethodCheckerForLinkFactory;
 import com.mercateo.common.rest.schemagen.plugin.common.TargetSchemaEnablerForLinkFactory;
 
-import javax.inject.Singleton;
-
-import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.glassfish.jersey.process.internal.RequestScoped;
-import org.glassfish.jersey.server.ResourceConfig;
+import jakarta.inject.Singleton;
 
 public class LinkFactoryResourceConfig {
 

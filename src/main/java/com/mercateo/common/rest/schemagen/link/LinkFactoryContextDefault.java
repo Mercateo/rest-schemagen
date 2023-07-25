@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,11 +17,11 @@ package com.mercateo.common.rest.schemagen.link;
 
 import static java.util.Objects.requireNonNull;
 
+import java.net.URI;
+
 import com.mercateo.common.rest.schemagen.plugin.FieldCheckerForSchema;
 import com.mercateo.common.rest.schemagen.plugin.MethodCheckerForLink;
 import com.mercateo.common.rest.schemagen.plugin.TargetSchemaEnablerForLink;
-
-import java.net.URI;
 
 public class LinkFactoryContextDefault implements LinkFactoryContext {
 

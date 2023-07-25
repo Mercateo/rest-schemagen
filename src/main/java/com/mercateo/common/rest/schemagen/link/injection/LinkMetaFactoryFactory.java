@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,13 +15,13 @@
  */
 package com.mercateo.common.rest.schemagen.link.injection;
 
-import javax.inject.Inject;
-
 import org.glassfish.hk2.api.Factory;
 
 import com.mercateo.common.rest.schemagen.JsonSchemaGenerator;
 import com.mercateo.common.rest.schemagen.link.LinkFactoryContext;
 import com.mercateo.common.rest.schemagen.link.LinkMetaFactory;
+
+import jakarta.inject.Inject;
 
 public class LinkMetaFactoryFactory implements Factory<LinkMetaFactory> {
 

@@ -1,4 +1,4 @@
-/**
+/*
  * Copyright © 2015 Mercateo AG (http://www.mercateo.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,12 +15,12 @@
  */
 package com.mercateo.common.rest.schemagen.plugin.common;
 
-import javax.inject.Inject;
-import javax.ws.rs.core.SecurityContext;
-
 import org.glassfish.hk2.api.Factory;
 
 import com.mercateo.common.rest.schemagen.plugin.MethodCheckerForLink;
+
+import jakarta.inject.Inject;
+import jakarta.ws.rs.core.SecurityContext;
 
 public class MethodCheckerForLinkFactory implements Factory<MethodCheckerForLink> {
 
