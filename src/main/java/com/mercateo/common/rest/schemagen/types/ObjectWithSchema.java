@@ -18,6 +18,7 @@ package com.mercateo.common.rest.schemagen.types;
 import static java.util.Objects.requireNonNull;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -26,9 +27,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.mercateo.common.rest.schemagen.IgnoreInRestSchema;
 import com.mercateo.common.rest.schemagen.JsonHyperSchema;
-
-import java.util.Collections;
-import java.util.List;
 
 import lombok.Setter;
 
@@ -76,6 +74,10 @@ public class ObjectWithSchema<T> {
         return messages;
     }
 
+    public void addMessage(Message message) {
+        getMessages().add(message);
+    }
+
     @JsonIgnore
     public T getObject() {
         return object;
@@ -85,4 +87,5 @@ public class ObjectWithSchema<T> {
     public String toString() {
         return "ObjectWithSchema{" + "object=" + object + ", schema=" + schema + ", messages=" + messages + '}';
     }
+
 }

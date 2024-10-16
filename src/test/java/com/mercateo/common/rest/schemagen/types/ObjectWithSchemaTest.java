@@ -82,7 +82,7 @@ public class ObjectWithSchemaTest {
             }
         };
 
-        objectWithSchema.getMessages().add(Message.create(messageCode, new MessageData() {/**/}));
+        objectWithSchema.addMessage(Message.create(messageCode, new MessageData() {/**/}));
 
         final String jsonString = objectMapper.writeValueAsString(objectWithSchema);
 
