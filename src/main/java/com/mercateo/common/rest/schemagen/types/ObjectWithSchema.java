@@ -17,6 +17,9 @@ package com.mercateo.common.rest.schemagen.types;
 
 import static java.util.Objects.requireNonNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -24,9 +27,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.mercateo.common.rest.schemagen.IgnoreInRestSchema;
 import com.mercateo.common.rest.schemagen.JsonHyperSchema;
-
-import java.util.Collections;
-import java.util.List;
 
 import lombok.Setter;
 
@@ -55,7 +55,7 @@ public class ObjectWithSchema<T> {
         // this has to be null, if T is Void, so please, do not "fix" this!
         this.object = object;
         this.schema = requireNonNull(schema);
-        this.messages = messages != null ? messages : Collections.emptyList();
+        this.messages = messages;
     }
 
     public static <U> ObjectWithSchema<U> create(U object, JsonHyperSchema schema) {
@@ -69,7 +69,13 @@ public class ObjectWithSchema<T> {
 
     @JsonIgnore
     public List<Message> getMessages() {
-        return messages == null ? Collections.emptyList() : messages;
+        if(messages == null)
+            messages = new ArrayList<>();
+        return messages;
+    }
+
+    public void addMessage(Message message) {
+        getMessages().add(message);
     }
 
     @JsonIgnore
@@ -81,4 +87,5 @@ public class ObjectWithSchema<T> {
     public String toString() {
         return "ObjectWithSchema{" + "object=" + object + ", schema=" + schema + ", messages=" + messages + '}';
     }
+
 }
